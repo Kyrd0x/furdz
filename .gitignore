@@ -1,2 +1,4 @@
+instructions/
 temp*
 temp/
+.env
