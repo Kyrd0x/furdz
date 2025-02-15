@@ -1,20 +1,23 @@
-# Compiler
 CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Wall -Wextra -O2 -luser32 -mwindows
+CFLAGS = -Itemp -Wall -Wextra -O2 -mwindows -nostdlib -ffreestanding -mconsole -mno-stack-arg-probe
+LIBS = -luser32 -lkernel32 -lshell32
+LINKER_FLAGS = -Xlinker --stack=0x100000,0x100000
 
-# Trouver tous les fichiers .c dans le dossier courant
-SRC = $(wildcard *.c)
+SRC = temp/loader.c
+EXE = bin/calculatrice.exe
 
-# Générer les noms de sortie en remplaçant .c par .exe
-EXE = $(SRC:.c=.exe)
 
-# Règle par défaut : compiler tous les .c en .exe
-all: $(EXE)
+.PHONY: all clean pre-build
 
-# Règle générique pour compiler chaque .c en .exe
-%.exe: %.c
-	$(CC) $(CFLAGS) $< -o $@
+all: pre-build $(EXE)
 
-# Nettoyer les fichiers générés
+pre-build:
+	@mkdir -p bin build temp
+	@cp src/* temp/
+	@sh comp.sh
+
+$(EXE): $(SRC)
+	$(CC) $(CFLAGS) $(LIBS) $(LINKER_FLAGS) $^ -o $@
+
 clean:
-	rm -f *.exe
+	rm -rf bin build temp

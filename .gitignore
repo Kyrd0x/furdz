@@ -1,4 +1,5 @@
-instructions/
 temp*
 temp/
+build/
+bin/
 .env
