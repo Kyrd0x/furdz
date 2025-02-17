@@ -8,8 +8,8 @@ config.read(".conf")
 # Access values
 ROR_VALUE = config.getint("Payload", "ror_value")
 ENCRYPTION_KEY = config.get("Payload", "encryption_key")
-PAYLOAD_FILE = config.get("Payload", "filepath")
-STUB_FILE = config.get("Loader", "stub")
+PAYLOAD_FILE = config.get("Payload", "filename")
+STUB_FILE = config.get("Loader", "filename")
 
 WORKING_FOLDER = "temp/"
 
