@@ -14,7 +14,8 @@ all: pre-build $(EXE)
 pre-build:
 	@mkdir -p bin build temp
 	@cp src/* temp/
-	@sh comp.sh
+	@cp asm/* temp/
+	@python3 main.py
 
 $(EXE): $(SRC)
 	$(CC) $(CFLAGS) $(LIBS) $(LINKER_FLAGS) $^ -o $@

@@ -23,6 +23,7 @@ int d() {
 
 char* h() {
     // hostanme to do
+    return "hostnameEXAMPLE";
 }
 
 int z() {
