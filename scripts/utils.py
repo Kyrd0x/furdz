@@ -1,7 +1,5 @@
-# from ROR import hash
 import subprocess
-import time
-import sys
+import re
 
 """
 Input : raw shellcode with tags
@@ -41,5 +39,9 @@ def nasm2instructions(filepath):
 def format_instructions(instructions):
     return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
 
-def clear_temp():
-    subprocess.run(["rm", "-f", "temp/*"], check=True)
+def extract_tags_from_file(filepath):
+    tags = []
+    with open(filepath, 'r') as file:
+        content = file.read()
+        tags = re.findall(r'%[^%]+%', content)
+    return tags

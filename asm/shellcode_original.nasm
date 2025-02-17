@@ -29,7 +29,7 @@ module_hash_loop:
     jl skip_case_adjustment
     sub al,0x20
 skip_case_adjustment:
-    ror r9d,%ROR_VALUE%
+    ror r9d,byte 0xd
     add r9d,eax
     loop module_hash_loop
 
@@ -62,7 +62,7 @@ find_function:
 function_hash_loop:
     xor rax,rax
     lodsb
-    ror r9d,%ROR_VALUE%
+    ror r9d,byte 0xD
     add r9d,eax
     cmp al,ah
     jnz function_hash_loop
