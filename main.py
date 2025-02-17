@@ -5,7 +5,6 @@ from scripts.utils import *
 config = ConfigParser()
 config.read(".conf") 
 
-# Access values
 ROR_VALUE = config.getint("Payload", "ror_value")
 ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 PAYLOAD_FILE = config.get("Payload", "filename")
@@ -25,6 +24,7 @@ def main():
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", f"byte {hex(ROR_VALUE)}")
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
 
+    # Tags like %HASH_MODULE_FUNCTION% are replaced by their hash
     for tag in remaining_tags:
         parts = tag.replace("%", "").split("_")
         if parts[0] == "HASH":
@@ -45,6 +45,7 @@ def main():
         print(encrypted_instructions)
         print("===================================\n")
 
+    # Need to decide if 909090 xor KEY is constant to unxor later, maybe no need to
     instructions = SHELLCODE_PREFIX+instructions
 
     # Replace the final shellcode in the loader

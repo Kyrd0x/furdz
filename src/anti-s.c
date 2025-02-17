@@ -9,12 +9,12 @@
 #endif
 
 
-// a tester
+// to test, should be ok
 int d() {
     #ifdef _WIN64
-        PVOID pebAddress = (PVOID)__readgsqword(PEB_OFFSET);  // Lecture de GS:[0x60] sur x64
+        PVOID pebAddress = (PVOID)__readgsqword(PEB_OFFSET);  // GS:[0x60] on x64
     #else
-        PVOID pebAddress = (PVOID)__readfsdword(PEB_OFFSET);  // Lecture de FS:[0x30] sur x86
+        PVOID pebAddress = (PVOID)__readfsdword(PEB_OFFSET);  // FS:[0x30] on x86
     #endif
     BYTE beingDebugged = *(BYTE*)((BYTE*)pebAddress + 0x02);
     
@@ -36,7 +36,7 @@ int z() {
         return totalSizeGB;
     } else {
         DWORD error = GetLastError();
-        printf("Erreur lors de la récupération de la taille du disque. Code d'erreur : %lu\n", error);
+        printf("Error during disk size process. Error code : %lu\n", error);
     }
     return 0;
 }
