@@ -21,5 +21,5 @@ def hash(module, function, bits=23):
         function_hash = ror(function_hash, bits)
         function_hash += ord(char)
     final_hash = module_hash + function_hash & 0xFFFFFFFF
-    print(f"Hash for {module}::{function} is {hex(final_hash)}")
+    print(f"ROR{bits} Hash for {module}::{function} is {hex(final_hash)}")
     return final_hash

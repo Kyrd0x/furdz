@@ -9,6 +9,9 @@ void main() {
     int size = z();
     char *hostname = h();
     char *country = c();
+
+    char k[10] = "%KEY%";
+    short l =  %LENGTH%;
     
     printf("is_debugged: %d\n", is_debugged);
     printf("hostname: %s\n", hostname);
