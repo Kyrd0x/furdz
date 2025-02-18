@@ -10,16 +10,36 @@
 
 
 // to test, should be ok
-int d() {
-    #ifdef _WIN64
-        PVOID pebAddress = (PVOID)__readgsqword(PEB_OFFSET);  // GS:[0x60] on x64
-    #else
-        PVOID pebAddress = (PVOID)__readfsdword(PEB_OFFSET);  // FS:[0x30] on x86
-    #endif
-    BYTE beingDebugged = *(BYTE*)((BYTE*)pebAddress + 0x02);
+// int d() {
+//     #ifdef _WIN64
+//         PVOID pebAddress = (PVOID)__readgsqword(PEB_OFFSET);  // GS:[0x60] on x64
+//     #else
+//         PVOID pebAddress = (PVOID)__readfsdword(PEB_OFFSET);  // FS:[0x30] on x86
+//     #endif
+//     BYTE beingDebugged = *(BYTE*)((BYTE*)pebAddress + 0x02);
     
+//     return beingDebugged;
+// }
+
+int d() {
+    PVOID pebAddress;
+
+    #ifdef _WIN64
+        __asm__(
+            "movq %%gs:0x60, %0\n\t"  // Charge l'adresse du PEB dans RAX
+            : "=r" (pebAddress)       // Stocke le résultat dans pebAddress
+        );
+    #else
+        __asm__(
+            "movl %%fs:0x30, %0\n\t"  // Charge l'adresse du PEB dans EAX
+            : "=r" (pebAddress)       // Stocke le résultat dans pebAddress
+        );
+    #endif
+
+    BYTE beingDebugged = *(BYTE*)((BYTE*)pebAddress + 0x02);
     return beingDebugged;
 }
+
 
 char* h() {
     // hostanme to do

