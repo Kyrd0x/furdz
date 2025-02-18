@@ -15,6 +15,7 @@ def sed_file(filepath, old, new):
         file.truncate()
 
 def nasm2instructions(filepath):
+    print("\nSetting up shellcode...")
     obj_file = "temp/shell.o"
     shell_file = "temp/shell"
     instructions_file = "temp/instructions_trash"
@@ -22,10 +23,13 @@ def nasm2instructions(filepath):
     nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
     ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
     dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
+    xxd_cmd = []
     try:
-        subprocess.run(nasm_cmd, check=True)
-        subprocess.run(ld_cmd, check=True, stderr=subprocess.DEVNULL)
-        subprocess.run(dd_cmd, check=True, stderr=subprocess.DEVNULL)
+        result = subprocess.run(nasm_cmd, check=True)
+
+        result = subprocess.run(ld_cmd, check=True)
+
+        subprocess.run(dd_cmd, check=True)
 
         result = subprocess.run(f"xxd -p {instructions_file}", shell=True, check=True, capture_output=True, text=True)
         hexa_content = result.stdout.strip()

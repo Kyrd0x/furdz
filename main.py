@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from scripts.ROR import hash
 from scripts.utils import *
+import random
 
 config = ConfigParser()
 config.read(".conf") 
@@ -29,6 +30,10 @@ def main():
         parts = tag.replace("%", "").split("_")
         if parts[0] == "HASH":
             sed_file(WORKING_FOLDER+PAYLOAD_FILE, tag, str(hex(hash(parts[1], parts[2], ROR_VALUE))))
+        if parts[0] == "RANDOM":
+            # Générer une valeur aléatoire de 32 bits
+            dword_value = random.randint(0, 0xFFFFFFF)
+            sed_file(WORKING_FOLDER+PAYLOAD_FILE, tag, str(hex(dword_value)))
 
 
     instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)

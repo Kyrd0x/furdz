@@ -2,13 +2,6 @@
 #include <windows.h>
 #include <stdio.h> // for debugging
 
-#ifdef _WIN64
-    #define PEB_OFFSET 0x60
-#else
-    #define PEB_OFFSET 0x30
-#endif
-
-
 // to test, should be ok
 // int d() {
 //     #ifdef _WIN64
@@ -30,10 +23,7 @@ int d() {
             : "=r" (pebAddress)       // Stocke le résultat dans pebAddress
         );
     #else
-        __asm__(
-            "movl %%fs:0x30, %0\n\t"  // Charge l'adresse du PEB dans EAX
-            : "=r" (pebAddress)       // Stocke le résultat dans pebAddress
-        );
+        return 1;
     #endif
 
     BYTE beingDebugged = *(BYTE*)((BYTE*)pebAddress + 0x02);
