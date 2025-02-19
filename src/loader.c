@@ -41,7 +41,5 @@ void main() {
 
     // jump on it
     ((void (*)())exec_mem)();
-
-    ((void (*)())exec_mem)();
 }
 
