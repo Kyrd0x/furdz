@@ -4,6 +4,7 @@ LIBS = -luser32 -lkernel32 -lshell32 -ladvapi32
 LINKER_FLAGS = -Xlinker --stack=0x100000,0x100000
 OBFUSCATION=
 
+SHELLCODE=asm/shellcode.nasm
 SRC = temp/loader.c #temp/anti-s.c
 EXE = bin/calculatrice.exe
 
@@ -14,7 +15,7 @@ all: pre-build $(EXE)
 
 pre-build:
 	@mkdir -p bin build temp
-	@cp src/loader.c temp/loader.c
+	@cp src/* temp/
 	@cp asm/* temp/
 	@python3 main.py
 

