@@ -138,7 +138,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "mov %%rbx, %%rax\n\t"
             "mov 0x24(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
-            "mov (%%r8, %%rcx, 2), %%eax\n\t"
+            "mov (%%r8, %%rcx, 2), %%cx\n\t"
             "mov 0x1c(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
             "mov (%%r8, %%rcx, 4), %%eax\n\t"
