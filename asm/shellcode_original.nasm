@@ -80,7 +80,7 @@ final:
     add r8,rdx   
     mov eax,[r8+rcx*4] 
     pop r8
-    add rax,rdx 
+    add rax,rdx // rax = adresse de la fonction
     pop r8
     pop rsi
     pop rcx 

