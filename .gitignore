@@ -1,6 +1,5 @@
 temp*
 temp/
 build/
-bin/
 .env
 .vscode/

@@ -117,6 +117,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "mov 0x18(%%rax), %%ecx\n\t"
             "mov 0x20(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
+            "mov %%rax, %%rbx\n\t"
         "find_function:\n\t"
             "jrcxz final\n\t"
             "xor %%r9d, %%r9d\n\t"            // Clear hash accumulator
@@ -134,6 +135,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "cmp %%r10d, %%r9d\n\t"           // Compare hash
             "jnz find_function\n\t"                     // If equal, jump to found
         "final:\n\t"
+            "mov %%rbx, %%rax\n\t"
             "mov 0x24(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
             "mov (%%r8, %%rcx, 2), %%eax\n\t"
