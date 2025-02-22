@@ -1,6 +1,5 @@
 #include <windows.h>
 #include <stdio.h>
-#include <winternl.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -50,32 +49,6 @@ typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObj)(
     PLARGE_INTEGER Timeout
 );
 
-// Fonction pour afficher un message d'erreur lisible
-void PrintLastErrorMessage() {
-    DWORD errorMessageID = GetLastError(); // Récupère le dernier code d'erreur
-    if (errorMessageID == 0) {
-        printf("Pas d'erreur.\n");
-        return;
-    }
-
-    LPSTR messageBuffer = NULL;
-
-    // Récupère le message d'erreur associé au code
-    FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        errorMessageID,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPSTR)&messageBuffer,
-        0,
-        NULL
-    );
-
-    printf("Erreur : %s\n", messageBuffer);
-
-    // Libère la mémoire allouée pour le message
-    LocalFree(messageBuffer);
-}
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     #ifdef _WIN64
