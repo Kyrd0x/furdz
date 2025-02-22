@@ -1,8 +1,8 @@
 CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Itemp -Wall -Wextra -O2 -ffreestanding -mconsole -mno-stack-arg-probe
+CFLAGS = -Itemp -Wall -Wextra -O2 -mconsole -ffunction-sections -fdata-sections
 LIBS = -luser32 -lkernel32 -lshell32 -ladvapi32
-LINKER_FLAGS = -Xlinker --stack=0x100000,0x100000
-OBFUSCATION=
+OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-ident -fmerge-all-constants
+LDFLAGS = -Wl,--gc-sections
 
 SHELLCODE=asm/shellcode.nasm
 SRC = temp/loader.c #temp/anti-s.c
@@ -20,7 +20,7 @@ pre-build:
 	@python3 main.py
 
 $(EXE): $(SRC)
-	$(CC) $(CFLAGS) $(LIBS) $(LINKER_FLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(OBFUSCATION) $(LDFLAGS) $(LIBS) $^ -o $@
 
 clean:
 	rm -rf bin build temp

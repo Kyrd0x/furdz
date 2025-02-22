@@ -54,11 +54,6 @@ def main():
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
         sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", "")
 
-    # Need to decide if 909090 xor KEY is constant to unxor later, maybe no need to
-    
-
-    # Replace the final shellcode in the loader
-
     
 
     print("\n================COMPILATION===============")
