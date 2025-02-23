@@ -53,15 +53,19 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             // Initialize r10d with hash and set up PEB access
             "xor %%rax, %%rax\n\t"
             "movl %[hash], %%r10d\n\t"  
+            "xor %%r9d, %%r9d\n\t"
             "mov $0xff, %%rax\n\t"
             "xor %%rdx, %%rdx\n\t"
             "xor $0x9f, %%rax\n\t"
             "mov %%gs:(%%rax), %%rax\n\t"
             "xor $947851, %%rax\n\t"
+            "mov $1000, %%r9d\n\t"
             "mov %%rax, %%rdx\n\t"
-            "xor %%r9d, %%r9d\n\t"
             "xor $947851, %%rdx\n\t"          
             "mov 0x18(%%rdx), %%rdx\n\t"
+            "xor %%rax, %%rdx\n\t"
+            "shl $0x4, %%r9d\n\t"
+            "xor %%rax, %%rdx\n\t"
             "mov 0x20(%%rdx), %%rdx\n\t"
         "load_module_name:\n\t"
             "mov 0x50(%%rdx), %%rsi\n\t"      // FullDllName.Buffer
@@ -95,12 +99,6 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     return module_base;
 }
 
-/*
-pour "wcstoul" ROR13
-ce prog me donne 62F36C5A
-internet         6D8B4C5E
-to_analyse.exe   62F36C5A
-*/
 
 FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
     if (hModule == NULL) {
@@ -110,15 +108,39 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
     #ifdef _WIN64
         __asm__ (
             // Initialize r10d with hash and set up PEB access
+            "xor %%r9d, %%r9d\n\t"
+            "mov %[module], %%rdx\n\t"
+            "xor %%rax, %%rax\n\t"
+            "mov $0x40, %%rax\n\t"
+            "push %%rax\n\t"
+            "mov $47651200, %%r9d\n\t"
             "movl %[hash], %%r10d\n\t"  
-            "mov %[module], %%rdx\n\t"  
-            "mov 0x20(%%rdx), %%rdx\n\t"
-            "mov 0x3c(%%rdx), %%eax\n\t"
+            "shr $1, %%rax\n\t"
             "add %%rdx, %%rax\n\t"
-            "mov 0x88(%%rax), %%eax\n\t"
+            "mov (%%rax), %%rdx\n\t" // rdx+0x20
+            "mov %%rdx, %%r8\n\t"
+            "mov $0x7e, %%rbx\n\t"
+            "push %%rbx\n\t"
+            "sub $0x42, %%rdx\n\t"
+            "xor $5454, %%r9d\n\t"
+            "add %%rbx, %%rdx\n\t"
+            "mov (%%rdx), %%eax\n\t" // rdx+0x3C
+            "mov %%r8, %%rdx\n\t"
             "add %%rdx, %%rax\n\t"
-            "mov 0x18(%%rax), %%ecx\n\t"
-            "mov 0x20(%%rax), %%r8d\n\t"
+            "pop %%rbx\n\t"
+            "add $0xa, %%rbx\n\t"
+            "add %%rax, %%rbx\n\t"
+            "mov (%%rbx), %%eax\n\t" // rax+0x88
+            "add %%rdx, %%rax\n\t"
+            "push %%rax\n\t"
+            "mov $0x18, %%r9\n\t"
+            "add %%r9, %%rax\n\t"
+            "mov (%%rax), %%ecx\n\t" // rax+0x18
+            "pop %%rax\n\t"
+            "pop %%rbx\n\t"
+            "shr $1, %%rbx\n\t"
+            "add %%rax, %%rbx\n\t"
+            "mov (%%rbx), %%r8d\n\t" // rax+0x20
             "add %%rdx, %%r8\n\t"
             "push %%rax\n\t"
         "find_function:\n\t"
@@ -136,7 +158,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "jnz function_hash_loop\n\t"
         "next:\n\t"
             "cmp %%r10d, %%r9d\n\t"           // Compare hash
-            "jnz find_function\n\t"                     // If equal, jump to found
+            "jnz find_function\n\t"           // If equal, jump to found
         "final:\n\t"
             "pop %%rax\n\t"
             "mov 0x24(%%rax), %%r8d\n\t"
@@ -149,7 +171,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "mov %%rax, %[result]\n\t"
             : [result] "=r" (function_base)                      // Output
             : [hash] "r" (function_hash), [module] "r" ((uintptr_t)hModule)                // Input
-            : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
+            : "rax", "rbx", "rdx", "rsi", "rcx", "r8", "r9", "r10", "memory"  // Clobbers
         );
         
     #else
