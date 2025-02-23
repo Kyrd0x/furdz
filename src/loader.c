@@ -153,7 +153,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
 
 void main() {
 
-    ShellExecute(0, "open", "calc.exe", 0, 0, SW_SHOWNORMAL);
+    // ShellExecute(0, "open", "calc.exe", 0, 0, SW_SHOWNORMAL);
 
     // int is_debugged = d();
     // int size = z();

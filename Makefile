@@ -1,6 +1,6 @@
 CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Itemp -Wall -Wextra -O2 -mconsole -ffunction-sections -fdata-sections
-LIBS = -luser32 -lkernel32 -lshell32 -ladvapi32
+CFLAGS = -Itemp -Wall -Wextra -O2 -mwindows -ffunction-sections -fdata-sections
+LIBS = -luser32 -lshell32 -ladvapi32 #-lkernel32
 OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-ident -fmerge-all-constants
 LDFLAGS = -Wl,--gc-sections
 
