@@ -5,7 +5,8 @@ OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-ident -fmerge-all-constant
 LDFLAGS = -Wl,--gc-sections
 
 SHELLCODE=asm/shellcode.nasm
-SRC = temp/loader.c #temp/anti-s.c
+SRC = temp/loader.c temp/decrypt.c #temp/WinAPI.c
+HEADERS = temp/config.h
 EXE = bin/calculatrice.exe
 
 
@@ -19,8 +20,8 @@ pre-build:
 	@cp asm/* temp/
 	@python3 main.py
 
-$(EXE): $(SRC)
-	$(CC) $(CFLAGS) $(OBFUSCATION) $(LDFLAGS) $(LIBS) $^ -o $@
+$(EXE): $(SRC) $(HEADERS)
+	$(CC) $(CFLAGS) $(OBFUSCATION) $(LDFLAGS) $(LIBS) $(SRC) -o $@
 
 clean:
 	rm -rf bin build temp

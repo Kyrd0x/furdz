@@ -1,6 +1,4 @@
 #include "config.h"
-#include <windows.h>
-#include <stdio.h> // for debugging
 
 // to test, should be ok
 // int d() {

