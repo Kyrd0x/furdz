@@ -46,13 +46,20 @@ typedef NTSYSAPI NTSTATUS(NTAPI* NtWaitForSingleObj)(
 );
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash) {
+    void* module_base = NULL;
     #ifdef _WIN64
-        void* module_base = NULL;
         __asm__ (
             // Initialize r10d with hash and set up PEB access
+            "xor %%rax, %%rax\n\t"
             "movl %[hash], %%r10d\n\t"  
+            "mov $0xff, %%rax\n\t"
             "xor %%rdx, %%rdx\n\t"
-            "mov %%gs:0x60, %%rdx\n\t"
+            "xor $0x9f, %%rax\n\t"
+            "mov %%gs:(%%rax), %%rax\n\t"
+            "xor $947851, %%rax\n\t"
+            "mov %%rax, %%rdx\n\t"
+            "xor %%r9d, %%r9d\n\t"
+            "xor $947851, %%rdx\n\t"          
             "mov 0x18(%%rdx), %%rdx\n\t"
             "mov 0x20(%%rdx), %%rdx\n\t"
         "load_module_name:\n\t"
@@ -81,11 +88,10 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             : [hash] "r" (module_hash)                // Input
             : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
         );
-        return module_base;
     #else
         // 32-bit code TODO
-        return NULL;
     #endif
+    return module_base;
 }
 
 /*
@@ -99,8 +105,8 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
     if (hModule == NULL) {
         return NULL;
     }
+    void* function_base = NULL;
     #ifdef _WIN64
-        void* function_base = NULL;
         __asm__ (
             // Initialize r10d with hash and set up PEB access
             "movl %[hash], %%r10d\n\t"  
@@ -144,11 +150,11 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             : [hash] "r" (function_hash), [module] "r" ((uintptr_t)hModule)                // Input
             : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
         );
-        return function_base;
+        
     #else
         // 32-bit code TODO
-        return NULL;
     #endif
+    return function_base;
 }
 
 void main() {
