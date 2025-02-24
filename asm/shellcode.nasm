@@ -83,6 +83,7 @@ check:
     add r9,[rsp+0x8]    ; on aoute au hash celui du module
     cmp r9d,r10d        ; afin d'essayer de trouver celui stocké en dur
     jnz find_function   ; Si une correspondance a été trouvée, on passe à la suite
+    
 final:                  
     pop rax             ; On recupere adresse de IMAGE_EXPORT_DIRECTORY
     mov r8d,[rax+0x24]  ; AddressOfNameOrdinals, à IMAGE_EXPORT_DIRECTORY + 0x24
