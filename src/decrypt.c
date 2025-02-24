@@ -1,8 +1,5 @@
 #include "config.h"
 
-
-
-
 // CQFD
 void XOR(unsigned char *data, size_t len, BYTE key) {
     for (size_t i = 0; i < len; i++) {
