@@ -16,7 +16,7 @@ def nasm2instructions(filepath):
     instructions_file = "temp/instructions_trash"
 
     nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
-    ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
+    ld_cmd = ["ld", obj_file, "-o", shell_file]
     dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
     xxd_cmd = []
     try:

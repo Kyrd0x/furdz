@@ -1,7 +1,7 @@
 CC = x86_64-w64-mingw32-gcc
 CFLAGS = -Itemp -Wall -Wextra -O2 -mwindows -ffunction-sections -fdata-sections
-LIBS = -luser32 -lshell32 -ladvapi32 #-lkernel32
-OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-ident -fmerge-all-constants
+LIBS = #-luser32 -lshell32 -ladvapi32 #-lkernel32
+OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident -fno-exceptions -fmerge-all-constants
 LDFLAGS = -Wl,--gc-sections
 
 SHELLCODE=asm/shellcode.nasm
