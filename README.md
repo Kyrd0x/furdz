@@ -2,10 +2,10 @@
 
 School project, deadline 1st of April.
 
-Harmless payload working on up-to-date Windows 10 & 11 (MessageBox).\
+Harmless (MessageBox) payload working on up-to-date Windows 10 & 11.\
 Spotted a bit on VT for now
 
-Harmfull (meterpreter TCP) working on Windows 10 with simple XOR.\
+Harmfull (meterpreter TCP) payload working on up-to-date Windows 10 with simple XOR.\
 Windows 11 flagged. Shellcode recoding in progress
 
 
