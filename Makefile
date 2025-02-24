@@ -1,5 +1,6 @@
 CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Itemp -Wall -Wextra -Os -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing
+CFLAGS = -Itemp -Wall -Wextra -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing
+WARNNIGS = -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes
 LIBS = -lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lmsvcrt  -lm -lgcc 
 OBFUSCATION = -nostdlib -nodefaultlibs -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
 LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no-insert-timestamp,--strip-all
@@ -22,7 +23,7 @@ pre-build:
 	@python3 main.py
 
 $(EXE): $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) $(SRC) $(ENTRYPOINT) -static -static-libgcc -o $@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
+	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) $(ENTRYPOINT) -static -static-libgcc -o $@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
 
 clean:
 	rm -rf bin build temp

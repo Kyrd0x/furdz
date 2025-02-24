@@ -16,9 +16,9 @@ def nasm2instructions(filepath):
     instructions_file = "temp/instructions_trash"
 
     nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
-    ld_cmd = ["ld", obj_file, "-o", shell_file]
+    ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
     dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
-    xxd_cmd = []
+    xxd_cmd = ["xxd", "-p", instructions_file]
     try:
         result = subprocess.run(nasm_cmd, check=True)
 
@@ -57,3 +57,20 @@ def xor_encrypt_decrypt(data, byte_key):
 
     # Retourner le résultat en hexadécimal
     return result.hex()
+
+def format_lhost_lport(lhost, lport):
+    if lport > 65535 or lport < 0:
+        print("Port number must be between 0 and 65535")
+    if lhost.count(".") != 3:
+        print("Invalid IP address")
+
+    ip = lhost.split(".")
+    result = ""
+    for part in ip[::-1]:
+        result += hex(int(part))[2:]
+    
+    port_hex = hex(lport)[2:].zfill(4)
+    port_hex = port_hex[2:] + port_hex[:2]  # Swap bytes
+
+    result += port_hex
+    return hex(int(result, 16))
