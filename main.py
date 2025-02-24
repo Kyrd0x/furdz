@@ -26,7 +26,7 @@ def main():
 
     # Tags like %HASH_MODULE_FUNCTION% are replaced by their hash
     for tag in remaining_tags:
-        parts = tag.replace("%", "").split("-")
+        parts = tag.replace("%", "").split("__")
         if parts[0] == "HASH":
             sed_file(WORKING_FOLDER+PAYLOAD_FILE, tag, str(hex(hash(parts[1], parts[2], ROR_VALUE))))
         if parts[0] == "RANDOM":
