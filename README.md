@@ -3,7 +3,7 @@
 School project, deadline 1st of April.
 
 Harmfull (meterpreter TCP) payload **working** on up-to-date Windows 10 & 11.\
-VirusTotal optimisation later
+VirusTotal flagged 8/76
 
 Harmless (MessageBox) payload working on up-to-date Windows 10 & 11.\
 Spotted a bit on VT for now, aiming for 0
@@ -16,6 +16,4 @@ Spotted a bit on VT for now, aiming for 0
         - xxx
  - add word encryption and AES encryption + possiblity to choose encr system
 
-## Notes about VirusTotal:
-       - before drastic small comparison it was a 5/76, now spotted as 'Brutel' (harmless)
 
