@@ -267,3 +267,31 @@
 //     {"into", 0xFE},
 //     {"down", 0xFF},
 // };
+
+
+
+
+
+    // IN MAIN
+    // int assoc_size = sizeof(tableau) / sizeof(tableau[0]);
+
+    // unsigned char payload[TAILLE] = {0};
+    // int result_index = 0;
+
+    // // Dupliquer la chaîne pour la tokeniser
+    // char buffer[TAILLE*8];
+    // strcpy(buffer, message);
+
+    // // Découper la chaîne en mots
+    // char *token = strtok(buffer, " ");
+    // while (token != NULL) {
+    //     for (int i = 0; i < assoc_size; i++) {
+    //         if (strcmp(token, tableau[i].mot) == 0) {
+    //             payload[result_index++] = tableau[i].octet;
+    //             break;
+    //         }
+    //     }
+    //     token = strtok(NULL, " ");
+    // } 
+
+    // unsigned char *payload = DICT_decrypt(message);

