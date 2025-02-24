@@ -122,7 +122,7 @@ save_beginning:
 
 load_USER32DLL:
     pop rcx   
-    mov r10d,%HASH_kernel32.dll_LoadLibraryA%   ; Hash de kernel32.LoadLibraryA 
+    mov r10d,%HASH-kernel32.dll-LoadLibraryA%   ; Hash de kernel32.LoadLibraryA 
     call rbp 
     mov r9, 0x0     
     call load_HELLO
@@ -138,8 +138,8 @@ load_INFO:
 
 load_hashes:
     xor rcx,rcx
-    mov r10d,%HASH_user32.dll_MessageBoxA%    ; Hash de user32.MessageBoxA
+    mov r10d,%HASH-user32.dll-MessageBoxA%    ; Hash de user32.MessageBoxA
     call rbp
     xor rcx,rcx
-    mov r10d,%HASH_kernel32.dll_ExitProcess%   ; Hash de kernel32.ExitProcess
+    mov r10d,%HASH-kernel32.dll-ExitProcess%   ; Hash de kernel32.ExitProcess
     call rbp

