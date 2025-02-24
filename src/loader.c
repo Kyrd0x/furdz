@@ -52,7 +52,7 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
         __asm__ (
             // Initialize r10d with hash and set up PEB access
             "xor %%rax, %%rax\n\t"
-            "movl %[hash], %%r10d\n\t"  
+            "movl %[hash], %%r10d\n\t"
             "xor %%r9d, %%r9d\n\t"
             "mov $0xff, %%rax\n\t"
             "xor %%rdx, %%rdx\n\t"
