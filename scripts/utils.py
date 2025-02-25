@@ -1,4 +1,6 @@
 import subprocess
+import ipaddress
+import socket
 import re
 
 
@@ -77,3 +79,17 @@ def format_lhost_lport(lhost, lport):
     result += port_hex
     print(f"LHOST={lhost}, LPORT={lport} -> {result}")
     return hex(int(result, 16))
+
+def is_valid_ip(ip):
+    pattern = r'^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$'
+    return bool(re.match(pattern, ip))
+
+def resolve_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+        return ip
+    except ValueError:
+        try:
+            return socket.gethostbyname(ip)
+        except socket.gaierror:
+            return None

