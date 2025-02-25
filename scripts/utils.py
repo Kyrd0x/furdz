@@ -75,4 +75,5 @@ def format_lhost_lport(lhost, lport):
     port_hex = port_hex[2:] + port_hex[:2]
 
     result += port_hex
+    print(f"LHOST={lhost}, LPORT={lport} -> {result}")
     return hex(int(result, 16))

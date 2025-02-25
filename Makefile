@@ -9,7 +9,7 @@ SHELLCODE=asm/shellcode.nasm
 SRC = temp/loader.c temp/decrypt.c #temp/WinAPI.c
 ENTRYPOINT = src/crt_stub.c
 HEADERS = temp/config.h
-EXE = bin/local_calculatrice.exe
+EXE = bin/calculatrice_v2.exe
 
 
 .PHONY: all clean pre-build

