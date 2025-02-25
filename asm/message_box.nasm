@@ -19,7 +19,6 @@ metasploit_block_api:
     push rcx
     mov rdx,rax
     xor rdx,%RANDOM__1%
-    ; mov rdx,[rax+0x60]
     mov rdx,[rdx+0x18]
     xor rdx,rax
     push rsi

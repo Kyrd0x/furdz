@@ -28,7 +28,7 @@ def main():
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
 
-    # Tags like %HASH_MODULE_FUNCTION% are replaced by their hash
+    # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
     for tag in remaining_tags:
         parts = tag.replace("%", "").split("__")
         if parts[0] == "HASH":

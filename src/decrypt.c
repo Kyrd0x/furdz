@@ -7,6 +7,29 @@ void XOR(unsigned char *data, size_t len, BYTE key) {
     }
 }
 
+    // __asm__ (
+    //     "mov %[len], %%rsi\n\t"
+    //     "mov %[data], %%rdi\n\t"
+    //     "movzx %[key], %%rdx\n\t"
+    //     "test %%rsi, %%rsi\n\t"
+    //     "jz done\n\t"
+    // "loop:\n\t"
+    //     "mov (%%rdi), %%al\n\t"
+    //     "mov %%al, %%bl\n\t"
+    //     "and %%dil, %%bl\n\t"
+    //     "or %%dil, %%al\n\t"
+    //     "not %%bl\n\t"
+    //     "and %%bl, %%al\n\t"
+    //     "mov %%al, (%%rdi)\n\t"
+    //     "inc %%rdi\n\t"
+    //     "dec %%rsi\n\t"
+    //     "jnz loop\n\t"
+    // "done:\n\t"
+    //     :
+    //     : [data] "r" (data), [len] "r" (len), [key] "r" (key)
+    //     : "rax", "rbx", "rdx", "rdi", "rsi", "memory"
+    // );
+
 void XOR2(unsigned char *data, size_t len, WORD key) {
     BYTE key_bytes[2];
     key_bytes[0] = key & 0xFF;

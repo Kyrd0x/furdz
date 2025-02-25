@@ -78,9 +78,11 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             "jl skip_case_adjustment\n\t"
             "sub $0x20, %%al\n\t"             // Convert to uppercase
         "skip_case_adjustment:\n\t"
+            "dec %%rcx\n\t"
             "rol $17, %%r9d\n\t"              // Rotate left by 13 bits
             "add %%eax, %%r9d\n\t"            // Add AL to hash
-            "loop module_hash_loop\n\t"
+            "test %%rcx, %%rcx\n\t"
+            "jnz module_hash_loop\n\t"
         "then:\n\t"
             "cmp %%r10d, %%r9d\n\t"           // Compare hash
             "je found\n\t"                     // If equal, jump to found

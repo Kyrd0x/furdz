@@ -67,10 +67,12 @@ def format_lhost_lport(lhost, lport):
     ip = lhost.split(".")
     result = ""
     for part in ip[::-1]:
-        result += hex(int(part))[2:]
+        hex_part = hex(int(part))[2:].zfill(2)  # Convertir en hex et remplir si nécessaire
+        print(f"{part} -> {hex_part}")
+        result += hex_part
     
     port_hex = hex(lport)[2:].zfill(4)
-    port_hex = port_hex[2:] + port_hex[:2]  # Swap bytes
+    port_hex = port_hex[2:] + port_hex[:2]
 
     result += port_hex
     return hex(int(result, 16))
