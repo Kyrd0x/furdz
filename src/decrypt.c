@@ -7,6 +7,16 @@ void XOR(unsigned char *data, size_t len, BYTE key) {
     }
 }
 
+void XOR2(unsigned char *data, size_t len, WORD key) {
+    BYTE key_bytes[2];
+    key_bytes[0] = key & 0xFF;
+    key_bytes[1] = (key >> 8) & 0xFF;
+
+    for (size_t i = 0; i < len; i++) {
+        data[i] ^= key_bytes[i % 2];
+    }
+}
+
 
 // // Word decryption
 // unsigned char* DICT_decrypt(const char *message) {
