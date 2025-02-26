@@ -11,8 +11,8 @@ Spotted a bit on VT for now, aiming for 0
 
 ## TODO
  - Anti sandbox checks (hostname, disk size, debug_flag) and ability to activate them or not (individually)
- - obfuscate GetHandle & GetProcAdr, changing from metasploit API
- - improve the Python part
+ - Custom ROR for ntdll and WinAPI clear hashes
+ - Make a proper Python
  - Improve loader (how to shellcode properly) :
         - grep and use a legit PPID maybe
         - xxx
