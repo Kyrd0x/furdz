@@ -5,9 +5,7 @@ LIBS = -lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lmsvcrt -lwin
 OBFUSCATION = -nostdlib -nodefaultlibs -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
 LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no-insert-timestamp,--strip-all
 
-SHELLCODE=asm/shellcode.nasm
 SRC = temp/loader.c temp/decrypt.c #temp/WinAPI.c
-ENTRYPOINT = #src/crt_stub.c
 HEADERS = temp/config.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
@@ -23,7 +21,7 @@ pre-build:
 	@python3 main.py
 
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) $(ENTRYPOINT) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
+	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
 
 clean:
 	rm -rf bin temp

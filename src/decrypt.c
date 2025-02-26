@@ -1,37 +1,33 @@
 #include "config.h"
 
-// CQFD
-    // __asm__ (
-    //     "mov %[len], %%rsi\n\t"
-    //     "mov %[data], %%rdi\n\t"
-    //     "movzx %[key], %%rdx\n\t"
-    //     "test %%rsi, %%rsi\n\t"
-    //     "jz done\n\t"
-    // "loop:\n\t"
-    //     "mov (%%rdi), %%al\n\t"
-    //     "mov %%al, %%bl\n\t"
-    //     "and %%dil, %%bl\n\t"
-    //     "or %%dil, %%al\n\t"
-    //     "not %%bl\n\t"
-    //     "and %%bl, %%al\n\t"
-    //     "mov %%al, (%%rdi)\n\t"
-    //     "inc %%rdi\n\t"
-    //     "dec %%rsi\n\t"
-    //     "jnz loop\n\t"
-    // "done:\n\t"
-    //     :
-    //     : [data] "r" (data), [len] "r" (len), [key] "r" (key)
-    //     : "rax", "rbx", "rdx", "rdi", "rsi", "memory"
-    // );
-
 void XOR(unsigned char *data, size_t len, WORD key) {
-    BYTE key_bytes[2];
-    key_bytes[0] = key & 0xFF;
-    key_bytes[1] = (key >> 8) & 0xFF;
-
-    for (size_t i = 0; i < len; i++) {
-        data[i] ^= key_bytes[i % 2];
-    }
+    __asm__ (
+        "mov %[len], %%rsi\n\t"
+        "mov %[data], %%rdi\n\t"
+        "movzx %[key], %%rdx\n\t"
+        "mov %%rdx, %%rcx\n\t"
+        "shr $8, %%rcx\n\t"
+        "xor %%rax, %%rax\n\t"
+        "test %%rsi, %%rsi\n\t"
+        "jz done\n\t"
+    "loop:\n\t"
+        "mov %%rax, %%r8\n\t"
+        "and $1, %%r8\n\t"
+        "jnz 1_\n\t"
+        "movb %%dl, %%bl\n\t"
+        "jmp 2_\n\t"
+    "1_:\n\t"
+        "movb %%cl, %%bl\n\t"
+    "2_:\n\t"
+        "xorb %%bl, (%%rdi, %%rax)\n\t"
+        "inc %%rax\n\t"
+        "cmp %%rsi, %%rax\n\t"
+        "jb loop\n\t"
+    "done:\n\t"
+        :
+        : [data] "r" (data), [len] "r" (len), [key] "r" (key)
+        : "rax", "rcx", "rdx", "rdi", "rsi", "r8", "memory"
+    );
 }
 
 

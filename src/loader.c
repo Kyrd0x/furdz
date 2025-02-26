@@ -1,5 +1,6 @@
 #include "config.h"
 
+
 typedef NTSYSAPI NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
     PVOID* BaseAddress,
