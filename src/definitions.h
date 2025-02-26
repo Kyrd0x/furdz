@@ -10,12 +10,13 @@
 #define TRUE 1
 #define FALSE 0
 
+
 void XOR(unsigned char *data, size_t len, WORD key);
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash);
 
-// void v();
+BYTE is_being_debugged();
 // int d();
 // int z();
 // char* h();

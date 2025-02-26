@@ -13,15 +13,18 @@ int substract(int a, int b) { return a - b; }
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 // int WinMainCRTStartup() {
 
-    char path[MAX_PATH];  // Stocke le chemin complet du fichier
-    snprintf(path, MAX_PATH, "%s\\Documents\\output.txt", getenv("USERPROFILE"));  
+    char path[MAX_PATH]; 
+    snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
 
     FILE *fichier = fopen(path, "w"); // Ouvre le fichier en mode écriture
 
     if (fichier == NULL) {
-        printf("Erreur lors de l'ouverture du fichier : %s\n", path);
+        printf("Error during file openning : %s\n", path);
         return 1;
     }
+
+    BYTE is_debugged = is_being_debugged();
+    fprintf(fichier, "Is debugged : %d\n", is_debugged);
 
     fprintf(fichier, "Hello, ceci est un texte écrit dans un fichier standard !\n");
     fclose(fichier);

@@ -16,7 +16,7 @@ OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
 LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no-insert-timestamp
 
 
-SRC = temp/loader.c temp/decrypt.c temp/WinAPI.c
+SRC = temp/loader.c temp/decrypt.c temp/WinAPI.c temp/anti-s.c
 HEADERS = temp/definitions.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
