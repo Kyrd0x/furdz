@@ -7,7 +7,7 @@ LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no
 
 SHELLCODE=asm/shellcode.nasm
 SRC = temp/loader.c temp/decrypt.c #temp/WinAPI.c
-ENTRYPOINT = src/crt_stub.c
+ENTRYPOINT = #src/crt_stub.c
 HEADERS = temp/config.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
