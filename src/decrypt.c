@@ -12,21 +12,21 @@ void XOR(unsigned char *data, size_t len, WORD key) {
         "jz done\n\t"
     "loop:\n\t"
         "mov %%rax, %%r8\n\t"
-        "and $1, %%r8\n\t"
-        "jnz odd_\n\t"
-        "movb %%dl, %%bl\n\t"
+        "and $1, %%r8\n\t"                // Test si i est pair ou impair avec i % 2
+        "jnz odd_\n\t"                      // Si impair, saute
+        "movb %%dl, %%bl\n\t"             // Si pair, utilise key_bytes[0]
         "jmp even_\n\t"
     "odd_:\n\t"
-        "movb %%cl, %%bl\n\t"
+        "movb %%cl, %%bl\n\t"             // Si impair, utilise key_bytes[1]
     "even_:\n\t"
-        "xorb %%bl, (%%rdi, %%rax)\n\t"
+        "xorb %%bl, (%%rdi, %%rax)\n\t"   // XOR data[i] avec l'octet de clé approprié
         "inc %%rax\n\t"
         "cmp %%rsi, %%rax\n\t"
         "jb loop\n\t"
     "done:\n\t"
         :
         : [data] "r" (data), [len] "r" (len), [key] "r" (key)
-        : "rax", "rcx", "rdx", "rdi", "rsi", "r8", "memory"
+        : "rax", "rbx", "rcx", "rdx", "rdi", "rsi", "r8", "memory"
     );
 }
 
