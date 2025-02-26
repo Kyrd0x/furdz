@@ -17,14 +17,13 @@ OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 all: pre-build $(OUTPUT_FILE)
 
 pre-build:
-	@mkdir -p bin build temp
+	@mkdir -p bin temp
 	@cp src/* temp/
 	@cp asm/* temp/
 	@python3 main.py
-	@echo $(OUTPUT_FILE)
 
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) $(ENTRYPOINT) -static -static-libgcc -o $@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
+	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) $(ENTRYPOINT) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
 
 clean:
-	rm -rf bin build temp
+	rm -rf bin temp
