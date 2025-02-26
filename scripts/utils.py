@@ -4,6 +4,8 @@ import socket
 import re
 import os
 
+def ro_line(ro_value, direction):
+    return f"ro{direction[0].lower()} ${ro_value}"
 
 def sed_file(filepath, old, new):
     with open(filepath, 'r+') as file:
@@ -64,8 +66,9 @@ def extract_tags_from_folder(folderpath):
     result = []
     for filename in os.listdir(folderpath):
         filepath = os.path.join(folderpath, filename)
-        if os.path.isfile(filepath):
+        if os.path.isfile(filepath) and (filename.endswith(".nasm") or filename.endswith(".c") or filename.endswith(".h")):
             result.append({"filename": filename, "tags": extract_tags_from_file(filepath)})
+    return result
 
 def xor_encrypt_decrypt(data, byte_key):
 
@@ -128,3 +131,4 @@ def resolve_ip(ip):
             return socket.gethostbyname(ip)
         except socket.gaierror:
             return None
+        
