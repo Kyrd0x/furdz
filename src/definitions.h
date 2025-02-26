@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <windows.h>
+#include <stdio.h>
 
 #define HOSTNAME_PREFIX "CYCORP-"
 #define DEBUG_MODE 1
