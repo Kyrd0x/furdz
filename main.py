@@ -15,7 +15,7 @@ LHOST = config.get("Payload", "lhost")
 LPORT = config.getint("Payload", "lport")
 USER_AGENT = config.get("Payload","user_agent")
 
-STUB_FILE = config.get("Loader", "filename")
+STUB_FILE = config.get("Stub", "filename")
 
 WORKING_FOLDER = "temp/"
 

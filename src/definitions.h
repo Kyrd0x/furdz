@@ -14,8 +14,6 @@ void XOR(unsigned char *data, size_t len, WORD key);
 HMODULE CustomGetModuleHandle(unsigned int module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash);
 
-// HMODULE CustomGetModuleHandle(unsigned int module_hash);
-// FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash);
 // void v();
 // int d();
 // int z();

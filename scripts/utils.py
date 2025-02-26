@@ -2,6 +2,7 @@ import subprocess
 import ipaddress
 import socket
 import re
+import os
 
 
 def sed_file(filepath, old, new):
@@ -10,6 +11,12 @@ def sed_file(filepath, old, new):
         file.seek(0)
         file.write(content)
         file.truncate()
+
+def sed_files(folderpath, old, new):
+    for filename in os.listdir(folderpath):
+        filepath = os.path.join(folderpath, filename)
+        if os.path.isfile(filepath):
+            sed_file(filepath, old, new)
 
 def nasm2instructions(filepath):
     # with open("asm/test.txt",'r') as f:
@@ -50,7 +57,15 @@ def extract_tags_from_file(filepath):
     with open(filepath, 'r') as file:
         content = file.read()
         tags = re.findall(r'%[^%]+%', content)
+    print(f"Tags found in {filepath}: {tags}")
     return tags
+
+def extract_tags_from_folder(folderpath):
+    result = []
+    for filename in os.listdir(folderpath):
+        filepath = os.path.join(folderpath, filename)
+        if os.path.isfile(filepath):
+            result.append({"filename": filename, "tags": extract_tags_from_file(filepath)})
 
 def xor_encrypt_decrypt(data, byte_key):
 
