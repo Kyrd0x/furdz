@@ -5,8 +5,8 @@ LIBS = -lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lmsvcrt -lwin
 OBFUSCATION = -nostdlib -nodefaultlibs -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
 LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no-insert-timestamp,--strip-all
 
-SRC = temp/loader.c temp/decrypt.c #temp/WinAPI.c
-HEADERS = temp/config.h
+SRC = temp/loader.c temp/decrypt.c temp/WinAPI.c
+HEADERS = temp/definitions.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
 

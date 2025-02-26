@@ -1,4 +1,4 @@
-#include "config.h"
+#include "definitions.h"
 
 void XOR(unsigned char *data, size_t len, WORD key) {
     __asm__ (
