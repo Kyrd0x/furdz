@@ -1,9 +1,9 @@
 #include "definitions.h"
 
 
-BYTE is_being_debugged() {
+uint8_t is_being_debugged() {
     PVOID pebAddress;
-    BYTE beingDebugged = 0;
+    uint8_t beingDebugged = 0;
     #ifdef _WIN64
         __asm__ (
             "mov $0xae, %%rax\n\t"

