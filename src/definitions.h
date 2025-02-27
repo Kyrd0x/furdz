@@ -88,9 +88,6 @@ extern FctHash WAIT_FOR_SINGLE_OBJECT_HASH;
 extern const char* HOSTNAME_PREFIX;
 
 
-#define DEBUG_MODE 1
-
-
 void XOR(unsigned char *data, size_t len, uint16_t key);
 
 HMODULE CustomGetModuleHandle(FctHash module_hash);

@@ -94,7 +94,7 @@ def main():
     # Encrypt the shellcode
     print("===========ENCRYPTION==============")
     print(instructions)
-    print(f"\nEncrypted with '{ENCRYPTION_KEY}'\n")
+    print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}'\n")
     encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
     print(encrypted_instructions)
     print("===================================\n")
