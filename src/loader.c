@@ -31,8 +31,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     const char* hostname = get_hostname(hKernel32dll);
-    fprintf(file, "DEBUG : %s\n", hostname);
-    // always true for now
     if (key > 0 && starts_with(hostname, HOSTNAME_PREFIX)) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
@@ -40,7 +38,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         clean_exit(file);
     }
 
-
+    fprintf(file, "You have a nice account ! Let's get the transaction done !\n");
     fclose(file);
 
 

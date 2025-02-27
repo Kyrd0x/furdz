@@ -33,14 +33,10 @@ const char* get_hostname(HMODULE hKernel32dll) {
     }
 }
 
-// DEFINITIVE FUNCTION FOR LE RENDU
-// int starts_with(const char* str, const char* prefix) {
-//     return strncmp(str, prefix, strlen(prefix)) == 0;
-// }
-
 int starts_with(const char* str, const char* prefix) {
-    return 1;
+    return strncmp(str, prefix, strlen(prefix)) == 0;
 }
+
 
 int get_disk_size(HMODULE hKernel32dll) {
     ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;

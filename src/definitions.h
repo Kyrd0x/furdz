@@ -85,7 +85,9 @@ extern FctHash VIRTUAL_PROTECT_HASH;
 extern FctHash CREATE_THREAD_HASH;
 extern FctHash WAIT_FOR_SINGLE_OBJECT_HASH;
 
-#define HOSTNAME_PREFIX "CYCORP-"
+extern const char* HOSTNAME_PREFIX;
+
+
 #define DEBUG_MODE 1
 
 

