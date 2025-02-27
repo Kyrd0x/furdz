@@ -64,11 +64,21 @@ typedef BOOL(WINAPI* GetComputerNameFunc)(
     LPDWORD lpnSize
 );
 
+typedef BOOL(WINAPI *GetDiskFreeSpaceExFuncA)(
+    LPCSTR,
+    PULARGE_INTEGER,
+    PULARGE_INTEGER,
+    PULARGE_INTEGER
+);
+
 extern FctHash NTDLL_HASH;
 extern FctHash KERNEL32_HASH;
 
 extern FctHash QUERY_INFORMATION_PROCESS_HASH;
 extern FctHash GET_COMPUTER_NAME_HASH;
+extern FctHash GET_DISK_FREE_SPACE_HASH;
+extern FctHash LOAD_LIBRARY_HASH;
+
 extern FctHash VIRTUAL_ALLOC_HASH;
 extern FctHash WRITE_MEMORY_HASH;
 extern FctHash VIRTUAL_PROTECT_HASH;
@@ -85,13 +95,11 @@ HMODULE CustomGetModuleHandle(FctHash module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, FctHash function_hash);
 
 uint8_t is_being_debugged();
-// BYTE is_being_debugged_alternative();
-// int d();
-int get_disk_size();
-const char* get_hostname(HMODULE hNtdll);
+int get_disk_size(HMODULE hKernel32dll);
+const char* get_hostname(HMODULE hKernel32dll);
 int starts_with(const char* str, const char* prefix);
-// char* c();
 
+void clean_exit(FILE* file);
 int divide(int a, int b);
 int multiply(int a, int b);
 int add(int a, int b);

@@ -10,32 +10,34 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
     printf("start");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
+    HMODULE hKernel32dll = NULL;
     FILE *file = fopen(path, "w");
 
     if (file == NULL || is_being_debugged(hNtdll)) {
         printf("Error during file openning : %s\n", path);
         return 1;
+    } else {
+        hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH);
     }
 
     fprintf(file, "Hey, welcoming to the banking system !\n");
 
-    int disk_size = get_disk_size();
-    if (money > 1000 && disk_size < %SANDBOX__DISKSIZE%) { // to replace with dynamic value
-        fprintf(file, "You have enough money !\n");
-        fclose(file);
-        return 1;
+    int disk_size = get_disk_size(hKernel32dll);
+    if (money > 1000 && disk_size < 0 && disk_size < %SANDBOX__DISKSIZE%) {
+        fprintf(file, "You have enough money !!!\n");
+        clean_exit(file);
     } else {
-        fprintf(file, "Vous don't have enough money: %d€ !\n",disk_size);
+        fprintf(file, "Vous don't have enough money: %d€ !!!\n",disk_size);
     }
 
-    const char* hostname = get_hostname(hNtdll);
+    const char* hostname = get_hostname(hKernel32dll);
     fprintf(file, "DEBUG : %s\n", hostname);
+    // always true for now
     if (key > 0 && starts_with(hostname, HOSTNAME_PREFIX)) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
         fprintf(file, "You don't have a key, try this one : %s\n", hostname);
-        fclose(file);
-        return 1;
+        clean_exit(file);
     }
 
 

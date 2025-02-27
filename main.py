@@ -71,22 +71,21 @@ def main():
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
 
-    # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
 
     if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
         instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
-
-
-
-
     elif PAYLOAD_FILE.endswith(".exe"):
         instructions = pe2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     else:
         print("Unknown file format of the payload")
         sys.exit(1)
+
+
     nb_bytes = int(len(instructions)/2)
     print(f"Shellcode length: {nb_bytes} bytes")
     print("================================\n")
+
+
 
     # Encrypt the shellcode
     print("===========ENCRYPTION==============")

@@ -22,11 +22,11 @@ uint8_t is_being_debugged() {
     return beingDebugged;
 }
 
-const char* get_hostname(HMODULE hNtdll) {
+const char* get_hostname(HMODULE hKernel32dll) {
     static char computerName[MAX_COMPUTERNAME_LENGTH + 1];
-    DWORD size = sizeof(computerName);
-    // GetComputerNameFunc _GetComputerName = (GetComputerNameFunc)CustomGetProcAdress(hNtdll, GET_COMPUTER_NAME_HASH);
-    if (GetComputerNameA(computerName, &size)) {
+    DWORD size = sizeof(computerName) / sizeof(computerName[0]);
+    GetComputerNameFunc _GetComputerName = (GetComputerNameFunc)CustomGetProcAdress(hKernel32dll, GET_COMPUTER_NAME_HASH);
+    if (_GetComputerName(computerName, &size)) {
         return computerName;
     } else {
         return "Error";
@@ -42,16 +42,13 @@ int starts_with(const char* str, const char* prefix) {
     return 1;
 }
 
-int get_disk_size() {
+int get_disk_size(HMODULE hKernel32dll) {
     ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
-    int totalSizeGB;
-    if (GetDiskFreeSpaceExA("C:\\", &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
+    int totalSizeGB = -11;
+    GetDiskFreeSpaceExFuncA _GetDiskFreeSpace = (GetDiskFreeSpaceExFuncA)CustomGetProcAdress(hKernel32dll, GET_DISK_FREE_SPACE_HASH);
+    if (_GetDiskFreeSpace("C:\\", &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
         totalSizeGB = (int)((totalBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));
         // int freeSizeGB = (int)((totalFreeBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));        
-    } else {
-        DWORD error = GetLastError();
-        printf("Error during disk size process. Error code : %lu\n", error);
-        totalSizeGB = 0;
     }
     return totalSizeGB;
 }
