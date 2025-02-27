@@ -49,6 +49,10 @@ def main():
             parts = tag.replace("%", "").split("__")
             if parts[0] == "HASH":
                 sed_file(WORKING_FOLDER+filename, tag, hex(hash(parts[1], parts[2], ROR_VALUE)))
+            if parts[0] == "MODHASH":
+                sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
+            if parts[0] == "FCTHASH":
+                sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
             if parts[0] == "RANDOM":
                 # Générer une valeur aléatoire de 32 bits
                 dword_value = random.randint(0, 0xFFFFFFF)
@@ -57,6 +61,7 @@ def main():
                 pass #todo
 
     # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
+
 
     instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     nb_bytes = int(len(instructions)/2)

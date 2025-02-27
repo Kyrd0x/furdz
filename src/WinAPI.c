@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-HMODULE CustomGetModuleHandle(unsigned int module_hash) {
+HMODULE CustomGetModuleHandle(FctHash module_hash) {
     void* module_base = NULL;
     #ifdef _WIN64
         __asm__ (
@@ -10,6 +10,7 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             "xor %%r9d, %%r9d\n\t"
             "mov $0xff, %%rax\n\t"
             "xor %%rdx, %%rdx\n\t"
+            "movzx %[is_ror], %%r12d\n\t"
             "xor $0x9f, %%rax\n\t"
             "mov %%gs:(%%rax), %%rax\n\t"
             "xor $947851, %%rax\n\t"
@@ -33,7 +34,16 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
             "sub $0x20, %%al\n\t"             // Convert to uppercase
         "skip_case_adjustment:\n\t"
             "dec %%rcx\n\t"
-            "rol $17, %%r9d\n\t"              // Rotate left by 13 bits
+            "push %%rcx\n\t"
+            "movzx %[rotation_value], %%ecx\n\t"   
+            "test %%r12d, %%r12d\n\t"
+            "jz m_rotate_left_%=\n\t"
+            "ror %%cl, %%r9d\n\t"              
+            "jmp m_rotate_end_%=\n\t"            
+        "m_rotate_left_%=:\n\t"
+            "rol %%cl, %%r9d\n\t"              
+        "m_rotate_end_%=:\n\t"
+            "pop %%rcx\n\t"
             "add %%eax, %%r9d\n\t"            // Add AL to hash
             "test %%rcx, %%rcx\n\t"
             "jnz module_hash_loop\n\t"
@@ -46,8 +56,8 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
         "found:\n\t"
             "mov %%rdx, %[result]\n\t"            // Store result
             : [result] "=r" (module_base)              // Output
-            : [hash] "r" (module_hash)                // Input
-            : "rax", "rdx", "rsi", "rcx", "r9", "r10", "memory"  // Clobbers
+            : [hash] "r" (module_hash.value), [rotation_value] "r" (module_hash.rotation_value), [is_ror] "m" (module_hash.is_rotation_right)
+            : "rax", "rdx", "rsi", "rcx", "r9", "r10", "r11", "r12", "memory"  // Clobbers
         );
     #else
         // 32-bit code TODO
@@ -55,7 +65,7 @@ HMODULE CustomGetModuleHandle(unsigned int module_hash) {
     return module_base;
 }
 
-FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
+FARPROC CustomGetProcAdress(IN HMODULE hModule, FctHash function_hash) {
     if (hModule == NULL) {
         return NULL;
     }
@@ -65,6 +75,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             // Initialize r10d with hash and set up PEB access
             "xor %%r9d, %%r9d\n\t"
             "mov %[module], %%rdx\n\t"
+            "movzx %[is_ror], %%r12d\n\t"
             "xor %%rax, %%rax\n\t"
             "mov $0x40, %%rax\n\t"
             "push %%rax\n\t"
@@ -106,8 +117,17 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "add %%rdx, %%rsi\n\t"            // Calculate function name VA
         "function_hash_loop:\n\t"
             "xor %%rax, %%rax\n\t"
-            "lodsb\n\t"                       // Load byte into AL
-            "ror $23, %%r9d\n\t"              // Rotate right by 23 bits
+            "lodsb\n\t"
+            "push %%rcx\n\t"
+            "test %%r12d, %%r12d\n\t"
+            "movzx %[rotation_value], %%ecx\n\t"   
+            "jz f_rotate_left_%=\n\t"
+            "ror %%cl, %%r9d\n\t"              
+            "jmp f_rotate_end_%=\n\t"            
+        "f_rotate_left_%=:\n\t"
+            "rol %%cl, %%r9d\n\t"              
+        "f_rotate_end_%=:\n\t"
+            "pop %%rcx\n\t"
             "add %%eax, %%r9d\n\t"            // Add AL to hash
             "cmp %%ah, %%al\n\t"
             "jnz function_hash_loop\n\t"
@@ -125,8 +145,8 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, unsigned int function_hash) {
             "add %%rdx, %%rax\n\t"
             "mov %%rax, %[result]\n\t"
             : [result] "=r" (function_base)                      // Output
-            : [hash] "r" (function_hash), [module] "r" ((uintptr_t)hModule)                // Input
-            : "rax", "rbx", "rdx", "rsi", "rcx", "r8", "r9", "r10", "memory"  // Clobbers
+            : [hash] "r" (function_hash.value), [module] "r" ((uintptr_t)hModule), [rotation_value] "r" (function_hash.rotation_value), [is_ror] "m" (function_hash.is_rotation_right)                // Input
+            : "rax", "rbx", "rcx", "rdx", "rsi", "r8", "r9", "r10", "r11", "r12", "memory"  // Clobbers
         );
 
     #else

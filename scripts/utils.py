@@ -1,5 +1,7 @@
+from scripts.ROR import hash
 import subprocess
 import ipaddress
+import random
 import socket
 import re
 import os
@@ -132,3 +134,8 @@ def resolve_ip(ip):
         except socket.gaierror:
             return None
         
+def hash_obj(module, function):
+    direction = random.choice(["R", "L"])
+    direction_word = "true" if direction == "R" else "false"
+    value = random.choice([13,17,23]) # will test more
+    return "{"+str(hex(hash(module, function, value, direction)))+", "+str(value)+", "+direction_word+"}"

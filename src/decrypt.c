@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-void XOR(unsigned char *data, size_t len, WORD key) {
+void XOR(unsigned char *data, size_t len, uint16_t key) {
     __asm__ (
         "mov %[len], %%rsi\n\t"
         "mov %[data], %%rdi\n\t"

