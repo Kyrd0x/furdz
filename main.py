@@ -29,7 +29,7 @@ WORKING_FOLDER = "temp/"
 def main():
 
     if config.get("Payload", "encryption_key") == "rand":
-        ENCRYPTION_KEY = random.randint(0, 0xFFFF)
+        ENCRYPTION_KEY = random.randint(0x1111, 0xFFFF)
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
 
