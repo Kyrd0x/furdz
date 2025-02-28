@@ -5,8 +5,8 @@ School project, deadline 1st of April.
 Harmfull (Meterpreter TCP) payload **working** on up-to-date Windows 10 & 11.\
 
 Harmless (MessageBox) payload working on up-to-date Windows 10 & 11.\
-Scoring 2 on VirusTotal for now, aiming for 0
 
+Harmfull scoring 2 on VirusTotal for now, aiming for 0
 
 ## TODO
  - Init function for opening bank file and load kernel32

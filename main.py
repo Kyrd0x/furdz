@@ -100,19 +100,14 @@ def main():
         print(f"Unknown file format of the payload : {PAYLOAD_FILE}")
         sys.exit(1)
 
-
-    nb_bytes = int(len(instructions)/2)
-    print(f"Shellcode length: {nb_bytes} bytes")
     print("================================\n")
 
 
 
     # Encrypt the shellcode
     print("===========ENCRYPTION==============")
-    # print(instructions)
-    print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}'\n")
+    print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
     encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
-    # print(encrypted_instructions)
     print("===================================\n")
     sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
     sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))
