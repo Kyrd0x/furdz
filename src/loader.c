@@ -4,8 +4,14 @@
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
     char path[MAX_PATH]; 
-    int money = 3500;
+
+    int min = 3000;
+    int max = 5000;
+    int range = max - min + 1;
+    int money =  min + (int)(rand() / (double)RAND_MAX * range);
+    
     uint16_t key = %XOR_KEY%;
+    srand(time(NULL));
     
     snprintf(path, MAX_PATH, "%s\\Documents\\bank_account.txt", getenv("USERPROFILE"));  
     printf("start");    
