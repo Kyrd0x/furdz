@@ -37,7 +37,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && starts_with(hostname, HOSTNAME_PREFIX)) {
+    if (key > 0 && is_valid_hostname(hostname)) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
         fprintf(file, "You don't have a key, try this one : %s\n", hostname);

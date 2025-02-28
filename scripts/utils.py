@@ -66,7 +66,6 @@ def extract_tags_from_file(filepath):
     with open(filepath, 'r') as file:
         content = file.read()
         tags = re.findall(r'%[^%]+%', content)
-    print(f"Tags found in {filepath}: {tags}")
     return tags
 
 def extract_tags_from_folder(folderpath):
@@ -115,7 +114,6 @@ def format_lhost_lport(lhost, lport):
     result = ""
     for part in ip[::-1]:
         hex_part = hex(int(part))[2:].zfill(2)  # Convertir en hex et remplir si nécessaire
-        print(f"{part} -> {hex_part}")
         result += hex_part
     
     port_hex = hex(lport)[2:].zfill(4)

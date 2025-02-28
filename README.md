@@ -11,7 +11,7 @@ Scoring 2 on VirusTotal for now, aiming for 0
 ## TODO
  - Init function for opening bank file and load kernel32
  - Dynamic values for sandbox tests from .conf
- - Add a hash padding in FctHash struct
+ - Add a hash padding in ObjHash struct
  - Make a proper Python
  - Improve loader (how to shellcode properly) :
         - grep and use a legit PPID maybe

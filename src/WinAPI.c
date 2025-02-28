@@ -1,6 +1,6 @@
 #include "definitions.h"
 
-HMODULE CustomGetModuleHandle(FctHash module_hash) {
+HMODULE CustomGetModuleHandle(ObjHash module_hash) {
     void* module_base = NULL;
     #ifdef _WIN64
         __asm__ (
@@ -65,7 +65,7 @@ HMODULE CustomGetModuleHandle(FctHash module_hash) {
     return module_base;
 }
 
-FARPROC CustomGetProcAdress(IN HMODULE hModule, FctHash function_hash) {
+FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash) {
     if (hModule == NULL) {
         return NULL;
     }

