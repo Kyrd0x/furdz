@@ -16,7 +16,7 @@ OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
 LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no-insert-timestamp
 
 
-SRC = $(wildcard temp/*.c)
+SRC = temp/loader.c temp/definitions.c temp/fake.c temp/decrypt.c temp/WinAPI.c temp/anti_sandbox.c
 HEADERS = temp/definitions.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
@@ -30,6 +30,8 @@ pre-build:
 	@cp src/* temp/
 	@cp asm/* temp/
 	@python3 main.py
+
+
 
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
 	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)

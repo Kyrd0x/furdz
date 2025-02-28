@@ -78,10 +78,10 @@ def main():
 
     if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
         instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
-    elif PAYLOAD_FILE.endswith(".exe"):
-        instructions = pe2instructions(WORKING_FOLDER+PAYLOAD_FILE)
+    elif PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
+        instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     else:
-        print("Unknown file format of the payload")
+        print(f"Unknown file format of the payload : {PAYLOAD_FILE}")
         sys.exit(1)
 
 

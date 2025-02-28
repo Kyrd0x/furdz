@@ -53,31 +53,10 @@ def nasm2instructions(filepath):
         print(f"Erreur lors de l'exécution de la commande : {e}")
         return None
 
-def pe2instructions(filepath):
-    obj_file = "temp/shell.o"
-    shell_file = "temp/shell"
-    instructions_file = "temp/instructions_trash"
-
-    objdump_cmd = ["objdump", "-d", filepath]
-    grep_cmd = ["grep", "-E", "([0-9a-f]{2} )+[0-9a-f]{2}"]
-    cut_cmd = ["cut", "-f2", "-d:"]
-    tr_cmd = ["tr", "-d", " "]
-    xxd_cmd = ["xxd", "-p"]
-
-    try:
-        result = subprocess.run(objdump_cmd, check=True, capture_output=True, text=True)
-        result = subprocess.run(grep_cmd, input=result.stdout, check=True, capture_output=True, text=True)
-        result = subprocess.run(cut_cmd, input=result.stdout, check=True, capture_output=True, text=True)
-        result = subprocess.run(tr_cmd, input=result.stdout, check=True, capture_output=True, text=True)
-        result = subprocess.run(xxd_cmd, input=result.stdout, check=True, capture_output=True, text=True)
-        hexa_content = result.stdout.strip()
-
-        instructions = hexa_content.split("00000000000000")[0].replace("\n", "")
-        return instructions
-    
-    except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'exécution de la commande : {e}")
-        return None
+def bin2instructions(filepath):
+    with open(filepath, 'rb') as file:
+        content = file.read()
+        return content.hex()
 
 def format_instructions(instructions):
     return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
