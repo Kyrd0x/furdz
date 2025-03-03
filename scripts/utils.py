@@ -3,8 +3,13 @@ import subprocess
 import ipaddress
 import random
 import socket
+import math
 import re
 import os
+
+
+def round_pow2(n):
+    return 2 ** math.ceil(math.log2(n))
 
 def ro_line(ro_value, direction):
     return f"ro{direction[0].lower()} ${ro_value}"
@@ -53,16 +58,25 @@ def nasm2instructions(filepath):
         print(f"Erreur lors de l'exécution de la commande : {e}")
         return None
 
+def txt2instructions(filepath):
+    with open(filepath, 'r') as file:
+        content = file.read()
+        return content
+
 def bin2instructions(filepath):
     with open(filepath, 'rb') as file:
         content = file.read()
         return content.hex()
 
 def format_instructions(instructions):
-    return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
+    if len(instructions) == 0:
+        return ""
+    else:
+        return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
 
 def extract_tags_from_file(filepath):
     tags = []
+    print(f"opening file {filepath}")
     with open(filepath, 'r') as file:
         content = file.read()
         tags = re.findall(r'%[^%]+%', content)

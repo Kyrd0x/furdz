@@ -31,32 +31,47 @@ void XOR(unsigned char *data, size_t len, uint16_t key) {
 }
 
 
-// // Word decryption
-// unsigned char* DICT_decrypt(const char *message) {
-//     int assoc_size = sizeof(tableau) / sizeof(tableau[0]); // Calculer la taille du tableau d'associations
-//     static unsigned char payload[TAILLE];  // Tableau pour stocker les octets associés
-//     int result_index = 0;
+// Word decryption
+void DICT_decrypt(const char* dict_payload) {
+    int i = 0;
+    int j = 0;
+    unsigned char decoded_byte;
+    
+    // Parcours de chaque mot dans dict_payload
+    while (*dict_payload != '\0') {
+        // Chercher chaque mot dans dict_payload
+        const char* start = dict_payload;
+        while (*dict_payload != ' ' && *dict_payload != '\0') {
+            dict_payload++;
+        }
+        
+        // Si on a trouvé un mot (on a atteint un espace ou la fin de la chaîne)
+        int length = dict_payload - start;  // Calcul de la longueur du mot
+        char word[length + 1];  // Créer un tableau pour le mot
+        strncpy(word, start, length);
+        word[length] = '\0';  // Ajouter le caractère de fin de chaîne
 
-//     // Dupliquer la chaîne pour éviter de modifier l'originale
-//     char buffer[TAILLE * 8]; 
-//     strcpy(buffer, message);  // Copie le message dans le buffer
+        // Chercher l'association du mot dans le association_table
+        decoded_byte = 0xFF;  // Valeur par défaut (si le mot n'est pas trouvé)
+        for (int k = 0; k < TAILLE; k++) {
+            if (strcmp(word, association_table[k].word) == 0) {
+                decoded_byte = association_table[k].byte;
+                break;
+            }
+        }
+        
+        // Ajouter l'octet décrypté au payload si trouvé
+        payload[j++] = decoded_byte;
+        
+        // Passer à l'espace suivant ou à la fin de la chaîne
+        if (*dict_payload != '\0') {
+            dict_payload++;  // Saute l'espace
+        }
+    }
 
-//     // Découper la chaîne en mots
-//     char *token = strtok(buffer, " ");
-//     while (token != NULL) {
-//         for (int i = 0; i < assoc_size; i++) {
-//             // Si le mot correspond à un mot dans le tableau, ajouter l'octet correspondant à la payload
-//             if (strcmp(token, tableau[i].mot) == 0) {
-//                 payload[result_index++] = tableau[i].octet;
-//                 break;
-//             }
-//         }
-//         token = strtok(NULL, " "); // Passer au mot suivant
-//     }
-
-//     // Retourner l'adresse de la payload
-//     return payload;
-// }
+    // Terminer le tableau payload avec un zéro si nécessaire
+    payload[j] = '\0'; 
+}
 
 //todo
 // void AES_decrypt(unsigned char *data, size_t len, BYTE key) {

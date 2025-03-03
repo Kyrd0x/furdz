@@ -1,1 +1,3 @@
 #include "definitions.h"
+
+%SHELLCODE%

