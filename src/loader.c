@@ -1,14 +1,14 @@
 #include "definitions.h"
 
-
+#define RANDOM_VAL (__TIME__[3] * __TIME__[6])
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
     srand(time(NULL));
     char path[MAX_PATH]; 
 
-    int min = 3000;
-    int max = 10000;
+    int min = 3000 + RANDOM_VAL;
+    int max = 15000;
     int range = max - min + 1;
     int money =  min + (int)(rand() / (double)RAND_MAX * range);
     
