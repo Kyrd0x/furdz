@@ -5,14 +5,13 @@ School project, deadline 1st of April.
 Harmfull payload **working** on up-to-date Windows 10 & 11\
 Scoring 2 on VirusTotal for now, aiming for 0
 
+*Both are false positives, even scoring on simple hello world ...*
+
 ## TODO
  - simple bash installer
  - Hostname check in sandbox detection
  - Make a better Python
  - Init function for opening bank file and load kernel32
- - Improve loader (how to shellcode properly) :
-        - grep and use a legit PPID maybe
-        - xxx
 
 
 ## How to Use
