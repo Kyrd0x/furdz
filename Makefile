@@ -28,7 +28,6 @@ all: pre-build $(OUTPUT_FILE)
 pre-build:
 	@mkdir -p bin temp
 	@cp src/* temp/
-	@cp asm/* temp/
 	@python3 main.py
 
 

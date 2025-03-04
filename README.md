@@ -2,11 +2,8 @@
 
 School project, deadline 1st of April.
 
-Harmfull (Meterpreter TCP, HTTP) payload **working** on up-to-date Windows 10 & 11.\
+Harmfull payload **working** on up-to-date Windows 10 & 11.\
 Scoring 2 on VirusTotal for now, aiming for 0
-
-
-*Harmless (MessageBox) payload working on up-to-date Windows 10 & 11.*\
 
 ## TODO
  - Hostname check in sandbox detection
@@ -17,3 +14,4 @@ Scoring 2 on VirusTotal for now, aiming for 0
         - xxx
 
 
+# How to use
