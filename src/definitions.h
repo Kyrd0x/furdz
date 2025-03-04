@@ -116,9 +116,8 @@ int get_disk_size(HMODULE hKernel32dll);
 const char* get_hostname(HMODULE hKernel32dll);
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);
 
-// bool is_target_hostname(const char* hostname);
-// bool is_valid_hostname(const char* hostname);
-// bool is_avoided(const char* hostname);
+bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash);
+bool is_valid_hostname(const char* hostname);
 
 FILE* clean_init();
 void clean_exit(FILE* file);
