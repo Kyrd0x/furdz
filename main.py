@@ -65,14 +65,10 @@ def main():
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
-            if parts[0] == "MODHASH":
+            if parts[0] == "MODHASH": # definitions.c
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
-            if parts[0] == "FCTHASH":
+            if parts[0] == "FCTHASH": # definitions.c
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
-            if parts[0] == "RANDOM":
-                # Générer une valeur aléatoire de 32 bits
-                dword_value = random.randint(0, 0xFFFFFFF)
-                sed_file(WORKING_FOLDER+filename, tag, hex(dword_value))
             if parts[0] == "SANDBOX":
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
