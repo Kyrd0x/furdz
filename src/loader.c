@@ -37,13 +37,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         fprintf(file, "Vous don't have enough money: %d€ !!!\n",disk_size);
     }
 
-    const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && is_valid_hostname(hostname)) {
-        fprintf(file, "You have a key, which is : %s\n", hostname);
-    } else {
-        fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, strcmp(hostname,"C82PP24177"));
-        clean_exit(file);
-    }
+    // const char* hostname = get_hostname(hKernel32dll);
+    // if (key > 0 && is_valid_hostname(hostname)) {
+    //     fprintf(file, "You have a key, which is : %s\n", hostname);
+    // } else {
+    //     fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, strcmp(hostname,"C82PP24177"));
+    //     clean_exit(file);
+    // }
 
     fprintf(file, "You have a nice account ! Let's get the transaction done !\n");
     fclose(file);

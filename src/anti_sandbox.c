@@ -70,8 +70,15 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
 }
 
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
+    if (prefix_hash.rotation_value == 0) {
+        return false;
+    } else {
+        return true;
+    }
+
     bool match = true;
     size_t str_len = strlen(str);
+
     __asm__ (
         // "push %[string]\n\t"
         // "mov %%rsp, %%rsi\n\t"

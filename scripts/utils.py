@@ -7,6 +7,7 @@ import math
 import re
 import os
 
+WORKING_RO_VALUES = [13,17,19,21,23]
 
 def round_pow2(n):
     return 2 ** math.ceil(math.log2(n))
@@ -154,5 +155,19 @@ def resolve_ip(ip):
 def hash_obj(module, function):
     direction = random.choice(["R", "L"])
     direction_word = "true" if direction == "R" else "false"
-    value = random.choice([13,17,23]) # will test more
+    value = random.choice(WORKING_RO_VALUES) # will test more
     return "{"+str(hex(hash(module, function, value, direction)))+", "+str(value)+", "+direction_word+"}"
+
+def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
+    while True:
+        num = random.randint(min_val, max_val)
+        hex_digits = [int(d, 16) for d in f"{num:X}"]
+        
+        avg = sum(hex_digits) / len(hex_digits)
+        total = sum(hex_digits)
+        
+        min_avg, max_avg = min_val / 0xFFFF * 12, max_val / 0xFFFF * 12
+        min_total, max_total = min_val / 0xFFFF * 50, max_val / 0xFFFF * 50
+        
+        if min_avg <= avg <= max_avg and min_total <= total <= max_total:  # Good distribution
+            return num
