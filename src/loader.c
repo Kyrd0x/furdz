@@ -4,15 +4,15 @@
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
+    srand(time(NULL));
     char path[MAX_PATH]; 
 
     int min = 3000;
-    int max = 5000;
+    int max = 10000;
     int range = max - min + 1;
     int money =  min + (int)(rand() / (double)RAND_MAX * range);
     
     uint16_t key = %XOR_KEY%;
-    srand(time(NULL));
     
     snprintf(path, MAX_PATH, "%s\\Documents\\market.txt", getenv("USERPROFILE"));  
     printf("start");    
@@ -38,10 +38,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && strcmp(hostname,"MYDOMAIN") != 0) {
+    if (key > 0 && strcmp(hostname,"C82PP24177") == 0) {
         fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
-        fprintf(file, "You don't have a key, try this one : %s\n", hostname);
+        fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, strcmp(hostname,"C82PP24177"));
         clean_exit(file);
     }
 
