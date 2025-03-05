@@ -2,28 +2,28 @@
 
 School project, deadline 1st of April.
 
-All the payloads **working** on up-to-date Windows (10 & 11) and other AVs\
-Scoring 2 on VirusTotal, 0 seems not possible without a legit signature.
+Harmfull payload **working** on up-to-date Windows 10 & 11\
+Scoring 2 on VirusTotal for now, aiming for 0
+
+*Both are false positives, even scoring on simple hello world ...*
 
 ## TODO
- - simple bash installer
- - Hostname check in sandbox detection
+ - IP, locals, keyboard checks
  - Make a better Python
- - Init function for opening bank file and load kernel32
 
 
 ## How to Use
 
 ### Installation
 
-Clone this repo
+Clone this repository and navigate to the project directory:
 
 ```sh
-git clone https://github.com/Kyrd0x/furdz.git
-cd furdz
+git clone https://github.com/yourusername/yourrepository.git
+cd yourrepository
 ```
 
-Run the installation script
+Run the installation script:
 
 ```sh
 chmod +x install.sh
