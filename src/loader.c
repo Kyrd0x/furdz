@@ -19,7 +19,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     HMODULE hKernel32dll = NULL;
     FILE *file = fopen(path, "w");
     
-    if (file == NULL || is_being_debugged(hNtdll)) {
+    if (file == NULL || !is_being_debugged()) {
         printf("Error during file openning : %s\n", path);
         return 1;
     } else {
