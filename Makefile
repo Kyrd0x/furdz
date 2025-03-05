@@ -11,19 +11,20 @@ HEADERS = temp/definitions.h
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
 
-.PHONY: all clean pre-build
+.PHONY: all clean pre-build post-build
 
-all: pre-build $(OUTPUT_FILE)
+all: pre-build $(OUTPUT_FILE) post-build
 
 pre-build:
 	@mkdir -p bin temp
 	@cp src/* temp/
 	@python3 main.py
 
-
-
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
 	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
+
+post-build:
+	@./pdf/create.sh
 
 clean:
 	rm -rf bin temp
