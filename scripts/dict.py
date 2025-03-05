@@ -1,36 +1,29 @@
 import random
 
-#to change
+# to change for a curl request maybe
 WORDLIST = ["is","was","are","be","have","had","were","can","said","use","do","will","would","make","like","has","look","write","go","see","could","been","call","am","find","did","get","come","made","may","take","know","live","give","think","say","help","tell","follow","came","want","show","set","put","does","must","ask","went","read","need","move","try","change","play","spell","found","study","learn","should","add","keep","start","thought","saw","turn","might","close","seem","open","begin","got","run","walk","began","grow","took","carry","hear","stop","miss","eat","watch","let","cut","talk","being","leave","word","time","number","way","people","water","day","part","sound","work","place","year","back","thing","name","sentence","man","line","boy","farm","end","men","land","home","hand","picture","air","animal","house","page","letter","point","mother","answer","America","world","food","country","plant","school","father","tree","city","earth","eye","head","story","example","life","paper","group","children","side","feet","car","mile","night","sea","river","state","book","idea","face","Indian","girl","mountain","list","song","family","he","a","one","all","an","each","other","many","some","two","more","long","new","little","most","good","great","right","mean","old","any","same","three","small","another","large","big","even","such","different","kind","still","high","every","own","light","left","few","next","hard","both","important","white","four","second","enough","above","young","not","when","there","how","up","out","then","so","no","first","now","only","very","just","where","much","before","too","also","around","well","here","why","again","off","away","near","below","last","never","always","together","often","once","later","far","really","almost","sometimes","soon","of","to","in","for","on","with","at","from","by","about","into","down"]
 random.shuffle(WORDLIST)
 
 def decode_instructions_and_generate_c(encoded_data):
-    # Charger les associations (octet -> mot)
     associations = {}
     for i in range(len(WORDLIST)):
         associations[i] = WORDLIST[i]
 
     print(associations)
-    # Décoder les octets
     decoded_words = []
     for i in range(0, len(encoded_data), 2):
-        byte = encoded_data[i:i+2]  # Prendre deux caractères à la fois (un octet)
+        byte = encoded_data[i:i+2]
         
-        # Convertir cet octet hexadécimal en entier
         byte_int = int(byte, 16)
         
         # Récupérer le mot associé ou afficher l'octet brut
-        word = associations.get(byte_int, f"[0x{byte_int:02X}]")  # Si pas trouvé, afficher l'octet brut
+        word = associations.get(byte_int, f"[0x{byte_int:02X}]")
         
         decoded_words.append(word)
 
 
-
-
-    # ✅ Générer la chaîne C
     c_message = ' '.join(decoded_words)
 
-    # ✅ Générer le tableau d'associations
     association_c_array = 'const Association association_table[TAILLE] = {\n'
     for i in range(256):
         word = associations.get(i, f"mot{i}")

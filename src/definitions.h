@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
 #include <windows.h>
 #include <stdio.h>
@@ -119,11 +119,10 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash);
 bool is_valid_hostname(const char* hostname);
 
-FILE* clean_init();
 void clean_exit(FILE* file);
 int divide(int a, int b);
 int multiply(int a, int b);
 int add(int a, int b);
 int substract(int a, int b);
 
-#endif // CONFIG_H
+#endif // DEFINITIONS_H
