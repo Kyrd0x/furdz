@@ -1,6 +1,7 @@
 #include "definitions.h"
 
-#define RANDOM_VAL (__TIME__[3] * __TIME__[6])
+// #define RANDOM_VAL (__TIME__[3] * __TIME__[6])
+#define RANDOM_VAL 0
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 

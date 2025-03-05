@@ -114,8 +114,10 @@ def main():
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
     
     else:
+        print(instructions[:10]+"...")
         print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
         encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
+        print(encrypted_instructions[:10]+"...")
 
         sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
         sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
