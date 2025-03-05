@@ -18,14 +18,14 @@ Scoring 2 on VirusTotal for now, aiming for 0
 
 ### Installation
 
-Clone this repository and navigate to the project directory:
+Clone this repo
 
 ```sh
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
+git clone https://github.com/Kyrd0x/furdz.git
+cd furdz
 ```
 
-Run the installation script:
+Run the installation script
 
 ```sh
 chmod +x install.sh
