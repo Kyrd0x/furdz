@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from scripts.ROR import hash
+from scripts.hasher import hash
 from scripts.config import parse_config
 from scripts.dict import dictionary_encrypt
 from scripts.utils import *

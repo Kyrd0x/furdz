@@ -1,4 +1,4 @@
-from scripts.ROR import hash
+from scripts.hasher import hash
 import subprocess
 import ipaddress
 import random
