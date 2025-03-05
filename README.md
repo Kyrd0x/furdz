@@ -42,3 +42,11 @@ After installation, you need to READ and edit the .conf file
 nano .conf
 make
 ```
+
+## Disclaimer & Legal Warning
+
+This project is intended for educational and research purposes only. The use of this code in any unauthorized, unethical, or illegal manner is strictly prohibited. By using this software, you agree that you are responsible for your actions and will comply with all applicable laws and regulations.
+
+The creator(s) and contributor(s) of this repository are not responsible for any misuse, damages, or legal consequences resulting from the use of this software. If you plan to test this tool, ensure that you have explicit permission to do so on your own devices or environments.
+
+Use at your own risk.
