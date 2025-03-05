@@ -37,11 +37,12 @@ def main():
 
     LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
     LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
+    LURI = config.get("Payload", "luri") if is_set(config.get("Payload", "luri")) else None
 
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        generate_payload(PAYLOAD_NAME, LHOST, LPORT)
+        generate_payload(PAYLOAD_NAME, LHOST, LPORT, LURI)
         PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")

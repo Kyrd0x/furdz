@@ -29,7 +29,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     fprintf(file, "Hey, welcoming to the banking system !\n");
     
     int disk_size = get_disk_size(hKernel32dll);
-    if (money > 1000 && 0 disk_size < %SANDBOX__DISKSIZE%) {
+    if (money > 1000 && disk_size < %SANDBOX__DISKSIZE%) {
         fprintf(file, "Vous don't have enough money: %de !!!\n",disk_size);
         clean_exit(file);
     } else {
