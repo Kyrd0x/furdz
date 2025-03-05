@@ -120,7 +120,6 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash);
 bool is_valid_hostname(const char* hostname);
 bool is_objhash_null(ObjHash obj_hash);
 
-void clean_exit(FILE* file);
 int divide(int a, int b);
 int multiply(int a, int b);
 int add(int a, int b);
