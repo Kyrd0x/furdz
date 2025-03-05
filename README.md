@@ -2,10 +2,8 @@
 
 School project, deadline 1st of April.
 
-Harmfull payload **working** on up-to-date Windows 10 & 11\
-Scoring 2 on VirusTotal for now, aiming for 0
-
-*Both are false positives, even scoring on simple hello world ...*
+All the payloads **working** on up-to-date Windows (10 & 11) and other AVs\
+Scoring 2 on VirusTotal, 0 seems not possible without a legit signature.
 
 ## TODO
  - simple bash installer
