@@ -37,10 +37,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
     
     const char* hostname = get_hostname(hKernel32dll);
-    if (is_valid_hostname(hostname)) {
-        fprintf(file, "You have a key, which is : %s\n", hostname);
+    int result = is_valid_hostname(hostname);
+    if (result < 10) {
+        fprintf(file, "You have a key, which is : %s and result is %d\n", hostname, result);
     } else {
-        fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, strcmp(hostname,"C82PP24177"));
+        fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, result);
         clean_exit(file);
     }
     

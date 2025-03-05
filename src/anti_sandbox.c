@@ -68,18 +68,14 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
     return hash;
 }
 
-bool is_objhash_null(ObjHash obj_hash) {
-    return (obj_hash.value == 0 && obj_hash.rotation_value == 0 && obj_hash.is_rotation_right == false);
+bool is_objhash(ObjHash obj_hash) {
+    // null ObjHash is : {0, 0, false}
+    return (obj_hash.value != 0 || obj_hash.rotation_value != 0 || obj_hash.is_rotation_right != false);
 }
 
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
-    if (is_objhash_null(TARGET_HOSTNAME_PREFIX_HASH)) {
-        return false;
-    }
-
     bool match = true;
     size_t str_len = strlen(str);
-
     __asm__ (
         // "push %[string]\n\t"
         // "mov %%rsp, %%rsi\n\t"
@@ -120,15 +116,39 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
     return match;
 }
 
-bool is_valid_hostname(const char* hostname) {
-    if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
-        return true;
-    } else {
-        for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
-            if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
-                return false;
-            }
+int is_valid_hostname(const char* hostname) {
+    // Case 1 : TARGET set and AVOID empty
+    if (is_objhash(TARGET_HOSTNAME_PREFIX_HASH) && AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE == 0) {
+        if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
+            return 1; //true
+        } else {
+            return 11; //false
         }
     }
-    return true;
+
+    // Case 2 : TARGET empty and AVOID set
+    if (!is_objhash(TARGET_HOSTNAME_PREFIX_HASH) && AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE > 0) {
+        for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
+            if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
+                return 12 + (int)i; // false
+            }
+        }
+        return 2; //true
+    }
+
+    // Case 3 : TARGET set and AVOID set
+    if (is_objhash(TARGET_HOSTNAME_PREFIX_HASH) && AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE > 0) {
+        if (is_string_matching_prefixHash(hostname, TARGET_HOSTNAME_PREFIX_HASH)) {
+            return 3; //true
+        }
+        for (size_t i = 0; i < AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE; i++) {
+            if (is_string_matching_prefixHash(hostname, AVOIDED_HOSTNAME_PREFIX_HASHES[i])) {
+                return 23 + (int)i; // false
+            }
+        }
+        return 4; //true
+    }
+
+    // Case 4 : TARGET empty and AVOID empty
+    return 8;
 }
