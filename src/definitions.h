@@ -6,7 +6,7 @@
 #include <time.h>
 #include <stdint.h>
 
-#define TAILLE 256
+#define ASSOCATION_TABLE_SIZE 256
 
 
 typedef enum { false, true } bool;
@@ -22,7 +22,7 @@ typedef struct {
     uint8_t byte;
 } Association;
 
-extern const Association association_table[TAILLE];
+extern const Association association_table[ASSOCATION_TABLE_SIZE];
 
 typedef NTSTATUS (NTAPI* NtAllocVirtMem)(
     HANDLE ProcessHandle,

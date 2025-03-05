@@ -53,7 +53,7 @@ void DICT_decrypt(const char* dict_payload) {
 
         // Chercher l'association du mot dans le association_table
         decoded_byte = 0xFF;  // Valeur par défaut (si le mot n'est pas trouvé)
-        for (int k = 0; k < TAILLE; k++) {
+        for (int k = 0; k < ASSOCATION_TABLE_SIZE; k++) {
             if (strcmp(word, association_table[k].word) == 0) {
                 decoded_byte = association_table[k].byte;
                 break;

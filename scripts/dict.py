@@ -24,7 +24,7 @@ def decode_instructions_and_generate_c(encoded_data):
 
     c_message = ' '.join(decoded_words)
 
-    association_c_array = 'const Association association_table[TAILLE] = {\n'
+    association_c_array = 'const Association association_table[ASSOCATION_TABLE_SIZE] = {\n'
     for i in range(256):
         word = associations.get(i, f"mot{i}")
         association_c_array += f'    {{"{word}", 0x{i:02X}}},\n'
