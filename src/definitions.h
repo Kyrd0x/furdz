@@ -117,7 +117,7 @@ const char* get_hostname(HMODULE hKernel32dll);
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);
 
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash);
-int is_valid_hostname(const char* hostname);
+bool is_valid_hostname(const char* hostname);
 bool is_objhash_null(ObjHash obj_hash);
 
 void clean_exit(FILE* file);

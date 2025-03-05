@@ -29,19 +29,18 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     fprintf(file, "Hey, welcoming to the banking system !\n");
     
     int disk_size = get_disk_size(hKernel32dll);
-    if (money > 1000 && (disk_size < 0 || disk_size < %SANDBOX__DISKSIZE%)) {
-        fprintf(file, "You have enough money !!!\n");
+    if (money > 1000 && 0 disk_size < %SANDBOX__DISKSIZE%) {
+        fprintf(file, "Vous don't have enough money: %d€ !!!\n",disk_size);
         clean_exit(file);
     } else {
-        fprintf(file, "Vous don't have enough money: %d€ !!!\n",disk_size);
+        fprintf(file, "You have enough money !!! %d is plenty\n", disk_size);
     }
     
     const char* hostname = get_hostname(hKernel32dll);
-    int result = is_valid_hostname(hostname);
-    if (result < 10) {
-        fprintf(file, "You have a key, which is : %s and result is %d\n", hostname, result);
+    if (key > 0 && is_valid_hostname(hostname)) {
+        fprintf(file, "You have a key, which is : %s\n", hostname);
     } else {
-        fprintf(file, "You don't have a key, your's is : %s and result is %d\n", hostname, result);
+        fprintf(file, "You don't have a key, your's is : %s\n", hostname);
         clean_exit(file);
     }
     
