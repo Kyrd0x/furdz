@@ -9,9 +9,6 @@ import re
 import os
 
 WORKING_RO_VALUES = [13,17,19,21,23]
-with open("data/lcid.json", "r") as file:
-    LANGUAGES = json.load(file)
-
 
 def round_pow2(n):
     return 2 ** math.ceil(math.log2(n))
@@ -148,13 +145,15 @@ def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
         
 def get_LCID(country_code):
     result = []
-    country_code = country_code.upper()
+    with open("data/lcid.json", "r") as file:
+        LANGUAGES = json.load(file)
 
+    country_code = country_code.upper()
     for key,element in LANGUAGES.items():
         if country_code in element:
             result.append(int(key))
 
     if len(result) == 0:
-        raise ValueError(f"Code de langue '{country_code}' non reconnu.")
+        raise ValueError(f"'{country_code}' is not valid.")
     
     return result
