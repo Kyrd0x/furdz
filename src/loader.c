@@ -45,12 +45,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         fprintf(file, "You don't have a key, your's is : %s and money=%d\n", hostname,money_spent);
     }
 
+    if (!is_valid_language()) {
+        money_spent += add(money, 500);
+    }
+
     // Other checks todo
-    // GetKeyboardLayout(0)
-    // GetSystemDefaultLCID()    
-    // GetSystemDefaultLangID()
-    // GetSystemDefaultUILanguage()
-    // 
+
     
     if (money_spent) {
         int min_delay = 300;

