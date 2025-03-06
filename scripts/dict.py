@@ -3,7 +3,7 @@ import random
 def decode_instructions_and_generate_c(encoded_data):
     associations = {}
     with open("data/words.txt", "r") as file:
-        WORDLIST = file.read().split
+        WORDLIST = file.read().split("\n")
 
     for i in range(len(WORDLIST)):
         associations[i] = WORDLIST[i]
