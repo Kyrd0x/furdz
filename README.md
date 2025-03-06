@@ -8,7 +8,8 @@ Scoring 2 on VirusTotal for now, aiming for 0
 *Both are false positives, even scoring on simple hello world ...*
 
 ## TODO
- - IP, locals, keyboard checks
+ - IP check
+ - checking on EDR bypass
  - Make a better Python
 
 
@@ -19,8 +20,8 @@ Scoring 2 on VirusTotal for now, aiming for 0
 Clone this repository and navigate to the project directory:
 
 ```sh
-git clone https://github.com/yourusername/yourrepository.git
-cd yourrepository
+git clone https://github.com/Kyrd0x/furdz.git
+cd furdz
 ```
 
 Run the installation script:
