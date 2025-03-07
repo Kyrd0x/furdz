@@ -5,6 +5,7 @@ import random
 import socket
 import math
 import json
+import yaml
 import re
 import os
 
@@ -145,8 +146,8 @@ def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
         
 def get_LCID(country_code):
     result = []
-    with open("data/lcid.json", "r") as file:
-        LANGUAGES = json.load(file)
+    with open("data/lcid.yaml", "r") as file:
+        LANGUAGES = yaml.safe_load(file)
 
     country_code = country_code.upper()
     for key,element in LANGUAGES.items():

