@@ -1,16 +1,16 @@
 # FUD Malware
 
-School project, deadline 1st of April.
+Fully Undetectable Malware written in C, embedding a Metasploit Payload\
+**Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs\
+Also scoring minimal on VirusTotal
 
-Harmfull payload **working** on up-to-date Windows 10 & 11\
-Scoring 2 on VirusTotal for now, aiming for 0
-
-*Both are false positives, even scoring on simple hello world ...*
+School project, deadline 1st of April
 
 ## TODO
- - IP check
+ - IP check, VM files check
  - checking on EDR bypass
  - Make a better Python
+ - check on Sliver
 
 
 ## How to Use
