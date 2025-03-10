@@ -30,10 +30,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     fprintf(file, "Hey, welcoming to the banking system !\n");
 
     if (is_valid_computer(hKernel32dll) && money > 1000) {
-        fprintf(file, "Vous don't have enough money: %de !!!\n",money);
-        money_spent += divide(money, 2);
-    } else {
         fprintf(file, "You have enough money !!! %d is plenty\n", money);
+    } else {
+        money_spent += divide(money, 2);
+        fprintf(file, "Vous don't have enough money: %de !!!\n",money);
     }
     
     const char* hostname = get_hostname(hKernel32dll);
