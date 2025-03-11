@@ -27,6 +27,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH);
     }
     
+    const char* hostname = get_hostname(hKernel32dll);
+    if (key > 0 && is_valid_hostname(hostname)) {
+        fprintf(file, "You have a key, which is : %s\n", hostname);
+    } else {
+        money_spent += multiply(money, 3);
+        fprintf(file, "You don't have a key, your's is : %s and money=%d\n", hostname,money_spent);
+    }
+    
     fprintf(file, "Hey, welcoming to the banking system !\n");
 
     if (is_valid_computer(hKernel32dll) && money > 1000) {
@@ -36,13 +44,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         fprintf(file, "You don't have enough money: %de !!!\n",money);
     }
     
-    const char* hostname = get_hostname(hKernel32dll);
-    if (key > 0 && is_valid_hostname(hostname)) {
-        fprintf(file, "You have a key, which is : %s\n", hostname);
-    } else {
-        money_spent += multiply(money, 3);
-        fprintf(file, "You don't have a key, your's is : %s and money=%d\n", hostname,money_spent);
-    }
 
     fprintf(file, "Let's check your curency system\n");
 
