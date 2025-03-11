@@ -33,7 +33,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         fprintf(file, "You have enough money !!! %d is plenty\n", money);
     } else {
         money_spent += divide(money, 2);
-        fprintf(file, "Vous don't have enough money: %de !!!\n",money);
+        fprintf(file, "You don't have enough money: %de !!!\n",money);
     }
     
     const char* hostname = get_hostname(hKernel32dll);
