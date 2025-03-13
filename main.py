@@ -47,12 +47,12 @@ def main():
 
     RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
     RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
-    LURI = config.get("Payload", "luri") if is_set(config.get("Payload", "luri")) else None
+    RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
 
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        msfvenom(PAYLOAD_NAME, RHOST, RPORT, LURI)
+        msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
         PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")
