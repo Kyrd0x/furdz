@@ -91,23 +91,23 @@ def xor2_encrypt_decrypt(data, word_key):
     return result.hex()
 
 
-def format_lhost_lport(lhost, lport):
-    if lport > 65535 or lport < 0:
+def format_rhost_rport(rhost, rport):
+    if rport > 65535 or rport < 0:
         print("Port number must be between 0 and 65535")
-    if lhost.count(".") != 3:
+    if rhost.count(".") != 3:
         print("Invalid IP address")
 
-    ip = lhost.split(".")
+    ip = rhost.split(".")
     result = ""
     for part in ip[::-1]:
         hex_part = hex(int(part))[2:].zfill(2)  # Convertir en hex et remplir si nécessaire
         result += hex_part
     
-    port_hex = hex(lport)[2:].zfill(4)
+    port_hex = hex(rport)[2:].zfill(4)
     port_hex = port_hex[2:] + port_hex[:2]
 
     result += port_hex
-    print(f"LHOST={lhost}, LPORT={lport} -> {result}")
+    print(f"RHOST={rhost}, RPORT={rport} -> {result}")
     return hex(int(result, 16))
 
 def is_valid_ip(ip):

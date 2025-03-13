@@ -26,11 +26,11 @@ def parse_config(config):
         CONFIG["payload"]["mode"] = None
 
     if CONFIG["payload"]["mode"] == "TCP":
-        CONFIG["payload"]["lhost"] = config.get("Payload", "lhost")
+        CONFIG["payload"]["rhost"] = config.get("Payload", "rhost")
 
 
-        CONFIG["LPORT"] = config.getint("Payload", "lport")
-        if CONFIG["LPORT"] > 65535 or CONFIG["LPORT"] < 0:
+        CONFIG["RPORT"] = config.getint("Payload", "rport")
+        if CONFIG["RPORT"] > 65535 or CONFIG["RPORT"] < 0:
             print("Port number must be between 0 and 65535")
             exit(1)
 
