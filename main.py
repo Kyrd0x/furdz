@@ -73,7 +73,7 @@ def main():
     for file in all_tags:
         filename = file["filename"]
         tags = file["tags"]
-        print(f"Processing {filename} with tags {tags}")
+        # print(f"Processing {filename} with tags {tags}")
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
