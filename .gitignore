@@ -1,4 +1,4 @@
 temp/
 .env
 .vscode/
-scrips/__pycache__/
+__pycache__/
