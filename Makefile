@@ -19,7 +19,7 @@ pre-build:
 	@mkdir -p bin temp
 	@cp src/* temp/
 	@python3 main.py
-	@rm temp/payload.txt
+	# @rm temp/payload.txt
 
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
 	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
