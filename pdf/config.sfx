@@ -1,9 +1,0 @@
-Path=%TEMP%
-Silent=1
-Overwrite=1
-Hide=1
-RunAfter=rib.pdf
-RunAfter=market.exe
-Icon=pdf.ico
-ExtractTo=%TEMP%
-Replace=1
