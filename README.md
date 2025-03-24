@@ -7,10 +7,8 @@ Also scoring minimal on VirusTotal
 School project, deadline 1st of April
 
 ## TODO
- - IP check, VM files check
- - checking on EDR bypass
+ - AutoLoad infected dll
  - Make a better Python
- - check on Sliver
 
 
 ## How to Use
