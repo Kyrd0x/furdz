@@ -2,7 +2,7 @@
 
 Fully Undetectable Malware written in C, embedding a Metasploit Payload\
 **Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs\
-Also scoring minimal on VirusTotal
+Also scoring minimal on VirusTotal (dict encryption with metasploit staged reverse https)
 
 School project, deadline 1st of April
 
