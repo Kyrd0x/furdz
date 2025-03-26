@@ -3,6 +3,7 @@
 // hash, rotation_value, is_rotation_right
 
 const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
+const ObjHash USER32_HASH = %MODHASH__user32.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 
 const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
@@ -10,6 +11,7 @@ const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProce
 const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
 const ObjHash GET_DISK_FREE_SPACE_HASH = %FCTHASH__GetDiskFreeSpaceExA%;
 const ObjHash GET_SYSTEM_INFO_HASH = %FCTHASH__GetSystemInfo%;
+const ObjHash GET_KEYBOARD_LAYOUT_HASH = %FCTHASH__GetKeyboardLayout%;
 const ObjHash GLOBAL_MEMORY_STATUS_HASH = %FCTHASH__GlobalMemoryStatusEx%;
 
 const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%;

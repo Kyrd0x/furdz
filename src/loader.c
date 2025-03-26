@@ -46,8 +46,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
 
     // fprintf(file, "Let's check your country\n");
+    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH);
 
-    if (!is_valid_language(hKernel32dll)) {
+    if (!is_valid_language(hKernel32dll, hUser32dll)) {
         money_spent += add(money, 500);
     }
 

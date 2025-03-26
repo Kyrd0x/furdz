@@ -33,8 +33,9 @@ COUNTRY_CHECK: |
   // Country section
     GetSystemDefaultLangIDFunc pGetSystemDefaultLangID = (GetSystemDefaultLangIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LANGID_HASH);
     GetSystemDefaultLCIDFunc pGetSystemDefaultLCID = (GetSystemDefaultLCIDFunc)CustomGetProcAdress(hKernel32, GET_SYSTEM_DEFAULT_LCID_HASH);
+    GetKeyboardLayoutFunc pGetKeyboardLayout = (GetKeyboardLayoutFunc)CustomGetProcAdress(hUser32, GET_KEYBOARD_LAYOUT_HASH);
 
-    uint16_t id_keyboard = LOWORD(GetKeyboardLayout(0));   // Keyboard layout
+    uint16_t id_keyboard = LOWORD(pGetKeyboardLayout(0));   // Keyboard layout
     uint16_t id_system = pGetSystemDefaultLangID();         // System language
     uint16_t id_regional = LOWORD(pGetSystemDefaultLCID()); // System regional settings
     for (size_t i = 0; i < AVOIDED_COUNTRIES_SIZE; i++) {

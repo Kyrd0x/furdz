@@ -111,7 +111,7 @@ bool is_valid_hostname(const char* hostname) {
 }
 
 
-bool is_valid_language(HMODULE hKernel32) {
+bool is_valid_language(HMODULE hKernel32, HMODULE hUser32) {
 
     %SANDBOX__COUNTRY_CHECK%
 
