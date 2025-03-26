@@ -1,4 +1,4 @@
-temp/
+build/
 .env
 .vscode/
 __pycache__/

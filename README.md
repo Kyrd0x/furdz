@@ -10,6 +10,17 @@ School project, deadline 1st of April
  - AutoLoad infected dll
  - Make a better Python
 
+## Options
+
+### Sandbox detection
+
+
+### Payloads
+
+Can be used:
+ - Any Metasploit payloads
+ - Custom ASM ones (from ```asm/```)
+
 
 ## How to Use
 

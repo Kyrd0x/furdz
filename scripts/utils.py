@@ -33,9 +33,9 @@ def sed_files(folderpath, old, new):
 
 def nasm2instructions(filepath):
     print("\nSetting up shellcode...")
-    obj_file = "temp/shell.o"
-    shell_file = "temp/shell"
-    instructions_file = "temp/instructions_trash"
+    obj_file = "build/shell.o"
+    shell_file = "build/shell"
+    instructions_file = "build/instructions_trash"
 
     nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
     ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
