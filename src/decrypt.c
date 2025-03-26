@@ -30,6 +30,25 @@ void XOR(unsigned char *data, size_t len, uint16_t key) {
     );
 }
 
+// int custom_strcmp(const char *s1, const char *s2) {
+//     while (*s1 && (*s1 == *s2)) { 
+//         s1++;
+//         s2++;
+//     }
+//     return *(unsigned char *)s1 - *(unsigned char *)s2;
+// }
+
+// char *custom_strncpy(char *dest, const char *src, size_t n) {
+//     size_t i;
+//     for (i = 0; i < n && src[i] != '\0'; i++) {
+//         dest[i] = src[i];
+//     }
+//     while (i < n) {  // Remplit le reste avec des '\0' si src est plus courte
+//         dest[i++] = '\0';
+//     }
+//     return dest;
+// }
+
 
 // Word decryption
 void DICT_decrypt(const char* dict_payload) {

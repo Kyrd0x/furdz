@@ -14,12 +14,22 @@ School project, deadline 1st of April
 
 ### Sandbox detection
 
+Hardware specs limits can se set, such as :
+ - CPU cores
+ - RAM size
+ - Disk size
+
+Target a specific hostname prefix
+
+Avoid specific hostname prefixes
+
+Avoid countries
 
 ### Payloads
 
 Can be used:
- - Any Metasploit payloads
- - Custom ASM ones (from ```asm/```)
+ - Any Metasploit payload
+ - ~~Custom ASM one (from ```asm/```)~~
 
 
 ## How to Use

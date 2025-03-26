@@ -13,12 +13,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     int money =  min + (int)(rand() / (double)RAND_MAX * range) + RANDOM_VAL;
     int money_spent = 0;
     
-    
     // snprintf(path, MAX_PATH, "%s\\Documents\\result.txt", getenv("USERPROFILE"));  
     printf("beginning\n");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
     HMODULE hKernel32dll = NULL;
-
+    
+    // FILE *file = fopen(path, "w");
     
     if (!is_being_debugged()) {
         printf("Error during file openning : %s\n", path);

