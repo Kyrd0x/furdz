@@ -9,12 +9,13 @@ LDFLAGS = -Wl,--gc-sections,--entry=WinMainCRTStartup,--disable-auto-import,--no
 
 SRC = build/loader.c build/definitions.c build/fake.c build/decrypt.c build/winapi.c build/anti_sandbox.c build/payload.c
 HEADERS = build/definitions.h
+ICON=build/icon.o
 OUTPUT_FILE=$(shell grep -oP '^output_file=\K.*' .conf)
 
 
 .PHONY: all clean pre-build post-build
 
-all: pre-build $(OUTPUT_FILE) post-build
+all: pre-build $(ICON) $(OUTPUT_FILE) post-build
 
 pre-build:
 	@mkdir -p bin build
@@ -23,8 +24,11 @@ pre-build:
 	@python3 main.py
 	# @rm build/payload.txt
 
+$(ICON): icon/icon.rc
+	x86_64-w64-mingw32-windres icon/icon.rc -o $(ICON)
+
 $(OUTPUT_FILE): $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
+	$(CC) $(CFLAGS) $(WARNNIGS) $(SRC) $(ICON) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
 
 post-build:
 	cp bin/$(OUTPUT_FILE) ../../sandbox/

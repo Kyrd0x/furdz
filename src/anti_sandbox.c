@@ -43,16 +43,19 @@ const char* get_hostname(HMODULE hKernel32dll) {
 unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
     size_t str_len = strlen(str);
-    for (size_t i = 0; i < str_len; i++) {
+    char debug_message[256]; // Buffer pour le message de débogage
+
+    for (size_t i = 0; i <= str_len; i++) { // Include null terminator
         if (is_rotation_right) {
-            hash = (hash >> rotation_value) | (hash << (32 - rotation_value));
+            hash = ((hash >> rotation_value) | (hash << (32 - rotation_value))) & 0xFFFFFFFF; // Rotate right
         } else {
-            hash = (hash << rotation_value) | (hash >> (32 - rotation_value));
+            hash = ((hash << rotation_value) | (hash >> (32 - rotation_value))) & 0xFFFFFFFF; // Rotate left
         }
-        hash += str[i];
+        hash = (hash + (unsigned char)str[i]) & 0xFFFFFFFF; // Add character to hash
     }
     return hash;
 }
+
 
 bool is_objhash(ObjHash obj_hash) {
     // null ObjHash is : {0, 0, false}

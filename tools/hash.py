@@ -23,12 +23,14 @@ def hash(module, function, bits=23, direction="R"):
         else:
             module_hash = rol(module_hash, bits)
         module_hash += ord(char)
+        print(f"char: {char} | module_hash: {hex(module_hash)}")
     for char in str(function+"\x00"):
         if direction == "R":
             function_hash = ror(function_hash, bits)
         else:
             function_hash = rol(function_hash, bits)
         function_hash += ord(char)
+        print(f"char: {char} | function_hash: {hex(function_hash)}")
     print(f"module_hash: {hex(module_hash)}")
     print(f"function_hash: {hex(function_hash)}")
     final_hash = module_hash + function_hash & 0xFFFFFFFF
