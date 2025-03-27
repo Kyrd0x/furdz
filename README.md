@@ -19,11 +19,11 @@ Hardware specs limits can se set, such as :
  - RAM size
  - Disk size
 
-Target a specific hostname prefix
-
-Avoid specific hostname prefixes
+Target a specific hostname prefix / Avoid specific hostname prefixes
+ - ComputerName
 
 Avoid countries
+ - KeyboardLayout/SystemDefaultLang/SystemDefaultLCID
 
 ### Payloads
 
