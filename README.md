@@ -1,6 +1,6 @@
 # FUD Malware
 
-Fully Undetectable Malware written in C, embedding a Metasploit Payload\
+Fully Undetectable Malware (remote thread injection) written in C, embedding a Metasploit Payload\
 **Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs\
 Also scoring minimal on VirusTotal (dict encryption with metasploit staged reverse https)
 
@@ -9,7 +9,6 @@ VirusTotal 0 on 27/03/2025
 School project, deadline 1st of April
 
 ## TODO
- - AutoLoad infected dll
  - Make a better Python
 
 ## Options
@@ -17,9 +16,7 @@ School project, deadline 1st of April
 ### Sandbox detection
 
 Hardware specs limits can se set, such as :
- - CPU cores
- - RAM size
- - Disk size
+ - CPU cores / RAM size / Disk size
 
 Target a specific hostname prefix / Avoid specific hostname prefixes
  - ComputerName
