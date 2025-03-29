@@ -83,7 +83,7 @@ fi
 
 # Compile the program
 if [[ "$VERBOSE" == "true" ]]; then
-    echo "$CC ${CFLAGS[@]} ${WARNINGS[@]} ${SRC[@]} $ICON -static -static-libgcc -o bin/$OUTPUT_FILE ${LDFLAGS[@]} ${LIBS[@]} ${OBFUSCATION[@]}"
+    echo -e "$CC ${CFLAGS[@]} ${WARNINGS[@]} ${SRC[@]} $ICON -static -static-libgcc -o bin/$OUTPUT_FILE ${LDFLAGS[@]} ${LIBS[@]} ${OBFUSCATION[@]}\n"
 fi
 
 $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" "$ICON" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"

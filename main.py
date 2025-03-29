@@ -19,11 +19,6 @@ def is_set(value):
 VERBOSE = True if sys.argv[1] == "true" else False
 PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
 
-FRAMEWORK = config.get("Payload", "framework")
-if FRAMEWORK != "metasploit" and FRAMEWORK != "sliver" and FRAMEWORK != "raw":
-    print("Framework must be metasploit or sliver or raw")
-    sys.exit(1)
-
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 TARGET_PROCESS = config.get("Payload", "target_process")
 
@@ -55,7 +50,6 @@ def main():
     RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
     RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
     RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
-    CMD = config.get("Payload", "cmd") if is_set(config.get("Payload", "cmd")) else None
 
     if PRIORIZE_SIZE:
         # no stdlib
@@ -72,18 +66,12 @@ def main():
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
         PAYLOAD_FILE = "payload.txt"
-        if FRAMEWORK == "metasploit":
+        if not (".nasm" in PAYLOAD_NAME or ".asm" in PAYLOAD_NAME):
             PAYLOAD_NAME = config.get("Payload", "name")
             if PAYLOAD_NAME == "":
                 print("No payload name specified")
                 sys.exit(1)
-            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI, CMD, VERBOSE)
-        elif FRAMEWORK == "sliver":
-            PAYLOAD_NAME = config.get("Payload", "name")
-            if PAYLOAD_NAME == "":
-                print("No payload name specified")
-                sys.exit(1)
-            sliver(PAYLOAD_NAME, RHOST, RPORT, RURI, CMD, VERBOSE)
+            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI, VERBOSE)
         else: #raw
             ROR_VALUE = random.choice([13,17,19,21,23])
             sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%ROR_VALUE%", hex(ROR_VALUE))

