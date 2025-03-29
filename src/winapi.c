@@ -79,7 +79,7 @@ HMODULE CustomGetModuleHandle(ObjHash module_hash) {
 
 // Function to retrieve the address of a function by its hash
 // Uses assembly to parse the export table of the module and compute hashes of function names.
-FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash) {
+FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash) {
     if (hModule == NULL) {
         return NULL; // Return NULL if the module handle is invalid
     }
@@ -181,10 +181,10 @@ FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash) {
 // Uses the Toolhelp32Snapshot API to enumerate processes and compare their names.
 DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash) {
     // Dynamically resolve required functions
-    Proc32First _Proc32First = (Proc32First)CustomGetProcAdress(hKernel32, PROC32_FIRST_HASH);
-    Proc32Next _Proc32Next = (Proc32Next)CustomGetProcAdress(hKernel32, PROC32_NEXT_HASH);
-    CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAdress(hKernel32, CLOSE_HANDLE_HASH);
-    CreateToolhelp32Snap _CreateToolhelp32Snapshot = (CreateToolhelp32Snap)CustomGetProcAdress(hKernel32, CREATE_TOOLHELP32_SNAPSHOT_HASH);
+    Proc32First _Proc32First = (Proc32First)CustomGetProcAddress(hKernel32, PROC32_FIRST_HASH);
+    Proc32Next _Proc32Next = (Proc32Next)CustomGetProcAddress(hKernel32, PROC32_NEXT_HASH);
+    CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAddress(hKernel32, CLOSE_HANDLE_HASH);
+    CreateToolhelp32Snap _CreateToolhelp32Snapshot = (CreateToolhelp32Snap)CustomGetProcAddress(hKernel32, CREATE_TOOLHELP32_SNAPSHOT_HASH);
 
     PROCESSENTRY32 pe32;
     pe32.dwSize = sizeof(PROCESSENTRY32);

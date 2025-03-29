@@ -29,7 +29,7 @@ const char* get_hostname(HMODULE hKernel32dll) {
     static char computerName[MAX_COMPUTERNAME_LENGTH + 1];
     DWORD size = sizeof(computerName) / sizeof(computerName[0]);
     // GetComputerName function is resolved dynamically
-    GetComputerNameFunc _GetComputerName = (GetComputerNameFunc)CustomGetProcAdress(hKernel32dll, GET_COMPUTER_NAME_HASH);
+    GetComputerNameFunc _GetComputerName = (GetComputerNameFunc)CustomGetProcAddress(hKernel32dll, GET_COMPUTER_NAME_HASH);
     if (_GetComputerName(computerName, &size)) {
         return computerName; // Successfully retrieved hostname
     } else {

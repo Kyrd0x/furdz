@@ -89,7 +89,7 @@ extern const char* dict_payload;
 void XOR(unsigned char *data, size_t len, uint16_t key);
 void DICT_decrypt(const char* dict_payload);
 HMODULE CustomGetModuleHandle(ObjHash module_hash);
-FARPROC CustomGetProcAdress(IN HMODULE hModule, ObjHash function_hash);
+FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash);
 DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash);
 
 // Validation and utility functions

