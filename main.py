@@ -107,6 +107,8 @@ def main():
         tags = file["tags"]
         # print(f"Processing {filename} with tags {tags}")
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
+        if "anti" in filename:
+            print(f"Processing {filename} with tags {tags}")
         for tag in tags:
             parts = tag.replace("%", "").split("__")
             if parts[0] == "MODHASH": # definitions.c
@@ -118,6 +120,7 @@ def main():
                     sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
             if parts[0] == "SANDBOX":
                 if parts[1] == "RAM_CHECK":
+                    print("RAM_CHECK")
                     if is_set(RAM_SIZE):
                         template = get_template("RAM_CHECK")
                         sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", RAM_SIZE))

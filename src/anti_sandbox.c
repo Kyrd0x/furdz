@@ -101,8 +101,8 @@ bool is_string_matching_prefixHash(const char* str, ObjHash prefix_hash) {
         "mov $1, %[result]\n\t" // Set match to true
     "end:\n\t"
         : [result] "=r" (match)
-        : [hash] "r" (prefix_hash.value), [string] "r" (str), [strlen] "r" (str_len), [rotation_value] "r" (prefix_hash.rotation_value), [is_ror] "m" (prefix_hash.is_rotation_right)
-        : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory"
+        : [hash] "r" (prefix_hash.value), [string] "r" (str), [strlen] "r" (str_len), [rotation_value] "r" (prefix_hash.rotation_value), [is_ror] "m" (prefix_hash.is_rotation_right) // %
+        : "rax", "rcx", "rsi", "r8", "r9", "r10", "memory" 
     );
     return match; // Return whether the string matches the prefix hash
 }

@@ -6,6 +6,10 @@ def decode_instructions_and_generate_c(encoded_data):
     with open("data/words.txt", "r") as file:
         WORDLIST = file.read().split("\n")  # Load the word list
 
+    random.shuffle(WORDLIST)  # Shuffle the word list for randomness
+    WORDLIST = WORDLIST[:256]  # Limit to 256 words for byte values
+    WORDLIST = [word.strip() for word in WORDLIST]  # Clean up whitespace
+
     # Map each byte value to a word
     for i in range(len(WORDLIST)):
         associations[i] = WORDLIST[i]
