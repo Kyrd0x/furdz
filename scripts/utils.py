@@ -10,7 +10,7 @@ import yaml
 import re
 import os
 
-WORKING_RO_VALUES = [13,17,19,21,23]
+WORKING_RO_VALUES = [17,19,21,23]
 
 def round_pow2(n):
     return 2 ** math.ceil(math.log2(n))
@@ -25,10 +25,10 @@ def sed_file(filepath, old, new):
         file.write(content)
         file.truncate()
 
-def sed_files(folderpath, old, new):
+def sed_files(folderpath, old, new, extension=[".nasm", ".c", ".h"]):
     for filename in os.listdir(folderpath):
         filepath = os.path.join(folderpath, filename)
-        if os.path.isfile(filepath):
+        if os.path.isfile(filepath) and (filename.endswith(tuple(extension))):
             sed_file(filepath, old, new)
 
 def nasm2instructions(filepath):
