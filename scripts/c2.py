@@ -1,5 +1,6 @@
 import subprocess
 
+# Function to generate a payload using msfvenom and save bytes of the payload in a file
 def msfvenom(payload, rhost, rport, ruri):
     print(f"Generating payload :")
     RURI_part = f" LURI={ruri}" if ruri else ""

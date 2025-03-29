@@ -2,6 +2,8 @@ from scripts.utils import resolve_ip
 import os
 import re
 
+# NOT USED YET, BUT MAYBE LATER
+
 ROR_VALUES_OK = [13,17,23]
 
 def parse_config(config):
