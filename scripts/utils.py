@@ -94,7 +94,6 @@ def format_instructions(instructions):
 # Extract tags from a file
 def extract_tags_from_file(filepath):
     tags = []
-    print(f"opening file {filepath}")
     with open(filepath, 'r') as file:
         content = file.read()
         tags = re.findall(r'%[^%]+%', content)

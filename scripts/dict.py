@@ -1,7 +1,7 @@
 import random
 
 # Decode encoded data into words and generate a C array for associations
-def decode_instructions_and_generate_c(encoded_data):
+def decode_instructions_and_generate_c(encoded_data, verbose):
     associations = {}
     with open("data/words.txt", "r") as file:
         WORDLIST = file.read().split("\n")  # Load the word list
@@ -14,7 +14,7 @@ def decode_instructions_and_generate_c(encoded_data):
     for i in range(len(WORDLIST)):
         associations[i] = WORDLIST[i]
 
-    print(associations)
+    print(associations) if verbose else None
     decoded_words = []
     for i in range(0, len(encoded_data), 2):
         byte = encoded_data[i:i+2]  # Extract two hex characters
@@ -36,8 +36,8 @@ def decode_instructions_and_generate_c(encoded_data):
     return c_message, association_c_array, len(decoded_words)
 
 # Encrypt instructions using a dictionary-based approach
-def dictionary_encrypt(instructions):
-    payload, association_table, size = decode_instructions_and_generate_c(instructions)
+def dictionary_encrypt(instructions, verbose):
+    payload, association_table, size = decode_instructions_and_generate_c(instructions, verbose)
     
     # Remove \x sequences from the payload
     payload = payload.replace("\\x", "")
