@@ -1,8 +1,9 @@
 # FUD Malware
 
-Fully Undetectable Malware (remote thread injection) written in C, embedding a Metasploit Payload\
-**Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs\
-Also scoring minimal on VirusTotal (dict encryption with metasploit staged reverse https)
+Fully Undetectable Malware (remote thread injection) written in C, embedding a [Metasploit](https://github.com/rapid7/metasploit-framework) or [Sliver](https://github.com/BishopFox/sliver) Payload.
+
+**Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs.\
+Also scoring minimal on VirusTotal (dict encryption with metasploit staged reverse https).
 
 VirusTotal 0 on 27/03/2025
 
@@ -10,6 +11,7 @@ School project, deadline 1st of April
 
 ## TODO
  - Make a better Python
+ - Implement Sliver payloads
 
 ## Options
 
@@ -42,15 +44,15 @@ git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
 ```
 
-Run the installation script:
+Run the installation script and choose between sliver and metasploit
 
 ```sh
 chmod +x install.sh
-./install.sh
+sudo ./install.sh metasploit
 ```
 
 This script will:
-- Download and install Metasploit if needed
+- Download and install Metasploit|Sliver if needed
 - Install necessary dependencies for compilation
 
 ### Usage

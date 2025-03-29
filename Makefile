@@ -41,6 +41,7 @@ $(OUTPUT_FILE): $(SRC) $(HEADERS)
 	$(CC) $(CFLAGS) $(WARNINGS) $(SRC) $(ICON) -static -static-libgcc -o bin/$@ $(LDFLAGS) $(LIBS) $(OBFUSCATION)
 
 post-build:
+	rm -f ../../sandbox/$(OUTPUT_FILE)
 	cp bin/$(OUTPUT_FILE) ../../sandbox/
 	# cp bin/$(OUTPUT_FILE) pdf/payload.exe
 	# @./pdf/create.sh

