@@ -16,7 +16,7 @@ def unicode(string, uppercase=True):
     return result
 
 # Generate a hash for a module and function name using rotation and addition
-def hash(module, function, bits=23, direction="R"):
+def hash(module, function, bits=23, direction="R", verbose=False):
     module_hash = 0
     function_hash = 0
 
@@ -38,5 +38,5 @@ def hash(module, function, bits=23, direction="R"):
 
     # Combine the two hashes and ensure it fits in 32 bits
     final_hash = module_hash + function_hash & 0xFFFFFFFF
-    print(f"RO{direction[0].upper()}{bits} Hash for {module}::{function} is {hex(final_hash)}")
+    print(f"RO{direction[0].upper()}{bits} Hash for {module}::{function} is {hex(final_hash)}") if verbose else None
     return final_hash

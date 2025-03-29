@@ -73,7 +73,7 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 mkdir -p bin build
 cp src/* build/
 cp asm/* build/
-python3 main.py $VERBOSE
+python3 main.py $VERBOSE $PRIORIZE_SIZE
 # rm build/payload.txt
 
 # Compile the icon if necessary
@@ -94,3 +94,4 @@ cp -f bin/$OUTPUT_FILE ../../sandbox/
 # cp bin/$OUTPUT_FILE pdf/payload.exe
 # ./pdf/create.sh
 
+echo "Build completed. Output file: bin/$OUTPUT_FILE"

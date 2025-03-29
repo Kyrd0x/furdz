@@ -174,11 +174,11 @@ def resolve_ip(ip):
             return None
         
 # Generate a hash object with random rotation values and direction
-def hash_obj(module, function):
+def hash_obj(module, function, verbose):
     direction = random.choice(["R", "L"])
     direction_word = "true" if direction == "R" else "false"
     value = random.choice(WORKING_RO_VALUES) # will test more
-    return "{"+str(hex(hash(module, function, value, direction)))+", "+str(value)+", "+direction_word+"}"
+    return "{"+str(hex(hash(module, function, value, direction, verbose)))+", "+str(value)+", "+direction_word+"}"
 
 # Generate a high entropy integer within a specified range
 def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):

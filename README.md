@@ -61,7 +61,7 @@ After installation, you need to READ and edit the .conf file
 
 ```sh
 nano .conf
-make
+./build.sh -h
 ```
 
 ## Disclaimer & Legal Warning
