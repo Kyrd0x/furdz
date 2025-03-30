@@ -26,7 +26,7 @@ if ENCRYPTION_METHOD == "xor":
     else:
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
 elif ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
-    ENCRYPTION_KEY = 0x0
+    ENCRYPTION_KEY = 0x1
 else:
     print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
     sys.exit(1)
