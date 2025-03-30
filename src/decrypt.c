@@ -1,28 +1,34 @@
 #include "definitions.h"
 
+// XOR encryption/decryption function
+// This function uses inline assembly to XOR each byte of the data with a key.
+// The key alternates between two bytes depending on whether the index is even or odd.
 void XOR(unsigned char *data, size_t len, uint16_t key) {
     __asm__ (
-        "mov %[len], %%rsi\n\t"
-        "mov %[data], %%rdi\n\t"
-        "movzx %[key], %%rdx\n\t"
-        "mov %%rdx, %%rcx\n\t"
-        "shr $8, %%rcx\n\t"
-        "xor %%rax, %%rax\n\t"
-        "test %%rsi, %%rsi\n\t"
-        "jz done\n\t"
+        // Initialize registers with input parameters
+        "mov %[len], %%rsi\n\t"          // Length of data
+        "mov %[data], %%rdi\n\t"         // Pointer to data
+        "movzx %[key], %%rdx\n\t"        // Load key into rdx
+        "mov %%rdx, %%rcx\n\t"           // Copy key to rcx
+        "shr $8, %%rcx\n\t"              // Extract high byte of key
+        "xor %%rax, %%rax\n\t"           // Initialize index (rax = 0)
+        "test %%rsi, %%rsi\n\t"          // Check if length is zero
+        "jz done\n\t"                    // If zero, jump to done
     "loop:\n\t"
+        // Determine whether the index is even or odd
         "mov %%rax, %%r8\n\t"
-        "and $1, %%r8\n\t"                // Test si i est pair ou impair avec i % 2
-        "jnz odd_\n\t"                      // Si impair, saute
-        "movb %%dl, %%bl\n\t"             // Si pair, utilise key_bytes[0]
+        "and $1, %%r8\n\t"               // Check if index % 2 == 0
+        "jnz odd_\n\t"                   // If odd, jump to odd_
+        "movb %%dl, %%bl\n\t"            // Use low byte of key if even
         "jmp even_\n\t"
     "odd_:\n\t"
-        "movb %%cl, %%bl\n\t"             // Si impair, utilise key_bytes[1]
+        "movb %%cl, %%bl\n\t"            // Use high byte of key if odd
     "even_:\n\t"
-        "xorb %%bl, (%%rdi, %%rax)\n\t"   // XOR data[i] avec l'octet de clé approprié
-        "inc %%rax\n\t"
-        "cmp %%rsi, %%rax\n\t"
-        "jb loop\n\t"
+        // XOR the current byte with the selected key byte
+        "xorb %%bl, (%%rdi, %%rax)\n\t"
+        "inc %%rax\n\t"                  // Increment index
+        "cmp %%rsi, %%rax\n\t"           // Compare index with length
+        "jb loop\n\t"                    // If index < length, repeat loop
     "done:\n\t"
         :
         : [data] "r" (data), [len] "r" (len), [key] "r" (key)
@@ -30,50 +36,50 @@ void XOR(unsigned char *data, size_t len, uint16_t key) {
     );
 }
 
-
-// Word decryption
+// Function to decrypt a dictionary-based payload
+// Each word in the payload is mapped to a byte using an association table.
 void DICT_decrypt(const char* dict_payload) {
     int i = 0;
     int j = 0;
     unsigned char decoded_byte;
     
-    // Parcours de chaque mot dans dict_payload
+    // Iterate through each word in the dictionary payload
     while (*dict_payload != '\0') {
-        // Chercher chaque mot dans dict_payload
+        // Find the start and end of the current word
         const char* start = dict_payload;
         while (*dict_payload != ' ' && *dict_payload != '\0') {
             dict_payload++;
         }
         
-        // Si on a trouvé un mot (on a atteint un espace ou la fin de la chaîne)
-        int length = dict_payload - start;  // Calcul de la longueur du mot
-        char word[length + 1];  // Créer un tableau pour le mot
+        // Extract the word and null-terminate it
+        int length = dict_payload - start;  // Calculate word length
+        char word[length + 1];  // Allocate space for the word
         strncpy(word, start, length);
-        word[length] = '\0';  // Ajouter le caractère de fin de chaîne
+        word[length] = '\0';  // Null-terminate the word
 
-        // Chercher l'association du mot dans le association_table
-        decoded_byte = 0xFF;  // Valeur par défaut (si le mot n'est pas trouvé)
+        // Look up the word in the association table
+        decoded_byte = 0xFF;  // Default value if the word is not found
         for (int k = 0; k < ASSOCATION_TABLE_SIZE; k++) {
             if (strcmp(word, association_table[k].word) == 0) {
-                decoded_byte = association_table[k].byte;
+                decoded_byte = association_table[k].byte;  // Get the associated byte
                 break;
             }
         }
         
-        // Ajouter l'octet décrypté au payload si trouvé
+        // Add the decoded byte to the payload
         payload[j++] = decoded_byte;
         
-        // Passer à l'espace suivant ou à la fin de la chaîne
+        // Skip the space or end of the string
         if (*dict_payload != '\0') {
-            dict_payload++;  // Saute l'espace
+            dict_payload++;  // Move past the space
         }
     }
 
-    // Terminer le tableau payload avec un zéro si nécessaire
+    // Null-terminate the payload if necessary
     payload[j] = '\0'; 
 }
 
-//todo
+// Placeholder for AES decryption function
 // void AES_decrypt(unsigned char *data, size_t len, BYTE key) {
 //     for (size_t i = 0; i < len; i++) {
 //         data[i] = data[i] ^ key;
