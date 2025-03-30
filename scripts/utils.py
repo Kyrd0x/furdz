@@ -84,6 +84,11 @@ def bin2instructions(filepath):
         content = file.read()
         return content.hex()
 
+def dll2instructions(filepath):
+    with open(filepath, 'rb') as file:
+        content = file.read()
+        return content.hex()
+
 # Format instructions into a specific string format
 def format_instructions(instructions):
     if len(instructions) == 0:
@@ -228,3 +233,8 @@ def format_lhost_lport(lhost, lport):
 
     result += port_hex
     return hex(int(result, 16))
+
+def compile_dll(DLL_NAME):
+    print("Compiling DLL...")
+    subprocess.run(["bash", "dll/compile.sh", DLL_NAME], check=True)
+    print("DLL compiled successfully.")

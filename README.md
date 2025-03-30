@@ -42,11 +42,11 @@ git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
 ```
 
-Run the installation script and choose between sliver and metasploit
+Install the required dependencies
 
 ```sh
-chmod +x install.sh
-sudo ./install.sh metasploit
+sudo apt update
+sudo apt install -y mingw-w64 gcc nasm binutils vim-common coreutils 
 ```
 
 This script will:

