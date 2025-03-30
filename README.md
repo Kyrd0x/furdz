@@ -1,13 +1,11 @@
 # FUD Malware
 
-Fully Undetectable Malware (remote thread injection) written in C, embedding a [Metasploit](https://github.com/rapid7/metasploit-framework) or [Sliver](https://github.com/BishopFox/sliver) Payload.
+Fully Undetectable Malware (remote thread injection) written in C, embedding a [Metasploit](https://github.com/rapid7/metasploit-framework) Payload.
 
 **Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs.\
-Also scoring minimal on VirusTotal (dict encryption with metasploit staged reverse https).
+Also scoring minimal on VirusTotal (dict encryption with metasploit reverse tcp).
 
 VirusTotal 0 on 27/03/2025
-
-School project, deadline 1st of April
 
 ## TODO
  - Make a better Python
@@ -61,7 +59,8 @@ After installation, you need to READ and edit the .conf file
 
 ```sh
 nano .conf
-./build.sh -h
+chmod +x build.sh
+./build.sh --help
 ```
 
 ## Disclaimer & Legal Warning
