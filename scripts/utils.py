@@ -233,3 +233,8 @@ def format_lhost_lport(lhost, lport):
 
     result += port_hex
     return hex(int(result, 16))
+
+def compile_dll(DLL_NAME):
+    print("Compiling DLL...")
+    subprocess.run(["bash", "dll/compile.sh", DLL_NAME], check=True)
+    print("DLL compiled successfully.")

