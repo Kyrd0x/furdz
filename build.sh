@@ -64,9 +64,9 @@ fi
 
 # Define compiler parameters
 CC="x86_64-w64-mingw32-gcc"
-CFLAGS=($STDLIB -Ibuild -Wall -Wextra -Os -O2 -mwindows -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
+CFLAGS=($STDLIB -Ibuild -Wall -Wextra -Os -mwindows -ffunction-sections -fdata-sections -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
 WARNINGS=(-Wtype-limits -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes)
-LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc)
+LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc -flto)
 OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 

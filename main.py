@@ -35,7 +35,6 @@ else:
     print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
     sys.exit(1)
 
-TARGET_PROCESS = config.get("Payload", "target_process")
 LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
 LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
 

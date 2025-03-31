@@ -136,7 +136,7 @@ example
 life
 paper
 group
-children
+child
 side
 feet
 car
@@ -183,7 +183,7 @@ large
 big
 even
 such
-different
+diff
 kind
 still
 high
@@ -195,7 +195,7 @@ few
 next
 hard
 both
-important
+portant
 white
 four
 second
@@ -233,14 +233,14 @@ below
 last
 never
 always
-together
+to_get
 often
 once
 later
 far
 really
 almost
-sometimes
+sometime
 soon
 of
 to
