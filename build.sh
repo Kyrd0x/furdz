@@ -22,6 +22,7 @@ if [[ "$1" == "clean" ]]; then
     exit 0
 fi
 
+# Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         -o|--output)
@@ -88,15 +89,13 @@ if [[ "$VERBOSE" == "true" ]]; then
     echo -e "$CC ${CFLAGS[@]} ${WARNINGS[@]} ${SRC[@]} -static -static-libgcc -o bin/$OUTPUT_FILE ${LDFLAGS[@]} ${LIBS[@]} ${OBFUSCATION[@]}\n"
 fi
 
+# Compile the main program
 $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"
 
+# Compilation success check
 if [ $? -eq 0 ]; then
-    
     # Post-build
     cp -f bin/$OUTPUT_FILE ../../sandbox/
-    # cp bin/$OUTPUT_FILE pdf/payload.exe
-    # ./pdf/create.sh
-
     echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1))"
 else
     echo "Compilation failed."

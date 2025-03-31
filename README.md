@@ -45,8 +45,7 @@ cd furdz
 Install the required dependencies
 
 ```sh
-sudo apt update
-sudo apt install -y mingw-w64 gcc nasm binutils vim-common coreutils 
+sudo apt update & sudo apt install -y mingw-w64 gcc 
 ```
 
 This script will:

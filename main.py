@@ -35,6 +35,7 @@ else:
     print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
     sys.exit(1)
 
+# C2 infos
 LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
 LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
 
@@ -60,7 +61,7 @@ PAYLOAD_FILE = "payload.txt"
 def main():
 
     if PRIORIZE_SIZE:
-        # no stdlib
+        # if no stdlib -> use custom functions & remove pointless ones
         sed_files(WORKING_FOLDER, "int WinMain(", "int WinMainCRTStartup(")
         sed_files(WORKING_FOLDER, "strlen(", "custom_strlen(",[".c"])
         sed_files(WORKING_FOLDER, "strcmp(", "custom_strcmp(",[".c"])
