@@ -155,7 +155,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
                         procAddress = _GetProcAddress(library, importByName->Name);
                     }
 
-                    if (!procAddress) return 1;//"Failed to resolve import");
+                    if (!procAddress) return 1;//"Failed to resolve import"
 
                     thunkIAT->u1.Function = (ULONG_PTR)procAddress;
                     thunkILT++;
@@ -168,7 +168,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // Step 6.1: Set the memory protection to PAGE_EXECUTE_READ
         DWORD oldProtect = 0;
         if (!_ProtectVirtMem((HANDLE)-1, allocated_vAddr, dll_vSize, PAGE_EXECUTE_READ, &oldProtect)) {
-            return 1;//"VirtualProtectEx() failed");
+            // VirtualFreeEx_t _FreeVirtMem = (VirtualFreeEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_FREE_HASH);
+            // _FreeVirtMem((HANDLE)-1, allocated_vAddr, 0, MEM_RELEASE); // Free the allocated memory
+            return 1;// Failed to VirtualProtect 
         }
 
         // Step 7: Execute the loaded DLL (DllMain())
