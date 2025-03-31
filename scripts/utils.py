@@ -34,40 +34,6 @@ def sed_files(folderpath, old, new, extension=[".nasm", ".c", ".h"]):
         if os.path.isfile(filepath) and (filename.endswith(tuple(extension))):
             sed_file(filepath, old, new)
 
-# Convert a NASM file into shellcode instructions
-def nasm2instructions(filepath):
-    print("\nSetting up shellcode...")
-    obj_file = "build/shell.o"  # Intermediate object file
-    shell_file = "build/shell"  # Final shell executable
-    instructions_file = "build/instructions_trash"  # Temporary file for instructions
-
-    # Commands to assemble, link, and extract instructions
-    nasm_cmd = ["nasm", "-f", "elf64", filepath, "-o", obj_file]
-    ld_cmd = ["ld", "-w", obj_file, "-o", shell_file]
-    dd_cmd = ["dd", f"if={shell_file}", f"of={instructions_file}", "bs=1", "skip=4096", "count=1280"]
-    xxd_cmd = ["xxd", "-p", instructions_file]
-    try:
-        # Run NASM assembler
-        result = subprocess.run(nasm_cmd, check=True)
-
-        # Run linker
-        result = subprocess.run(ld_cmd, check=True)
-
-        # Extract instructions using dd
-        subprocess.run(dd_cmd, check=True)
-
-        # Convert binary instructions to hexadecimal
-        result = subprocess.run(f"xxd -p {instructions_file}", shell=True, check=True, capture_output=True, text=True)
-        hexa_content = result.stdout.strip()
-
-        # Extract and clean up the instructions
-        instructions = hexa_content.split("00000000000000")[0].replace("\n", "")
-        return instructions
-    
-    except subprocess.CalledProcessError as e:
-        print(f"Erreur lors de l'exécution de la commande : {e}")
-        return None
-
 def dll2instructions(filepath):
     with open(filepath, 'rb') as file:
         content = file.read()
@@ -97,20 +63,7 @@ def extract_tags_from_folder(folderpath):
             result.append({"filename": filename, "tags": extract_tags_from_file(filepath)})
     return result
 
-# XOR encryption/decryption with a single byte key
-def xor_encrypt_decrypt(data, byte_key):
-
-    data_bytes = bytes.fromhex(data)  
-
-    # Perform XOR operation on each byte
-    result = bytearray()
-    for i in range(len(data_bytes)):
-        result.append(data_bytes[i] ^ byte_key)  # XOR between data and key
-
-    # Return the result in hexadecimal
-    return result.hex()
-
-# XOR encryption/decryption with a 16-bit word key
+# XOR encryption/decryption with a WORD key
 def xor2_encrypt_decrypt(data, word_key):
     # Convert the hexadecimal string to bytes
     data_bytes = bytes.fromhex(data)

@@ -3,10 +3,10 @@
 
 // Standard library includes for various functionalities
 #include <windows.h>
+#include <tlhelp32.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-#include <stdint.h>
-#include <tlhelp32.h>
 
 // Define constants
 #define ASSOCATION_TABLE_SIZE 256

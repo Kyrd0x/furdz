@@ -1,4 +1,3 @@
-from scripts.utils import resolve_ip
 import os
 import re
 
