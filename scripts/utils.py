@@ -1,11 +1,7 @@
 from scripts.hasher import hash
 import subprocess
-import ipaddress
-import locale
 import random
-import socket
 import math
-import json
 import yaml
 import re
 import os
@@ -72,18 +68,6 @@ def nasm2instructions(filepath):
         print(f"Erreur lors de l'exécution de la commande : {e}")
         return None
 
-# Read instructions from a text file
-def txt2instructions(filepath):
-    with open(filepath, 'r') as file:
-        content = file.read()
-        return content
-
-# Read instructions from a binary file
-def bin2instructions(filepath):
-    with open(filepath, 'rb') as file:
-        content = file.read()
-        return content.hex()
-
 def dll2instructions(filepath):
     with open(filepath, 'rb') as file:
         content = file.read()
@@ -141,42 +125,6 @@ def xor2_encrypt_decrypt(data, word_key):
 
     # Return the result in hexadecimal
     return result.hex()
-
-# Format RHOST and RPORT into a specific hexadecimal format
-def format_rhost_rport(rhost, rport):
-    if rport > 65535 or rport < 0:
-        print("Port number must be between 0 and 65535")
-    if rhost.count(".") != 3:
-        print("Invalid IP address")
-
-    ip = rhost.split(".")
-    result = ""
-    for part in ip[::-1]:
-        hex_part = hex(int(part))[2:].zfill(2)  # Convert to hex and pad if necessary
-        result += hex_part
-    
-    port_hex = hex(rport)[2:].zfill(4)
-    port_hex = port_hex[2:] + port_hex[:2]
-
-    result += port_hex
-    print(f"RHOST={rhost}, RPORT={rport} -> {result}")
-    return hex(int(result, 16))
-
-# Validate an IP address
-def is_valid_ip(ip):
-    pattern = r'^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.|$)){4}$'
-    return bool(re.match(pattern, ip))
-
-# Resolve an IP address from a hostname
-def resolve_ip(ip):
-    try:
-        ipaddress.ip_address(ip)
-        return ip
-    except ValueError:
-        try:
-            return socket.gethostbyname(ip)
-        except socket.gaierror:
-            return None
         
 # Generate a hash object with random rotation values and direction
 def hash_obj(module, function, verbose):
@@ -216,25 +164,6 @@ def get_LCID(country_code):
     
     return result
 
-# Format LHOST and LPORT into a specific hexadecimal format
-def format_lhost_lport(lhost, lport):
-    if lport > 65535 or lport < 0:
-        print("Port number must be between 0 and 65535")
-    if lhost.count(".") != 3:
-        print("Invalid IP address")
-
-    ip = lhost.split(".")
-    result = ""
-    for part in ip[::-1]:
-        result += hex(int(part))[2:]
-    
-    port_hex = hex(lport)[2:].zfill(4)
-    port_hex = port_hex[2:] + port_hex[:2]  # Swap bytes
-
-    result += port_hex
-    return hex(int(result, 16))
-
+# Run the dll/compile.sh script to compile the DLL to inject
 def compile_dll(DLL_NAME):
-    print("Compiling DLL...")
     subprocess.run(["bash", "dll/compile.sh", DLL_NAME], check=True)
-    print("DLL compiled successfully.")
