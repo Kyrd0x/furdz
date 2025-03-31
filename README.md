@@ -1,15 +1,14 @@
 # FUD Malware
 
-Fully Undetectable Malware (remote thread injection) written in C, embedding a [Metasploit](https://github.com/rapid7/metasploit-framework) Payload.
+Fully Undetectable Malware (DLL Injection) written in C.
 
 **Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs.\
-Also scoring minimal on VirusTotal (dict encryption with metasploit reverse tcp).
+Also scoring minimal on VirusTotal (dict encryption with reverse shell tcp).
 
 VirusTotal 0 on 27/03/2025
 
 ## TODO
- - Make a better Python
- - Implement Sliver payloads
+ - a lot
 
 ## Options
 
@@ -47,10 +46,6 @@ Install the required dependencies
 ```sh
 sudo apt update & sudo apt install -y mingw-w64
 ```
-
-This script will:
-- Download and install Metasploit|Sliver if needed
-- Install necessary dependencies for compilation
 
 ### Usage
 

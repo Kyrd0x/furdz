@@ -1,16 +1,15 @@
-from configparser import ConfigParser
-from scripts.hasher import hash
-from scripts.config import parse_config
 from scripts.templating import *
-from scripts.dict import dictionary_encrypt
+from scripts.hasher import *
 from scripts.utils import *
+from scripts.dict import dictionary_encrypt
+
+from configparser import ConfigParser
 import random
 import sys
 
 config = ConfigParser()
 config.read(".conf") 
 
-# CONFIG = parse_config(config)
 
 def is_set(value):
     return value != None and value != ""
