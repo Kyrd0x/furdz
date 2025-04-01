@@ -26,8 +26,7 @@ Avoid countries
 ### Payloads
 
 Can be used:
- - Any Metasploit payload
- - ~~Custom ASM one (from ```asm/```)~~
+ - C written payloads
 
 
 ## How to Use
