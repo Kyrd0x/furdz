@@ -95,7 +95,6 @@ $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$
 # Compilation success check
 if [ $? -eq 0 ]; then
     # Post-build
-    # cp -f bin/$OUTPUT_FILE ../../sandbox/
     echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1))"
 else
     echo "Compilation failed."
