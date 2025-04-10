@@ -63,6 +63,18 @@ def extract_tags_from_folder(folderpath):
             result.append({"filename": filename, "tags": extract_tags_from_file(filepath)})
     return result
 
+def xor1_encrypt_decrypt(data, key):
+    # Convert the hexadecimal string to bytes
+    data_bytes = bytes.fromhex(data)
+
+    # Apply XOR operation on each byte with the key
+    result = bytearray()
+    for byte in data_bytes:
+        result.append(byte ^ key)
+
+    # Return the result in hexadecimal
+    return result.hex()
+
 # XOR encryption/decryption with a WORD key
 def xor2_encrypt_decrypt(data, word_key):
     # Convert the hexadecimal string to bytes
