@@ -43,7 +43,7 @@ cd furdz
 Install the required dependencies
 
 ```sh
-sudo apt update & sudo apt install -y mingw-w64
+sudo apt update & sudo apt install -y mingw-w64 python3-yaml
 ```
 
 ### Usage
