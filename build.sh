@@ -95,7 +95,7 @@ $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$
 # Compilation success check
 if [ $? -eq 0 ]; then
     # Post-build
-    echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1))"
+    echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1), dll size: $(du -h build/injected-dll.dll | cut -f1))"
 else
     echo "Compilation failed."
     exit 1
