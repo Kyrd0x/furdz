@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit early on any failure
+set -euo pipefail
+
 # Read arguments
 OUTPUT_FILE="executable.exe"
 PRIORIZE_SIZE="false"
@@ -48,6 +51,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Define source and header files
+shopt -s nullglob
 SRC=(
     build/src/common/*.c
     build/src/exe/*.c
@@ -56,6 +60,7 @@ HEADERS=(
     build/include/common/*.h
     build/include/exe/*.h
 )
+shopt -u nullglob
 # Configure options based on PRIORIZE_SIZE
 if [[ "$PRIORIZE_SIZE" == "true" ]]; then
     STDLIB="-nostdlib"
@@ -78,7 +83,6 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 
 
 # Create necessary directories
-rm -rf build
 mkdir -p bin build/bin
 cp -r src/ include/ build/
 
