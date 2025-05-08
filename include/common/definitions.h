@@ -9,7 +9,6 @@
 #include <time.h>
 
 // Define constants
-#define ASSOCATION_TABLE_SIZE 256
 #define CUR_PROC (HANDLE)-1
 
 typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
@@ -23,15 +22,6 @@ typedef struct {
     uint8_t rotation_value;      // Rotation value for the hash
     bool is_rotation_right;      // Direction of rotation
 } ObjHash;
-
-// Structure to map words to bytes
-typedef struct {
-    char *word;                  // Word to be mapped
-    uint8_t byte;                // Corresponding byte value
-} Association;
-
-// Declaration of an external association table
-extern const Association association_table[ASSOCATION_TABLE_SIZE];
 
 // Structure to represent a process environment block (PEB)
 typedef struct __PEB {

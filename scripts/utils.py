@@ -17,6 +17,11 @@ def round_pow2(n):
 def ro_line(ro_value, direction):
     return f"ro{direction[0].lower()} ${ro_value}"
 
+def is_valid_tag(tag):
+    tag_content = tag[1:-1]  # Remove the '%' characters
+    # Check if the tag contains only alphanumeric characters and underscores
+    return bool(re.fullmatch(r'[A-Za-z0-9_.-]+', tag_content))
+
 # Replace occurrences of a string in a file
 def sed_file(filepath, old, new):
     # Open the file in read/write mode
@@ -46,11 +51,6 @@ def format_instructions(instructions):
         return ""
     else:
         return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
-
-def is_valid_tag(tag):
-    tag_content = tag[1:-1]  # Remove the '%' characters
-    # Check if the tag contains only alphanumeric characters and underscores
-    return bool(re.fullmatch(r'[A-Z0-9_-]+', tag_content))
 
 # Extract tags from a file
 def extract_tags_from_file(filepath):
