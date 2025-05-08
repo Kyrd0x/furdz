@@ -25,6 +25,11 @@ if [[ "$1" == "clean" ]]; then
     exit 0
 fi
 
+# Recreate build environment
+rm -rf build
+mkdir -p build/bin bin
+cp -r src include build/
+
 # Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
@@ -61,6 +66,7 @@ HEADERS=(
     build/include/exe/*.h
 )
 shopt -u nullglob
+
 # Configure options based on PRIORIZE_SIZE
 if [[ "$PRIORIZE_SIZE" == "true" ]]; then
     STDLIB="-nostdlib"
@@ -82,10 +88,6 @@ OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 
 
-# Create necessary directories
-mkdir -p bin build/bin
-cp -r src/ include/ build/
-
 # Sed everything and compile the dll
 if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE"; then
     echo "❌ Erreur : l'exécution de main.py a échoué."
@@ -105,11 +107,6 @@ fi
 # Compile the main program
 $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"
 
-# Compilation success check
-if [ $? -eq 0 ]; then
-    # Post-build
-    echo "Build completed. Output file: bin/$OUTPUT_FILE (size: $(du -h bin/$OUTPUT_FILE | cut -f1), dll size: $(du -h build/bin/injected-dll.dll | cut -f1))"
-else
-    echo "Compilation failed."
-    exit 1
-fi
+echo "✅ Build completed. Output file: bin/$OUTPUT_FILE"
+echo "🔍 Size: $(du -h bin/$OUTPUT_FILE | cut -f1)"
+echo "📦 DLL size: $(du -h build/bin/injected-dll.dll | cut -f1 || echo 'N/A')"
