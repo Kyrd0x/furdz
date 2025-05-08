@@ -48,9 +48,14 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Define source and header files
-SRC=(build/loader.c build/definitions.c build/fake.c build/decrypt.c build/winapi.c build/anti_sandbox.c build/payload.c)
-HEADERS=(build/definitions.h)
-
+SRC=(
+    build/src/common/*.c
+    build/src/exe/*.c
+)
+HEADERS=(
+    build/include/common/*.h
+    build/include/exe/*.h
+)
 # Configure options based on PRIORIZE_SIZE
 if [[ "$PRIORIZE_SIZE" == "true" ]]; then
     STDLIB="-nostdlib"
@@ -65,7 +70,7 @@ fi
 
 # Define compiler parameters
 CC="x86_64-w64-mingw32-gcc"
-CFLAGS=($STDLIB -Ibuild -Wall -Wextra -Os -mwindows -ffunction-sections -fdata-sections -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
+CFLAGS=($STDLIB -Ibuild/include/common -Ibuild/include/exe -Wall -Wextra -Os -mwindows -ffunction-sections -fdata-sections -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
 WARNINGS=(-Wtype-limits -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes)
 LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc -flto)
 OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
@@ -73,12 +78,15 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 
 
 # Create necessary directories
-mkdir -p bin build
-cp src/* build/
-cp dll/* build/
+rm -rf build
+mkdir -p bin build/bin
+cp -r src/ include/ build/
 
 # Sed everything and compile the dll
-python3 main.py $VERBOSE $PRIORIZE_SIZE
+if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE"; then
+    echo "❌ Erreur : l'exécution de main.py a échoué."
+    exit 1
+fi
 
 # Compile the icon if necessary
 if [[ -n "$ICON" ]]; then

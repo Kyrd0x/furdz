@@ -88,9 +88,7 @@ extern const uint16_t AVOIDED_COUNTRIES[];
 extern const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE;
 extern const size_t AVOIDED_COUNTRIES_SIZE;
 
-// Payload-related declarations
-extern unsigned char payload[%PAYLOAD_SIZE%];
-extern const char* dict_payload;
+
 
 // Function declarations for cryptographic and utility operations
 void XOR(unsigned char *data, size_t len, uint16_t key);
