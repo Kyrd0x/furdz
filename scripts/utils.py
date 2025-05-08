@@ -131,4 +131,4 @@ def get_LCID(country_code):
 
 # Run the dll/compile.sh script to compile the DLL to inject
 def compile_dll(DLL_NAME):
-    subprocess.run(["bash", "dll/compile.sh", DLL_NAME], check=True)
+    subprocess.run(["bash", "scripts/compile_dll.sh", DLL_NAME], check=True)

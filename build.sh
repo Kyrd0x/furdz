@@ -74,7 +74,8 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 
 # Create necessary directories
 mkdir -p bin build
-cp src/* dll/* build/
+cp src/* build/
+cp dll/* build/
 
 # Sed everything and compile the dll
 python3 main.py $VERBOSE $PRIORIZE_SIZE
