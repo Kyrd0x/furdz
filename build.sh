@@ -8,7 +8,7 @@ VERBOSE="false"
 usage() {
     echo "Usage: $0 -o <output_file> [--priorize-size] [-v] [-h]"
     echo "Options:"
-    echo "  -o, --output <output_file>   Specify the output file name (default: final.exe)"
+    echo "  -o, --output <output_file>   Specify the output file name (default: executable.exe)"
     echo "  --priorize-size              Prioritize size over detection (no icon & no stdlib)"
     echo "  -v, --verbose                Enable verbose mode"
     echo "  -h, --help                   Show this help message"

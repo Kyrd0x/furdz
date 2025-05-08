@@ -1,0 +1,24 @@
+name: Test Compilation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Update apt and install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential mingw-w64 python3-yaml
+
+    - name: Run build script
+      run: |
+        chmod +x build.sh
+        ./build.sh -o trash.exe
