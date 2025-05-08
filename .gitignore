@@ -1,6 +1,7 @@
-build/
-.env
 .vscode/
 __pycache__/
+
+build/
+bin/
+.env
 other/
-hp.md
