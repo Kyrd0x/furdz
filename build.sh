@@ -20,7 +20,7 @@ usage() {
 }
 
 # Cleanup
-if [[ "$1" == "clean" ]]; then
+if [[ "${1:-}" == "clean" ]]; then
     rm -rf build
     exit 0
 fi

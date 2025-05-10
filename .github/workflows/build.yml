@@ -22,3 +22,25 @@ jobs:
       run: |
         chmod +x build.sh
         ./build.sh -o trash.exe
+
+    - name: Set up Tailscale
+      uses: tailscale/github-action@v3
+      with:
+        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID  }}
+        oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+        tags: tag:ci
+
+    - name: Add SSH key and wait for Tailscale host
+      run: |
+        for i in {1..10}; do
+          echo "⏳ Pinging ${{ vars.CAPE_HOST }} (attempt $i)..."
+          ping -c 1 ${{ vars.CAPE_HOST }} >/dev/null 2>&1 && break || {
+            echo "❌ Tailscale not ready yet, retrying in 5 seconds..."
+            sleep 5
+          }
+        done
+        echo "✅ Host is reachable, sending to Sandbox..."
+        # todo
+
+
+    
