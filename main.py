@@ -66,12 +66,6 @@ def main():
     if PRIORIZE_SIZE:
         # if no stdlib -> use custom functions & remove pointless ones
         sed_files(WORKING_FOLDER, "int WinMain(", "int WinMainCRTStartup(")
-        sed_files(WORKING_FOLDER, "strlen(", "custom_strlen(",[".c"])
-        sed_files(WORKING_FOLDER, "strcmp(", "custom_strcmp(",[".c"])
-        sed_files(WORKING_FOLDER, "strncpy(", "custom_strncpy(",[".c"])
-        sed_files(WORKING_FOLDER, "srand(", "// srand(")
-        sed_files(WORKING_FOLDER, "rand()", f"{random.randint(0, 0xFFFF)}")
-        sed_files(WORKING_FOLDER, "printf(", "// printf(")
 
 
     print("===========PAYLOAD==============") if VERBOSE else None

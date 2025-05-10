@@ -12,7 +12,7 @@ usage() {
     echo "Usage: $0 -o <output_file> [--priorize-size] [-v] [-h]"
     echo "Options:"
     echo "  -o, --output <output_file>   Specify the output file name (default: executable.exe)"
-    echo "  --priorize-size              Prioritize size over detection (no icon & no stdlib)"
+    echo "  -s, --small                  Prioritize size over detection (no icon & no stdlib)"
     echo "  -v, --verbose                Enable verbose mode"
     echo "  -h, --help                   Show this help message"
     echo "  clean                        Clean the build directory"
@@ -37,7 +37,7 @@ while [[ "$#" -gt 0 ]]; do
             OUTPUT_FILE="$2"
             shift 2
             ;;
-        --priorize-size)
+        -s|--small)
             PRIORIZE_SIZE="true"
             shift
             ;;
@@ -69,7 +69,7 @@ shopt -u nullglob
 
 # Configure options based on PRIORIZE_SIZE
 if [[ "$PRIORIZE_SIZE" == "true" ]]; then
-    STDLIB="-nostdlib"
+    STDLIB="-nostdlib -DLIGHWEIGHT=1"
     ICON=""
     ENTRYPOINT="WinMainCRTStartup"
 else
@@ -110,3 +110,4 @@ $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$
 echo "✅ Build completed. Output file: bin/$OUTPUT_FILE"
 echo "🔍 Size: $(du -h bin/$OUTPUT_FILE | cut -f1)"
 echo "📦 DLL size: $(du -h build/bin/injected-dll.dll | cut -f1 || echo 'N/A')"
+echo " LIGHTWEIGHT: $PRIORIZE_SIZE"

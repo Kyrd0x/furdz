@@ -1,4 +1,5 @@
-#include "definitions.h"
+#include "sandbox.h"
+#include "winapi.h"
 
 // Function to check if the program is being debugged
 // Uses low-level assembly to detect debugging on Windows x64 systems.
@@ -39,7 +40,7 @@ const char* get_hostname(HMODULE hKernel32dll) {
 
 // Function to compute a hash with rotation
 // Implements a custom hashing algorithm with configurable rotation direction and value.
-unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right) {
+unsigned int compute_hash(const char* str, uint8_t rotation_value, bool is_rotation_right) {
     unsigned int hash = 0;
     size_t str_len = strlen(str);
 
@@ -54,13 +55,6 @@ unsigned int RO(const char* str, uint8_t rotation_value, bool is_rotation_right)
         hash = (hash + (unsigned char)str[i]) & 0xFFFFFFFF;
     }
     return hash; // Return the computed hash
-}
-
-// Function to check if an ObjHash is valid (non-null)
-// An ObjHash is considered valid if any of its fields are non-zero.
-bool is_objhash(ObjHash obj_hash) {
-    // A null ObjHash is defined as {0, 0, false}
-    return (obj_hash.value != 0 || obj_hash.rotation_value != 0 || obj_hash.is_rotation_right != false);
 }
 
 // Function to check if a string matches a prefix hash
