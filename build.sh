@@ -9,19 +9,23 @@ PRIORIZE_SIZE="false"
 VERBOSE="false"
 
 usage() {
-    echo "Usage: $0 -o <output_file> [--priorize-size] [-v] [-h]"
+    echo "Usage: $0 [options] | clean"
+    echo ""
     echo "Options:"
     echo "  -o, --output <output_file>   Specify the output file name (default: executable.exe)"
     echo "  -s, --small                  Prioritize size over detection (no icon & no stdlib)"
     echo "  -v, --verbose                Enable verbose mode"
     echo "  -h, --help                   Show this help message"
+    echo ""
+    echo "Commands:"
     echo "  clean                        Clean the build directory"
     exit 1
 }
 
 # Cleanup
 if [[ "${1:-}" == "clean" ]]; then
-    rm -rf build
+    rm -rf bin build .build
+    echo "🧹 Cleaned build and bin directories."
     exit 0
 fi
 
