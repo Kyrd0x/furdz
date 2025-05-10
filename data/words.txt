@@ -100,7 +100,7 @@ year
 back
 thing
 name
-sentence
+us
 man
 line
 boy
@@ -119,7 +119,7 @@ letter
 point
 mother
 answer
-America
+I
 world
 food
 country
@@ -150,7 +150,7 @@ idea
 face
 Indian
 girl
-mountain
+me
 list
 song
 family
@@ -240,7 +240,7 @@ later
 far
 really
 almost
-sometime
+yo
 soon
 of
 to

@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "winapi.h"
 #include "sandbox.h"
@@ -11,9 +12,6 @@
 #define _UTF16(x)   L##x
 #define UTF16(x)    _UTF16(x)
 
-#define bool _Bool
-#define true 1
-#define false 0
 
 // Function to get the length of a string
 size_t strlen(const char* str) {
