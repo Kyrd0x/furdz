@@ -17,7 +17,6 @@ def is_set(value):
 VERBOSE = False
 PRIORIZE_SIZE = False
 
-DLL_NAME = config.get("Payload", "dll_name", fallback="").strip()
 ENCRYPTION_METHOD = config.get("Payload", "encryption_method", fallback="").strip()
 
 if len(sys.argv) > 1:
@@ -25,8 +24,6 @@ if len(sys.argv) > 1:
 if len(sys.argv) > 2:
     PRIORIZE_SIZE = sys.argv[2].lower() == "true"
 
-if not DLL_NAME:
-    sys.exit("Error: DLL name must be specified in the configuration (.conf) file.")
 
 if ENCRYPTION_METHOD == "xor":
     if config.get("Payload", "encryption_key") == "random":

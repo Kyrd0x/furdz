@@ -15,7 +15,7 @@ x86_64-w64-mingw32-gcc -s -shared -ffreestanding \
   -o $OUTPUT_FILE \
   ${SRC[@]} \
   -e DllMain \
-  -lws2_32 -nostdlib -lkernel32 -lmsvcrt
+  -lws2_32 -nostdlib -lkernel32 -luser32 -lmsvcrt
 
 if [[ $? -ne 0 ]]; then
     echo "Failed to compile DLL."

