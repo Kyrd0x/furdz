@@ -49,3 +49,10 @@ int custom_rand() {
 
 // Custom srand function
 void custom_srand(unsigned int seed) {}
+
+time_t custom_time(time_t *t) {
+    static time_t fake_time = 652307613; // arbitrary value
+
+    if (t) *t = fake_time;
+    return fake_time;
+}

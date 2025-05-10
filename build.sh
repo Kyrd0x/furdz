@@ -83,7 +83,7 @@ fi
 CC="x86_64-w64-mingw32-gcc"
 CFLAGS=($STDLIB -Ibuild/include/common -Ibuild/include/exe -Wall -Wextra -Os -mwindows -ffunction-sections -fdata-sections -fno-stack-protector -fno-stack-check -fno-strict-aliasing -ffreestanding)
 WARNINGS=(-Wtype-limits -Wno-cast-function-type -Wno-unused-parameter -Wno-unused-variable -Wattributes)
-LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc -flto)
+LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc -fno-lto)
 OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 

