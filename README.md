@@ -3,12 +3,12 @@
 Fully Undetectable Malware (DLL Injection) written in C.
 
 **Working** without any detection on up-to-date Windows 10/11 and bypassing other AVs.\
-Also scoring minimal on VirusTotal (dict encryption with reverse shell tcp).
-
-VirusTotal 0 on 27/03/2025
+Also scoring minimal on VirusTotal.
 
 ## TODO
- - a lot
+
+ - AutoLoad the DLL
+ - DLL actions modularity
 
 ## Options
 
@@ -27,7 +27,6 @@ Avoid countries
 
 Can be used:
  - C written payloads
-
 
 ## How to Use
 
