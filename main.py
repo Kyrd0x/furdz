@@ -54,7 +54,7 @@ if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
     AVOID_COUNTRIES = []
 
 WORKING_FOLDER = "build/"
-STUB_FILE = "loader.c"
+STUB_FILE = "main.c"
 PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"
 
