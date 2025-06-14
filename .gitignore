@@ -4,5 +4,6 @@ __pycache__/
 build/
 .build/
 bin/
+!bin/a.exe
 .env
 other/
