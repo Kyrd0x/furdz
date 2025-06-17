@@ -55,6 +55,14 @@ chmod +x build.sh
 ./build.sh --help
 ```
 
+### Tips
+
+Fixing Windows/Linux file formatting
+
+```bash
+find . -name "*.sh" -type f -exec dos2unix {} \;
+```
+
 ## Disclaimer & Legal Warning
 
 This project is intended for educational and research purposes only. The use of this code in any unauthorized, unethical, or illegal manner is strictly prohibited. By using this software, you agree that you are responsible for your actions and will comply with all applicable laws and regulations.

