@@ -20,7 +20,19 @@ jobs:
         chmod +x build.sh
 
     - name: Run default build
-      run: ./build.sh
+      run: |
+        output=$(./build.sh)
+        echo "$output"
+
+        if ! echo "$output" | grep -q "Build completed"; then
+          exit 1
+        fi
 
     - name: Run alternative build
-      run: ./build.sh --small    
+      run: |
+        output=$(./build.sh --small)
+        echo "$output"
+
+        if ! echo "$output" | grep -q "Build completed"; then
+          exit 1
+        fi
