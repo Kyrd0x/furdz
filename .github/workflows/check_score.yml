@@ -1,0 +1,57 @@
+name: Check CAPEv2 Detection
+
+on:
+  workflow_run:
+    workflows:
+      - Test Build
+    types:
+      - completed
+
+jobs:
+  on-success:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Update apt and install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y mingw-w64 python3-yaml
+        chmod +x build.sh
+
+    - name: Set up Tailscale
+      uses: tailscale/github-action@v3
+      with:
+        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID  }}
+        oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+        tags: tag:ci
+
+    - name: wait for Tailscale host
+      run: |
+        echo "[*] Waiting for Tailscale to be ready..."
+        for i in {1..10}; do
+          echo "⏳ Pinging ${{ secrets.CAPE_HOST }} (attempt $i)..."
+          ping -c 1 ${{ secrets.CAPE_HOST }} >/dev/null 2>&1 && break || {
+            echo "❌ Tailscale not ready yet, retrying in 5 seconds..."
+            sleep 5
+          }
+        done
+        echo "✅ Host is reachable"
+      
+    - name: Check for CAPE Sandbox status
+      run:
+        echo "[*] Checking Sandbox status..."
+        # curl and parse result
+        # curl ${{secrets.CAPE_HOST}}/apiv2/status
+
+    - name: Send default build to CAPE
+      run: |
+        ./build.sh -o furdz_output.exe
+
+
+    - name: Send small build to CAPE
+      run: |
+        ./build.sh --small -o furdz_small_output.exe

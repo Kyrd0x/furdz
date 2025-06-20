@@ -1,0 +1,26 @@
+name: Test Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Update apt and install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y mingw-w64 python3-yaml
+        chmod +x build.sh
+
+    - name: Run default build
+      run: ./build.sh
+
+    - name: Run alternative build
+      run: ./build.sh --small    
