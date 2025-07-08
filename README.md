@@ -37,8 +37,6 @@ Clone this repository and navigate to the project directory:
 ```sh
 git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
-# might need to fix file format by doing:
-find . -name "*.sh" -type f -exec dos2unix {} \;
 ```
 
 Install the required dependencies
