@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # FUD Malware
 
 Fully Undetectable Malware (DLL Injection) written in C.
@@ -146,4 +145,3 @@ This project is intended for educational and research purposes only. The use of 
 The creator(s) and contributor(s) of this repository are not responsible for any misuse, damages, or legal consequences resulting from the use of this software. If you plan to test this tool, ensure that you have explicit permission to do so on your own devices or environments.
 
 Use at your own risk.
->>>>>>> b62eed6667d29698fe0f11fbe37ba56958eca183
