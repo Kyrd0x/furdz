@@ -33,11 +33,11 @@ jobs:
       run: |
         echo "[*] Waiting for Tailscale to be ready..."
         sleep 10
-        for i in {1..10}; do
+        for i in {1..20}; do
           echo "⏳ Pinging ${{ secrets.CAPE_HOST }} (attempt $i)..."
           ping -c 1 ${{ secrets.CAPE_HOST }} >/dev/null 2>&1 && break || {
-            echo "❌ Tailscale not ready yet, retrying in 5 seconds..."
-            sleep 5
+            echo "❌ Tailscale not ready yet, retrying in 10 seconds..."
+            sleep 10
           }
         done
         echo "✅ Host is reachable"
@@ -47,7 +47,7 @@ jobs:
       run:
         echo "[*] Checking Sandbox status..."
 
-        response=$(curl -s "http://10.12.0.70:8000/apiv2/cuckoo/status/")
+        response=$(curl -s "{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
 
         if [[ -z "$response" ]]; then
             echo "❌ No response received from CAPE"
@@ -67,10 +67,10 @@ jobs:
             exit 1
         fi
 
-    - name: Send default build to CAPE
+    - name: Build different versions
       run: |
         ./build.sh -o furdz_output.exe
-
-    - name: Send small build to CAPE
-      run: |
         ./build.sh --small -o furdz_small_output.exe
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
