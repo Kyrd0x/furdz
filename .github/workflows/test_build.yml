@@ -15,13 +15,13 @@ jobs:
 
     - name: Update apt and install dependencies
       run: |
-        sudo apt update
-        sudo apt install -y mingw-w64 python3-yaml
+        sudo apt-get update
+        sudo apt-get install -y mingw-w64 python3-yaml
         chmod +x build.sh
 
     - name: Run default build
       run: |
-        output=$(./build.sh -o output.exe)
+        output=$(./build.sh)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
@@ -30,15 +30,9 @@ jobs:
 
     - name: Run alternative build
       run: |
-        output=$(./build.sh --small -o output_small.exe)
+        output=$(./build.sh --small)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
           exit 1
         fi
-
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-outputs
-        path: bin/

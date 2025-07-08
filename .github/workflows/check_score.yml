@@ -16,6 +16,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Update apt and install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mingw-w64 python3-yaml
+
     - name: Set up Tailscale
       uses: tailscale/github-action@v3
       with:
@@ -64,9 +69,22 @@ jobs:
             exit 1
         fi
 
-    - name: Download build artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: build-outputs
-        path: ./bin/
+    - name: Compile samples
+      run: |
+        echo "[*] Compiling samples..."
+        chmod +x build.sh
+        ./build.sh -o output.exe
+        ./build.sh --small -o output_small.exe
+
+    - name: Submit default sample to CAPE
+      env:
+        CAPE_HOST: ${{ secrets.CAPE_HOST }}
+        CAPE_API_TOKEN: ${{ secrets.CAPE_API_TOKEN }}
+      run: |
+        echo "[*] Submitting file to CAPE..."
+
+        curl -sSL -X POST \
+          -F file=@bin/output.exe \
+          -H "Authorization: Token $CAPE_API_TOKEN" \
+          http://${CAPE_HOST}:8000/apiv2/tasks/create/file/
       
