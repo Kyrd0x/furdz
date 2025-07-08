@@ -25,7 +25,9 @@ jobs:
     - name: Set up Tailscale
       uses: tailscale/github-action@v3
       with:
-        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+        oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+        tags: tag:ci
 
     - name: wait for Tailscale host
       run: |
@@ -42,7 +44,7 @@ jobs:
         # Need to implement timeout exit
       
     - name: Check for CAPE Sandbox status
-      run: |
+      run:
         echo "[*] Checking Sandbox status..."
 
         response=$(curl -s "http://{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
