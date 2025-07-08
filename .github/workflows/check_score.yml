@@ -47,7 +47,7 @@ jobs:
       run:
         echo "[*] Checking Sandbox status..."
 
-        response=$(curl -s "{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
+        response=$(curl -s "http://{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
 
         if [[ -z "$response" ]]; then
             echo "❌ No response received from CAPE"
