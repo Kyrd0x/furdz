@@ -38,10 +38,12 @@ jobs:
         # Need to implement timeout exit
       
     - name: Check for CAPE Sandbox status
+      env:
+        CAPE_HOST: ${{ secrets.CAPE_HOST }}
       run: |
         echo "[*] Checking Sandbox status..."
 
-        response=$(curl -s "http://{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
+        response=$(curl -s "http://{CAPE_HOST}:8000/apiv2/cuckoo/status/")
         echo $response
 
         if [[ -z "$response" ]]; then
