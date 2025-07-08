@@ -57,7 +57,7 @@ jobs:
         fi
 
         error=$(echo "$response" | jq -r '.error')
-        available=$(echo "$response" | jq -r '.data.machines.available')
+        available=$(echo "$response" | jq -r '.data.machines.total')
 
         if [[ "$error" != "false" ]]; then
             echo "❌ CAPE reported error=true"
@@ -69,34 +69,54 @@ jobs:
             exit 1
         fi
 
+    - name: Get commit message
+      id: get_commit_msg
+      run: |
+        commit_url="${{ github.event.workflow_run.head_repository.url }}/commits/${{ github.event.workflow_run.head_sha }}"
+        echo "Fetching commit from: $commit_url"
+        
+        message=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }} \
+          | jq -r '.commit.message')
+
+        # Sanitize the message for filenames
+        safe_message=$(echo "$message" | tr -cd '[:alnum:]_-' | cut -c1-50)
+        echo "commit_message=$safe_message" >> "$GITHUB_OUTPUT"
+
     - name: Compile samples
       run: |
         echo "[*] Compiling samples..."
         chmod +x build.sh
-        ./build.sh -o output.exe
-        ./build.sh --small -o output_small.exe
 
-    - name: Submit default sample to CAPE
+        safe_name="${{ steps.get_commit_msg.outputs.commit_message }}"
+        ./build.sh -o "bin/sample_${safe_name}.exe"
+        ./build.sh --small -o "bin/sample_${safe_name}_small.exe"
+
+    - name: Submit sample to CAPE
       env:
         CAPE_HOST: ${{ secrets.CAPE_HOST }}
         CAPE_API_TOKEN: ${{ secrets.CAPE_API_TOKEN }}
       run: |
-        echo "[*] Submitting files to CAPE..."
+        name="${{ steps.get_commit_msg.outputs.commit_message }}"
+
+        echo "[*] Submitting $name binaries to CAPE..."
 
         response=$(curl -sSL -X POST \
-          -F file=@bin/output.exe \
+          -F file=@bin/sample_${name}.exe \
+          -F package="exe" \
           -H "Authorization: Token $CAPE_API_TOKEN" \
           http://${CAPE_HOST}:8000/apiv2/tasks/create/file/)
 
         task_id=$(echo "$response" | jq -r '.data.task_ids[0]')
 
         response_small=$(curl -sSL -X POST \
-          -F file=@bin/output_small.exe \
+          -F file=@bin/sample_${name}_small.exe \
+          -F package="exe" \
           -H "Authorization: Token $CAPE_API_TOKEN" \
           http://${CAPE_HOST}:8000/apiv2/tasks/create/file/)
 
         task_id_small=$(echo "$response_small" | jq -r '.data.task_ids[0]')
 
-        # then loop until the task is done and get infos maybe
-        echo "[*] Waiting for tasks to complete..."
-      
+        echo "Submitted tasks: $task_id, $task_id_small"
+          
