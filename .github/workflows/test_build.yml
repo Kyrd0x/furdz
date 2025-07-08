@@ -21,7 +21,7 @@ jobs:
 
     - name: Run default build
       run: |
-        output=$(./build.sh)
+        output=$(./build.sh -o output.exe)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
@@ -30,9 +30,15 @@ jobs:
 
     - name: Run alternative build
       run: |
-        output=$(./build.sh --small)
+        output=$(./build.sh --small -o output_small.exe)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
           exit 1
         fi
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-outputs
+        path: bin/

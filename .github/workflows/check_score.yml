@@ -16,12 +16,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Update apt and install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y mingw-w64 python3-yaml
-        chmod +x build.sh
-
     - name: Set up Tailscale
       uses: tailscale/github-action@v3
       with:
@@ -48,6 +42,7 @@ jobs:
         echo "[*] Checking Sandbox status..."
 
         response=$(curl -s "http://{{ secrets.CAPE_HOST }}:8000/apiv2/cuckoo/status/")
+        echo $response
 
         if [[ -z "$response" ]]; then
             echo "❌ No response received from CAPE"
@@ -67,8 +62,9 @@ jobs:
             exit 1
         fi
 
-    - name: Build different versions
-      run: |
-        ./build.sh -o furdz_output.exe
-        ./build.sh --small -o furdz_small_output.exe
-
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: build-outputs
+        path: ./bin/
+      
