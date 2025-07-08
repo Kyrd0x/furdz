@@ -25,9 +25,7 @@ jobs:
     - name: Set up Tailscale
       uses: tailscale/github-action@v3
       with:
-        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID  }}
-        oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-        tags: tag:ci
+        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
 
     - name: wait for Tailscale host
       run: |
@@ -36,8 +34,8 @@ jobs:
         for i in {1..20}; do
           echo "⏳ Pinging ${{ secrets.CAPE_HOST }} (attempt $i)..."
           ping -c 3 ${{ secrets.CAPE_HOST }} >/dev/null 2>&1 && break || {
-            echo "❌ Tailscale not ready yet, retrying in 10 seconds..."
-            sleep 10
+            echo "❌ Tailscale not ready yet, retrying in 5 seconds..."
+            sleep 5
           }
         done
         echo "✅ Host is reachable"
