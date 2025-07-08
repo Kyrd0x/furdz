@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Update apt and install dependencies
       run: |
@@ -35,7 +35,7 @@ jobs:
         sleep 10
         for i in {1..20}; do
           echo "⏳ Pinging ${{ secrets.CAPE_HOST }} (attempt $i)..."
-          ping -c 1 ${{ secrets.CAPE_HOST }} >/dev/null 2>&1 && break || {
+          ping -c 3 ${{ secrets.CAPE_HOST }} >/dev/null 2>&1 && break || {
             echo "❌ Tailscale not ready yet, retrying in 10 seconds..."
             sleep 10
           }
@@ -72,5 +72,3 @@ jobs:
         ./build.sh -o furdz_output.exe
         ./build.sh --small -o furdz_small_output.exe
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
