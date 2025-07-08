@@ -43,7 +43,7 @@ jobs:
       run: |
         echo "[*] Checking Sandbox status..."
 
-        response=$(curl -s "http://{CAPE_HOST}:8000/apiv2/cuckoo/status/")
+        response=$(curl -s "http://${CAPE_HOST}:8000/apiv2/cuckoo/status/")
         echo $response
 
         if [[ -z "$response" ]]; then
