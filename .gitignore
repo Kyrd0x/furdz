@@ -7,3 +7,4 @@ bin/
 !bin/a.exe
 .env
 other/
+temp*

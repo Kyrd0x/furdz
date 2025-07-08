@@ -46,13 +46,25 @@ jobs:
     - name: Check for CAPE Sandbox status
       run:
         echo "[*] Checking Sandbox status..."
-        STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.CAPE_HOST }}/apiv2/cuckoo/status")
 
-        if [ "$STATUS_CODE" -ne 200 ]; then
-          echo "❌ CAPE Sandbox is Dead"
-          exit 1
-        else
-          echo "✅ CAPE Sandbox is Alive"
+        response=$(curl -s "http://10.12.0.70:8000/apiv2/cuckoo/status/")
+
+        if [[ -z "$response" ]]; then
+            echo "❌ No response received from CAPE"
+            exit 1
+        fi
+
+        error=$(echo "$response" | jq -r '.error')
+        available=$(echo "$response" | jq -r '.data.machines.available')
+
+        if [[ "$error" != "false" ]]; then
+            echo "❌ CAPE reported error=true"
+            exit 1
+        fi
+
+        if [[ "$available" -lt 1 ]]; then
+            echo "❌ No machines available in CAPE"
+            exit 1
         fi
 
     - name: Send default build to CAPE
