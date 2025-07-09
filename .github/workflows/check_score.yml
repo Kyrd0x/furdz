@@ -90,8 +90,8 @@ jobs:
         chmod +x build.sh
 
         safe_name="${{ steps.get_commit_msg.outputs.commit_message }}"
-        ./build.sh -o "bin/sample_${safe_name}.exe"
-        ./build.sh --small -o "bin/sample_${safe_name}_small.exe"
+        ./build.sh -o "sample_${safe_name}.exe"
+        ./build.sh --small -o "sample_${safe_name}_small.exe"
 
     - name: Submit sample to CAPE
       env:
