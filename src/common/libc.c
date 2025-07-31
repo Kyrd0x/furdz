@@ -56,3 +56,13 @@ time_t custom_time(time_t *t) {
     if (t) *t = fake_time;
     return fake_time;
 }
+
+// Custom snprintf function
+// int custom_snprintf(char *str, size_t size, const char *format, ...) {
+//     int count;
+//     va_list args;
+//     va_start(args, format);
+//     count = vsnprintf(str, size, format, args);
+//     va_end(args);
+//     return count;
+// }

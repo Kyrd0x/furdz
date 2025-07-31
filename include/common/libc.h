@@ -14,6 +14,7 @@
     #define rand custom_rand
     #define srand custom_srand
     #define time custom_time
+    // #define snprintf custom_snprintf
 
     int custom_strcmp(const char *s1, const char *s2);
     char *custom_strncpy(char *dest, const char *src, size_t n);
@@ -22,6 +23,7 @@
     int custom_rand();
     void custom_srand(unsigned int seed);
     time_t custom_time(time_t  *t);
+    // int custom_snprintf(char *str, size_t size, const char *format, ...);
 
 #else
     #include <string.h>  // pour strcmp, strncpy, strlen

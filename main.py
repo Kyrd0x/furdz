@@ -38,6 +38,7 @@ else:
 # C2 infos
 LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
 LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
+PAYLOAD_TYPE = config.get("Payload", "type") if is_set(config.get("Payload", "type")) else None
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -145,7 +146,7 @@ def main():
                     else:
                         sed_file(WORKING_FOLDER+filename, tag, "") # {0, 0, false}
 
-    compile_dll()
+    compile_dll(PAYLOAD_TYPE)
 
     instructions = dll2instructions()
     with open(WORKING_FOLDER+PAYLOAD_FILE, "w") as f:

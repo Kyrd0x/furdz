@@ -7,6 +7,7 @@ Also scoring minimal on VirusTotal.
 
 ## TODO
 
+ - Create --debug option to compile without anti debug checks
  - AutoLoad the DLL
  - DLL actions modularity
 
