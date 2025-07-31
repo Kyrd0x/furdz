@@ -7,9 +7,11 @@ Also scoring minimal on VirusTotal.
 
 ## TODO
 
+ - **fix the ```memcpy()``` usage in ```main.c```**
  - Create --debug option to compile without anti debug checks
+ - Implement --<module> to compile with specif payload (instead of editing ```.conf```)
  - AutoLoad the DLL
- - DLL actions modularity
+ - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
 
 ## Options
 

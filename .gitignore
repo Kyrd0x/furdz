@@ -6,7 +6,6 @@ temp*
 build/
 .build/
 bin/
-!bin/a.exe
 act
 
 .env
