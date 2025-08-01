@@ -45,13 +45,10 @@ def format_bytes(data, varname):
     lines.append("};")
     return "\n".join(lines)
 
-# === Write to C file ===
-with open(output_c_path, "w") as f:
-    f.write("// RLE-compressed 1-bit image\n")
-    f.write(f"// Size: {len(compressed)} bytes, Dimensions: {width}x{height}\n\n")
-    f.write(format_bytes(compressed, "background_image"))
-    f.write(f"\n\nconst unsigned int background_image_len = {len(compressed)};\n")
-    f.write(f"const unsigned int image_width = {width};\n")
-    f.write(f"const unsigned int image_height = {height};\n")
-
-print(f"[✔] C file written to: {output_c_path}")
+# === Print result ===
+print("// RLE-compressed 1-bit image")
+print(f"// Size: {len(compressed)} bytes, Dimensions: {width}x{height}\n")
+print(format_bytes(compressed, "background_image"))
+print(f"\nconst unsigned int background_image_len = {len(compressed)};")
+print(f"const unsigned int image_width = {width};")
+print(f"const unsigned int image_height = {height};")

@@ -11,3 +11,5 @@ act
 
 .env
 .secrets
+
+background.c
