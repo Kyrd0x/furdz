@@ -9,6 +9,7 @@ build/
 bin/
 act
 
+.conf
 .env
 .secrets
 

