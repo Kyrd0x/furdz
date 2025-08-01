@@ -1,5 +1,50 @@
 #include "libc.h"
 #include <stdarg.h>
+#include <fcntl.h>   // open()
+#include <unistd.h>  // close()
+
+#define MAX_OPEN_FILES 4
+
+// static LWFILE file_pool[MAX_OPEN_FILES]; // Statically allocated
+
+// LWFILE *custom_fopen(const char *filename, const char *mode) {
+//     int flags;
+
+//     if (mode[0] == 'r') {
+//         flags = O_RDONLY;
+//     } else if (mode[0] == 'w') {
+//         flags = O_WRONLY | O_CREAT | O_TRUNC;
+//     } else if (mode[0] == 'a') {
+//         flags = O_WRONLY | O_CREAT | O_APPEND;
+//     } else {
+//         return NULL;
+//     }
+
+//     int fd = open(filename, flags, 0644);
+//     if (fd < 0) return NULL;
+
+//     for (int i = 0; i < MAX_OPEN_FILES; ++i) {
+//         if (!file_pool[i].used) {
+//             file_pool[i].fd = fd;
+//             file_pool[i].mode = mode;
+//             file_pool[i].used = 1;
+//             return &file_pool[i];
+//         }
+//     }
+
+//     close(fd);
+//     return NULL;
+// }
+
+// int custom_fclose(LWFILE *stream) {
+//     if (!stream || !stream->used) return -1;
+
+//     int result = close(stream->fd);
+//     stream->used = 0;
+//     return result;
+// }
+
+//--------------------------------------------------------
 
 // Compare two strings lexicographically
 int custom_strcmp(const char *s1, const char *s2) {
@@ -57,12 +102,13 @@ time_t custom_time(time_t *t) {
     return fake_time;
 }
 
-// Custom snprintf function
-// int custom_snprintf(char *str, size_t size, const char *format, ...) {
-//     int count;
-//     va_list args;
-//     va_start(args, format);
-//     count = vsnprintf(str, size, format, args);
-//     va_end(args);
-//     return count;
-// }
+void *custom_memcpy(void *dest, const void *src, size_t n) {
+    unsigned char *d = (unsigned char *)dest;
+    const unsigned char *s = (const unsigned char *)src;
+
+    for (size_t i = 0; i < n; i++) {
+        d[i] = s[i];
+    }
+
+    return dest;
+}

@@ -73,7 +73,7 @@ shopt -u nullglob
 
 # Configure options based on PRIORIZE_SIZE
 if [[ "$PRIORIZE_SIZE" == "true" ]]; then
-    STDLIB="-nostdlib -DLIGHWEIGHT=1"
+    STDLIB="-nostdlib -DLIGHTWEIGHT=1"
     ICON=""
     ENTRYPOINT="WinMainCRTStartup"
 else
