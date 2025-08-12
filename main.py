@@ -32,6 +32,7 @@ if ENCRYPTION_METHOD == "xor":
         ENCRYPTION_KEY = int(config.get("Payload", "encryption_key"),16)
 elif ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
     ENCRYPTION_KEY = 1
+    WORDLIST_SOURCE = config.get("Payload", "wordlist_source", fallback="data/words_100000.txt").strip()
 else:
     sys.exit("Error: Invalid encryption method specified in the configuration (.conf) file.\nValid options are 'xor', 'dictionary', or 'dict'.")
 
@@ -161,7 +162,7 @@ def main():
     
     if ENCRYPTION_METHOD == "dictionary" or ENCRYPTION_METHOD == "dict":
         print(f"\nEncrypted with dictionary\n") if VERBOSE else None
-        instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions, VERBOSE)
+        instructions, association_table, size_payload_phrase = dictionary_encrypt(instructions, WORDLIST_SOURCE, VERBOSE)
 
         sed_files(WORKING_FOLDER, "%PAYLOAD_SIZE%", str(round_pow2(size_payload_phrase)))
         sed_files(WORKING_FOLDER, "%SHELLCODE_DECODER%", "DICT_decrypt(dict_payload);")

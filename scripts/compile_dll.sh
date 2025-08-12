@@ -31,6 +31,12 @@ HEADERS=(
 )
 OUTPUT_FILE="build/bin/injected-dll.dll"
 
+if [[ "$PAYLOAD" == "lsass" ]]; then
+  EXTRA_LIBS="data/DbgHelp.lib"
+else
+  EXTRA_LIBS=""
+fi
+
 # Log the compile command
 # echo "Using SRC: ${SRC[@]}"
 # echo "Using HEADERS: ${HEADERS[@]}"
@@ -40,7 +46,8 @@ x86_64-w64-mingw32-gcc -s -shared -ffreestanding \
   -o $OUTPUT_FILE \
   ${SRC[@]} \
   -e DllMain \
-  -lws2_32 -nostdlib -lkernel32 -luser32 -lmsvcrt
+  -lws2_32 -ldbghelp -ladvapi32 -lkernel32 -luser32 -lmsvcrt -lgcc -Os -nostdlib
+#                      to remove
 
 if [[ $? -ne 0 ]]; then
     echo "Failed to compile DLL."

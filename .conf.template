@@ -14,6 +14,11 @@ encryption_method=dictionary
 # encryption_key=random
 encryption_key=0xabcd
 
+# Dict wordlist source, if encryption_method=dictionary else ignored
+# Can be file or URL
+wordlist_source=data/words_100000.txt
+# wordlist_source=https://www.mit.edu/~ecprice/wordlist.100000
+
 [Anti-Analysis]
 # If cpu cores is less or equal than <value>, the payload will not be executed
 # If not set, check will no be made

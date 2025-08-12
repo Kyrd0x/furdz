@@ -8,6 +8,7 @@ Also scoring minimal on VirusTotal.
 ## TODO
 
  - **fix the ```memcpy()``` usage in ```main.c```**
+ - Increase ```winapi.c``` obfuscation
  - Create --debug option to compile without anti debug checks
  - Implement --<module> to compile with specif payload (instead of editing ```.conf```)
  - AutoLoad the DLL

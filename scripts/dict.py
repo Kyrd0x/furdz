@@ -1,18 +1,24 @@
+import requests
 import random
 
-# Decode encoded data into words and generate a C array for associations
-def decode_instructions_and_generate_c(encoded_data, verbose):
-    associations = {}
-    with open("data/words.txt", "r") as file:
-        WORDLIST = file.read().split("\n")  # Load the word list
 
-    random.shuffle(WORDLIST)  # Shuffle the word list for randomness
-    WORDLIST = WORDLIST[:256]  # Limit to 256 words for byte values
-    WORDLIST = [word.strip() for word in WORDLIST]  # Clean up whitespace
+def get_wordlist(source="data/words_100000.txt", size=256):
+    if "http" in source:
+        words = requests.get(source).text.splitlines()
+    else:
+        with open(source, "r") as file:
+            words = file.read().split("\n")  # Load the word list
+
+    words = [word.strip() for word in words]
+    return random.sample(words, size)
+
+# Decode encoded data into words and generate a C array for associations
+def decode_instructions_and_generate_c(encoded_data, wordlist, verbose):
+    associations = {}
 
     # Map each byte value to a word
-    for i in range(len(WORDLIST)):
-        associations[i] = WORDLIST[i]
+    for i in range(len(wordlist)):
+        associations[i] = wordlist[i]
 
     print(associations) if verbose else None
     decoded_words = []
@@ -36,8 +42,9 @@ def decode_instructions_and_generate_c(encoded_data, verbose):
     return c_message, association_c_array, len(decoded_words)
 
 # Encrypt instructions using a dictionary-based approach
-def dictionary_encrypt(instructions, verbose):
-    payload, association_table, size = decode_instructions_and_generate_c(instructions, verbose)
+def dictionary_encrypt(instructions, wordlist_source, verbose):
+    wordlist = get_wordlist(wordlist_source)
+    payload, association_table, size = decode_instructions_and_generate_c(instructions, wordlist, verbose)
     
     # Remove \x sequences from the payload
     payload = payload.replace("\\x", "")
