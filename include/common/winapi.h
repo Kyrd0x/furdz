@@ -38,5 +38,6 @@ typedef DWORD (WINAPI* GetSystemDefaultLCIDFunc)(void);
 HMODULE CustomGetModuleHandle(ObjHash module_hash);
 FARPROC CustomGetProcAddress(IN HMODULE hModule, ObjHash function_hash);
 PIMAGE_NT_HEADERS64 PE_getNtheaders(unsigned char* dll_data);
+DWORD GetProcessPidByName(const char *processName);
 
 #endif // WINAPI_H

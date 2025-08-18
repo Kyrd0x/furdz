@@ -3,7 +3,17 @@
 #include "sandbox.h"
 #include "entrypoint.h"
 
-// AutoLoader later
+// AutoLoader
+
+// Plan:
+// Calculate images base address
+//
+
+void ReflectiveLoader() {
+    return; 
+}
+
+
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
     (void)hinstDLL; (void)lpvReserved;

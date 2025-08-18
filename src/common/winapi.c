@@ -188,3 +188,27 @@ PIMAGE_NT_HEADERS64 PE_getNtheaders(unsigned char* dll_data) {
 
     return htHeaders;
 }
+
+// Retrieve PID from process name
+// TO OBFUSCATE WITH OBJHASH
+DWORD GetProcessPidByName(const char *processName) {
+    DWORD pid = 0;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (snapshot != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32 pe;
+        pe.dwSize = sizeof(PROCESSENTRY32);
+
+        if (Process32First(snapshot, &pe)) {
+            do {
+                if (_stricmp(pe.szExeFile, processName) == 0) {
+                    pid = pe.th32ProcessID;
+                    break;
+                }
+            } while (Process32Next(snapshot, &pe));
+        }
+        CloseHandle(snapshot);
+    }
+
+    return pid; // 0 si non trouvé
+}

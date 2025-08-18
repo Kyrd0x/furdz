@@ -1,5 +1,5 @@
 #include "payload.h"
-#include "libc.h"
+
 
 // XOR encryption/decryption function
 // This function uses inline assembly to XOR each byte of the data with a key.

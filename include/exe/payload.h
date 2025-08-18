@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "libc.h"
+
 #define ASSOCATION_TABLE_SIZE 256
 
 // Structure to map words to bytes
