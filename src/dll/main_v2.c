@@ -4,10 +4,8 @@
 #include "entrypoint.h"
 
 // AutoLoader
+// to be implemented
 
-// Plan:
-// Calculate images base address
-//
 
 void ReflectiveLoader() {
     return; 

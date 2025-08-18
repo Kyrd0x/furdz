@@ -110,6 +110,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         /*-SHELLCODE_DECODER-*/
 
 
+        // TODO HERE
+        // - replace strings with objhashs
+        // - use a constant in reflective loader to avoid using a function name
+        // - Use non imported functions (later syswhispers)
+
+
         DWORD64 reflective_loader_offset = get_reflective_loader_offset((DWORD64)payload, "ReflectiveLoader");
 
         // Step 1 : Get DLL's NT headers
