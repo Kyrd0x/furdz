@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Read arguments
-MODULE=""
+PAYLOAD=""
 OUTPUT_FILE="executable.exe"
 PRIORIZE_SIZE="false"
 VERBOSE="false"
@@ -78,12 +78,12 @@ while [[ "$#" -gt 0 ]]; do
 
     --*)
       mod="${1#--}"  # strip leading --
-      if [[ -n "$MODULE" ]]; then
-        echo "Error: only one payload allowed (already got --$MODULE, received --$mod)."
+      if [[ -n "$PAYLOAD" ]]; then
+        echo "Error: only one payload allowed (already got --$PAYLOAD, received --$mod)."
         exit 2
       fi
       if [[ -f "src/dll/${mod}.c" ]]; then
-        MODULE="$mod"
+        PAYLOAD="$mod"
         shift
       else
         echo "Error: payload '$mod' not found."
@@ -133,7 +133,7 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 
 
 # Run Python, capture payload type, fail on non-zero exit
-if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE" "$MODULE"; then
+if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE" "$PAYLOAD"; then
     echo "❌ Erreur : l'exécution de main.py a échoué."
     exit 1
 fi
