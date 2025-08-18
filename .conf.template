@@ -1,9 +1,10 @@
 [Payload]
-# Remote host and port corresponding to the C2 server to connect back to
-lhost="0.0.0.0"
-lport=443
 # DLL Payload, need to match src/dll/<type>.c
 type=debug
+
+# Remote host and port corresponding to the C2 server to connect back to, if needed
+lhost="0.0.0.0"
+lport=443
 
 # xor, dictionary (not yet aes/rc4) (XOR SEEMS NO BUENO ANYMORE)
 # encryption_method=xor

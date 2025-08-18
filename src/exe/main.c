@@ -12,6 +12,16 @@
 
 typedef void (*DllEntryPoint)(HINSTANCE, DWORD, LPVOID);
 
+void *customm(void* dest, const void* src, size_t n) {
+    // Custom memcpy implementation
+    char* d = (char*)dest;
+    const char* s = (const char*)src;
+    for (size_t i = 0; i < n; i++) {
+        d[i] = s[i];
+    }
+    return 0;
+}
+
 // void LogToFile(const char* format, ...)
 // {
 //     FILE* logFile = fopen("debug_log.txt", "a+"); // Append mode in current dir
@@ -135,7 +145,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         }
 
         // temporary fix cause target process is current process
-        memcpy(allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders);
+        customm(allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders);
         // if (!_WriteVirtMem(hProc, allocated_vAddr, payload, dll_htHeaders->OptionalHeader.SizeOfHeaders, NULL)) {
         //     DWORD err = GetLastError();
         //     LogToFile("WriteProcessMemory failed. Error: %lu", err);

@@ -4,12 +4,13 @@
 set -euo pipefail
 
 # Read arguments
+MODULE=""
 OUTPUT_FILE="executable.exe"
 PRIORIZE_SIZE="false"
 VERBOSE="false"
 
 usage() {
-    echo "Usage: $0 [options] | clean"
+    echo "Usage: $0 [options] --<payload> | clean"
     echo ""
     echo "Options:"
     echo "  -o, --output <output_file>   Specify the output file name (default: executable.exe)"
@@ -17,8 +18,26 @@ usage() {
     echo "  -v, --verbose                Enable verbose mode"
     echo "  -h, --help                   Show this help message"
     echo ""
+    echo "Payload:"
+    echo "  --<payload>                  Exactly one payload must be specified."
+    echo "                               Maps to src/dll/<payload>.c (e.g., --foo -> src/dll/foo.c)"
+    echo ""
+    echo "Available payloads:"
+    if compgen -G "src/dll/*.c" >/dev/null; then
+        for f in src/dll/*.c; do
+            printf '  --%s\n' "$(basename "$f" .c)"
+        done
+    else
+        echo "  (none found in src/dll)"
+    fi
+    echo ""
     echo "Commands:"
     echo "  clean                        Clean the build directory"
+    echo ""
+    echo "Examples:"
+    echo "  $0 --small -o out.exe --foo"
+    echo "  $0 --help"
+    echo "  $0 clean"
     exit 1
 }
 
@@ -34,29 +53,50 @@ rm -rf build
 mkdir -p build/bin bin
 cp -r src include build/
 
-# Parse command line arguments
 while [[ "$#" -gt 0 ]]; do
-    case "$1" in
-        -o|--output)
-            OUTPUT_FILE="$2"
-            shift 2
-            ;;
-        -s|--small)
-            PRIORIZE_SIZE="true"
-            shift
-            ;;
-        -v|--verbose)
-            VERBOSE="true"
-            shift
-            ;;
-        -h|--help)
-            usage
-            ;;
-        *)
-            echo "Unknown option: $1"
-            usage
-            ;;
-    esac
+  case "$1" in
+    -o|--output)
+      OUTPUT_FILE="${2:?--output requires a file path}"
+      shift 2
+      ;;
+    -s|--small)
+      PRIORIZE_SIZE="true"
+      shift
+      ;;
+    -v|--verbose)
+      VERBOSE="true"
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+
+    --) # end of options
+      shift
+      break
+      ;;
+
+    --*)
+      mod="${1#--}"  # strip leading --
+      if [[ -n "$MODULE" ]]; then
+        echo "Error: only one payload allowed (already got --$MODULE, received --$mod)."
+        exit 2
+      fi
+      if [[ -f "src/dll/${mod}.c" ]]; then
+        MODULE="$mod"
+        shift
+      else
+        echo "Error: payload '$mod' not found."
+        echo "Available payloads:"
+        for f in src/dll/*.c; do printf '  --%s\n' "$(basename "$f" .c)"; done
+        exit 1
+      fi
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      ;;
+  esac
 done
 
 # Define source and header files
@@ -92,8 +132,8 @@ OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 
 
-# Sed everything and compile the dll
-if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE"; then
+# Run Python, capture payload type, fail on non-zero exit
+if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE" "$MODULE"; then
     echo "❌ Erreur : l'exécution de main.py a échoué."
     exit 1
 fi

@@ -7,12 +7,10 @@ Also scoring minimal on VirusTotal.
 
 ## TODO
 
- - **fix the ```memcpy()``` usage in ```main.c```**
- - Increase ```winapi.c``` obfuscation
- - Create --debug option to compile without anti debug checks
- - Implement --<module> to compile with specif payload (instead of editing ```.conf```)
- - AutoLoad the DLL
+ - **fix the ```memcpy()``` usage in ```main.c``` by autoloading the DLL**
+ - Increase ```winapi.c``` obfuscation (jmp -1 as an example)
  - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
+ - Clean the Python code (logging)
 
 ## Options
 
