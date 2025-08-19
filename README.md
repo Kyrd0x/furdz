@@ -58,6 +58,11 @@ chmod +x build.sh scripts/compile_dll.sh
 ./build.sh -h
 ```
 
+Might need to
+```bash
+dos2unix build.sh scripts/compile_dll.sh
+```
+
 ### Tips
 
 Fixing Windows/Linux file formatting

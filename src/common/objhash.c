@@ -7,6 +7,7 @@ bool is_objhash(ObjHash obj_hash) {
     return (obj_hash.value != 0 || obj_hash.rotation_value != 0 || obj_hash.is_rotation_right != false);
 }
 
+const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
 const ObjHash USER32_HASH = %MODHASH__user32.dll%;
 const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
 

