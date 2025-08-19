@@ -25,7 +25,10 @@ usage() {
     echo "Available payloads:"
     if compgen -G "src/dll/*.c" >/dev/null; then
         for f in src/dll/*.c; do
-            printf '  --%s\n' "$(basename "$f" .c)"
+          base=$(basename "$f" .c)
+          if [[ $base != "main" ]]; then
+              printf '  --%s\n' "$base"
+          fi  
         done
     else
         echo "  (none found in src/dll)"
@@ -82,7 +85,7 @@ while [[ "$#" -gt 0 ]]; do
         echo "Error: only one payload allowed (already got --$PAYLOAD, received --$mod)."
         exit 2
       fi
-      if [[ -f "src/dll/${mod}.c" ]]; then
+      if [[ -f "src/dll/${mod}.c" && "$mod" != "main" ]]; then
         PAYLOAD="$mod"
         shift
       else
