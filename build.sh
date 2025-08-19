@@ -23,12 +23,12 @@ usage() {
     echo "                               Maps to src/dll/<payload>.c (e.g., --foo -> src/dll/foo.c)"
     echo ""
     echo "Available payloads:"
-    if compgen -G "src/dll/*.c" >/dev/null; then
-        for f in src/dll/*.c; do
+    if compgen -G "src/dll/payloads/*.c" >/dev/null; then
+        for f in src/dll/payloads/*.c; do
             printf '  --%s\n' "$(basename "$f" .c)"
         done
     else
-        echo "  (none found in src/dll)"
+        echo "  (none found in src/dll/payloads)"
     fi
     echo ""
     echo "Commands:"
@@ -82,13 +82,13 @@ while [[ "$#" -gt 0 ]]; do
         echo "Error: only one payload allowed (already got --$PAYLOAD, received --$mod)."
         exit 2
       fi
-      if [[ -f "src/dll/${mod}.c" ]]; then
+      if [[ -f "src/dll/payloads/${mod}.c" ]]; then
         PAYLOAD="$mod"
         shift
       else
         echo "Error: payload '$mod' not found."
         echo "Available payloads:"
-        for f in src/dll/*.c; do printf '  --%s\n' "$(basename "$f" .c)"; done
+        for f in src/dll/payloads/*.c; do printf '  --%s\n' "$(basename "$f" .c)"; done
         exit 1
       fi
       ;;

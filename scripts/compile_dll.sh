@@ -9,8 +9,8 @@ if [[ -z "$PAYLOAD" ]]; then
   exit 1
 fi
 
-if [[ ! -f "build/src/dll/$PAYLOAD.c" ]]; then
-  echo "Error: Source file build/src/dll/$PAYLOAD.c does not exist."
+if [[ ! -f "build/src/dll/payloads/$PAYLOAD.c" ]]; then
+  echo "Error: Source file build/src/dll/payloads/$PAYLOAD.c does not exist."
   exit 1
 fi
 
@@ -21,13 +21,13 @@ fi
 
 SRC=(
   build/src/common/*.c
-  build/src/dll/main.c
-  build/src/dll/$PAYLOAD.c
+  build/src/dll/*.c
+  build/src/dll/payloads/$PAYLOAD.c
 )
 HEADERS=(
     build/include/common/*.h
-    build/include/dll/entrypoint.h
-    build/include/dll/$PAYLOAD.h
+    build/include/dll/*.h
+    # build/include/dll/$PAYLOAD.h
 )
 OUTPUT_FILE="build/bin/injected-dll.dll"
 
