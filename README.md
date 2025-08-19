@@ -60,14 +60,6 @@ chmod +x build.sh scripts/compile_dll.sh
 
 Might need to
 ```bash
-dos2unix build.sh scripts/compile_dll.sh
-```
-
-### Tips
-
-Fixing Windows/Linux file formatting
-
-```bash
 find . -name "*.sh" -type f -exec dos2unix {} \;
 ```
 

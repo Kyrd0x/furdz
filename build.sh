@@ -22,6 +22,10 @@ usage() {
     echo "  --<payload>                  Exactly one payload must be specified."
     echo "                               Maps to src/dll/<payload>.c (e.g., --foo -> src/dll/foo.c)"
     echo ""
+    echo "Evasion:"
+    echo "  --etw                        Disable ETW"
+    echo "  --ntdll                      Overwrite ntdll from disk"
+    echo ""
     echo "Available payloads:"
     if compgen -G "src/dll/payloads/*.c" >/dev/null; then
         for f in src/dll/payloads/*.c; do
