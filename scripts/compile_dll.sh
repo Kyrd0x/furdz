@@ -21,7 +21,7 @@ fi
 
 SRC=(
   build/src/common/*.c
-  build/src/dll/main_v2.c
+  build/src/dll/main.c
   build/src/dll/$PAYLOAD.c
 )
 HEADERS=(
