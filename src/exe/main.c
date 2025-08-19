@@ -123,9 +123,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         SIZE_T dll_vSize = dll_htHeaders->OptionalHeader.SizeOfImage;
         // Implement later
         LPVOID dll_vAddr = (LPVOID)dll_htHeaders->OptionalHeader.ImageBase;
-        
-        // Get explorer PID and handle
-        DWORD pid = GetProcessPidByName("explorer.exe");
+
+        // Get notepad PID and handle
+        DWORD pid = GetProcessPidByName("notepad.exe");
         HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 
         //                                               maybe adddr pref

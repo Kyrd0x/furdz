@@ -212,3 +212,4 @@ DWORD GetProcessPidByName(const char *processName) {
 
     return pid; // 0 si non trouvé
 }
+
