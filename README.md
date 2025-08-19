@@ -52,9 +52,10 @@ sudo apt update & sudo apt install -y build-essential mingw-w64 python3-yaml
 After installation, you need to READ and edit the .conf file
 
 ```sh
+cp .conf.template .conf
 nano .conf
-chmod +x build.sh
-./build.sh --help
+chmod +x build.sh scripts/compile_dll.sh
+./build.sh -h
 ```
 
 ### Tips
