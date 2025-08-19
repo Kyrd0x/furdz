@@ -23,7 +23,7 @@ int DisableETW(void) {
 	_ProtectVirtMem((HANDLE)-1,_EtwEventWrite, 4096, oldprotect, &oldprotect);
 
     // Flush instruction cache
-	_FlushInstructionCache(-1, _EtwEventWrite, 4096);
+	_FlushInstructionCache((HANDLE)-1, _EtwEventWrite, 4096);
 	return 0;
 }
 
