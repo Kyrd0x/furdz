@@ -7,10 +7,10 @@ Also scoring minimal on VirusTotal.
 
 ## TODO
 
- - **fix the ```memcpy()``` usage in ```main.c``` by autoloading the DLL**
+ - **Autoload the DLL**
  - Increase ```winapi.c``` obfuscation (jmp -1 as an example)
  - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
- - Clean the Python code (logging)
+ - Clean the Python code (logging, use ```/*-%TAG%-*/``` project-wide)
 
 ## Options
 
