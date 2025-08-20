@@ -48,3 +48,7 @@ avoid_hostname=
 # if one match, the payload will not be executed
 # avoid_countries=RU,CN
 avoid_countries=
+
+[Evasion]
+# Patch EtwEventWrite
+etw_patching=false

