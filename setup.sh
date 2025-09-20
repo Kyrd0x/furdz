@@ -67,7 +67,15 @@ virtualenv_setup() {
     fi
 }
 
+
 fullinstall() {
+    # check if current location in git repo
+    if [[ ! -d .git ]]; then
+        echo "Git repository not found. Cloning repository..."
+        git clone https://github.com/Kyrd0x/furdz.git
+        cd furdz
+    fi
+
     dependencies_install
     virtualenv_setup
 
@@ -76,3 +84,4 @@ fullinstall() {
 }
 
 fullinstall
+
