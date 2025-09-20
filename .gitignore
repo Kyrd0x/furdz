@@ -2,6 +2,7 @@
 __pycache__/
 other/
 env/
+.env/
 temp*
 
 build/
