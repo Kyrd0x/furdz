@@ -36,21 +36,6 @@ dependencies_install() {
     echo "Dependencies installed successfully."
 }
 
-
-
-# to change to config.ini later
-if [[ -f .conf ]]; then
-    echo ".conf file already exists. Skipping creation."
-else
-    echo "Creating .conf file from template..."
-    cp .conf.template .conf
-fi
-
-echo "Please edit the .conf file to configure the build options."
-
-echo "Fixing bash scripts and making them executable..."
-find . -name "*.sh" -type f -exec dos2unix {} \; -exec chmod +x {} \;
-
 virtualenv_setup() {
     if [[ -f .env/bin/activate ]]; then
         echo "Python virtual environment already exists. Skipping creation."
@@ -67,6 +52,20 @@ virtualenv_setup() {
     fi
 }
 
+project_init() {
+    # to change to config.ini later
+    if [[ -f .conf ]]; then
+        echo ".conf file already exists. Skipping creation."
+    else
+        echo "Creating .conf file from template..."
+        cp .conf.template .conf
+    fi
+
+    echo "Please edit the .conf file to configure the build options."
+
+    echo "Fixing bash scripts and making them executable..."
+    find . -name "*.sh" -type f -exec dos2unix {} \; -exec chmod +x {} \;
+}
 
 fullinstall() {
     # check if current location in git repo
@@ -78,6 +77,7 @@ fullinstall() {
 
     dependencies_install
     virtualenv_setup
+    project_init
 
     echo "Then run './build.sh -h' to see build options."
     echo "Setup done. Please edit the .conf file to configure the build options."
