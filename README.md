@@ -58,7 +58,7 @@ sudo ./setup.sh
 
 The ```setup.sh``` script will:
 - Install required system dependencies ```mingw-w64 dos2unix```
-- Create, activate and fill a Python virtual environment
+- Create and setup a Python virtual environment
 - Copy the config file from the template
 - Normalize and fix executable permissions for all ```*.sh``` scripts
 
