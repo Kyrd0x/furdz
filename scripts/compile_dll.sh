@@ -54,4 +54,4 @@ if [[ $? -ne 0 ]]; then
     exit 1
 fi
 
-strip --strip-all $OUTPUT_FILE # cause why not
+x86_64-w64-mingw32-strip --strip-unneeded "$OUTPUT_FILE"
