@@ -34,21 +34,33 @@ Can be used:
 
 ### Installation
 
-Convenient way is 
+**Linux (Debian, Ubuntu, WSL, etc.)**
 
 ```bash
-curl https://furdz.kyrd0x.net/install | bash
+curl -fsSL https://furdz.kyrd0x.net/install | sudo bash
 ```
 
-Otherwise, install the required dependencies, fix permissions, and setup python virtual env
+**macOS**
 
-```sh
+```bash
+curl -fsSL https://furdz.kyrd0x.net/install | bash
+```
+
+**Manual installation**  
+If you prefer to install dependencies yourself, adjust permissions, and set up the Python virtual environment manually, you can clone the repository and run the setup script:
+
+```bash
 git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
 chmod +x setup.sh
-# cat setup.sh
 sudo ./setup.sh
 ```
+
+The ```setup.sh``` script will:
+- Install required system dependencies ```mingw-w64 dos2unix```
+- Create, activate and fill a Python virtual environment
+- Copy the config file from the template
+- Normalize and fix executable permissions for all ```*.sh``` scripts
 
 ### Usage
 

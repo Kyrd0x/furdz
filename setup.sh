@@ -27,7 +27,7 @@ dependencies_install() {
         fi
 
         echo "Installing dependencies with apt..."
-        apt update && apt install -y build-essential mingw-w64 dos2unix python3-venv python3-pip
+        apt update && apt install -y build-essential mingw-w64 dos2unix python3-venv
         if [[ $? -ne 0 ]]; then
             echo "Failed to install dependencies with apt."
             exit 1
