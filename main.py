@@ -4,7 +4,6 @@ from scripts.utils import *
 from scripts.dict import dictionary_encrypt
 
 from configparser import ConfigParser
-import random
 import sys
 
 config = ConfigParser()

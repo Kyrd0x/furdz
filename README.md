@@ -34,34 +34,27 @@ Can be used:
 
 ### Installation
 
-Clone this repository and navigate to the project directory:
+Convenient way is 
+
+```bash
+curl https://furdz.kyrd0x.net/install | bash
+```
+
+Otherwise, install the required dependencies, fix permissions, and setup python virtual env
 
 ```sh
 git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
-```
-
-Install the required dependencies
-
-```sh
-sudo apt update & sudo apt install -y build-essential mingw-w64 python3-yaml
+chmod +x setup.sh
+# cat setup.sh
+./setup.sh
 ```
 
 ### Usage
 
-After installation, you need to READ and edit the .conf file
+After installation, you need to READ and edit the .conf file.
 
-```sh
-cp .conf.template .conf
-nano .conf
-chmod +x build.sh scripts/compile_dll.sh
-./build.sh -h
-```
-
-Might need to
-```bash
-find . -name "*.sh" -type f -exec dos2unix {} \;
-```
+Then running ```./build.sh -h``` is a nice idea.
 
 ## Disclaimer & Legal Warning
 
