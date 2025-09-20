@@ -18,9 +18,8 @@ jobs:
 
     - name: Update apt and install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y mingw-w64 python3-yaml
-        cp .conf.template .conf
+        chmod +x setup.sh
+        sudo ./setup.sh
 
     - name: Set up Tailscale
       uses: tailscale/github-action@v3

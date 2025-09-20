@@ -1,0 +1,44 @@
+name: Deploy setup.sh via FTP
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "setup.sh"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: wait for Tailscale host
+        run: |
+          echo "[*] Waiting for Tailscale to be ready..."
+          sleep 10
+          for i in {1..20}; do
+            echo "⏳ Pinging ${{ secrets.FTP_HOST }} (attempt $i)..."
+            ping -c 3 ${{ secrets.FTP_HOST }} >/dev/null 2>&1 && break || {
+              echo "❌ Tailscale not ready yet, retrying in 5 seconds..."
+              sleep 5
+            }
+          done
+          echo "✅ Host is reachable"
+
+      - name: Deploy setup.sh via FTP
+        run: |
+          echo "[*] Deploying setup.sh to FTP server..."
+
+          curl -T setup.sh -u "${{ secrets.FTP_USER }}:${{ secrets.FTP_PASSWORD }}" "ftp://${{ secrets.FTP_HOST }}/uploads/install"
+
+          echo "✅ Deployment completed."

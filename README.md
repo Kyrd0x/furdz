@@ -47,7 +47,7 @@ git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
 chmod +x setup.sh
 # cat setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 
 ### Usage
