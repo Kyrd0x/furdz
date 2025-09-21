@@ -16,3 +16,6 @@ config.ini
 .secrets
 
 background.c
+
+#temp
+build_v2.py
