@@ -1,14 +1,14 @@
-from scripts.templating import *
-from scripts.hasher import *
-from scripts.utils import *
-from scripts.dict import dictionary_encrypt
+from .templating import *
+from .hasher import *
+from .utils import *
+from .dict import dictionary_encrypt
 
 from configparser import ConfigParser
 import sys
 
 config = ConfigParser()
 config.read(".conf") 
-
+"""
 
 def is_set(value):
     return value != None and value != ""
@@ -73,8 +73,8 @@ WORKING_FOLDER = "build/"
 STUB_FILE = "main.c"
 PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"
-
-def main():
+"""
+def make():
 
     if PRIORIZE_SIZE:
         # if no stdlib -> use custom functions & remove pointless ones
@@ -204,7 +204,3 @@ def main():
     print("================COMPILATION===============") if VERBOSE else None
 
     return PAYLOAD_TYPE
-
-
-if __name__ == "__main__":
-    main()

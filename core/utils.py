@@ -1,8 +1,7 @@
-from scripts.hasher import hash
+from .hasher import hash
 import subprocess
 import random
 import math
-import yaml
 import re
 import os
 
@@ -131,8 +130,14 @@ def generate_high_entropy_int(min_val=0x1111, max_val=0xFFFF):
 # Get LCID (Locale ID) for a given country code
 def get_LCID(country_code):
     result = []
-    with open("data/lcid.yaml", "r") as file:
-        LANGUAGES = yaml.safe_load(file)
+    with open("data/lcid.csv", "r") as file:
+        # pattern is as an example:
+        # 4;en_US
+        LANGUAGES = {}
+        for line in file:
+            parts = line.strip().split(";")
+            if len(parts) == 2:
+                LANGUAGES[parts[0]] = parts[1]
 
     country_code = country_code.upper()
     for key,element in LANGUAGES.items():
@@ -147,3 +152,6 @@ def get_LCID(country_code):
 # Run the dll/compile.sh script to compile the DLL to inject
 def compile_dll(name):
     subprocess.run(["bash", "scripts/compile_dll.sh", name], check=True)
+
+def clean_repo():
+    subprocess.run(["rm", "-rf", "bin", "build", ".build"], check=True)
