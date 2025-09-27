@@ -106,6 +106,7 @@ def main():
     if args.verbose:
         print(f"[i] building with payload='{payload}', output='{args.output}', small={args.small}")
 
+    make(args.verbose, args.small, payload)
     # TODO: appelle ton orchestrateur avec payload / options
     # run_build(payload=payload, output=args.output, small=args.small, verbose=args.verbose)
     print(f"Build completed: {args.output}")

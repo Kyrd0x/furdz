@@ -2,6 +2,7 @@ from .templating import *
 from .hasher import *
 from .utils import *
 from .dict import dictionary_encrypt
+from .config import *
 
 from configparser import ConfigParser
 import sys
@@ -74,7 +75,10 @@ STUB_FILE = "main.c"
 PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"
 """
-def make():
+
+def make(VERBOSE, PRIORIZE_SIZE, PAYLOAD_TYPE):
+
+    
 
     if PRIORIZE_SIZE:
         # if no stdlib -> use custom functions & remove pointless ones
