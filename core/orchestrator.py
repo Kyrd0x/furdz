@@ -1,4 +1,4 @@
-from .templating import *
+from .templator import *
 from .hasher import *
 from .utils import *
 from .dict import dictionary_encrypt
@@ -76,9 +76,9 @@ PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"
 """
 
-def make(VERBOSE, PRIORIZE_SIZE, PAYLOAD_TYPE):
+def make(args):
 
-    
+
 
     if PRIORIZE_SIZE:
         # if no stdlib -> use custom functions & remove pointless ones

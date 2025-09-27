@@ -15,3 +15,14 @@ def get_template(tag):
                 match = pattern.search(content)
                 if match:
                     return match.group(1).strip()
+
+
+class Templator:
+    """Class to handle templating operations.
+    This can be:
+        - Replacing config values (LHOST, LPORT, etc)
+        - Adding anti-sandbox checks (RAM, CPU, etc)
+        - Adding evasions (ETW, AMSI, etc)
+        - Replacing hashes (function, module, etc)
+    """
+    pass

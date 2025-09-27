@@ -14,12 +14,10 @@ class _Fmt(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFo
 EPILOG = """Examples:
   build.py --small -o out.exe --foo
   build.py --help
-  build.py clean
 """
 
 DESCRIPTION = """Usage:
   build.py [options] --<payload>
-  build.py clean|setup
 
 Exactly one payload must be specified unless you run a command.
 """
@@ -61,12 +59,6 @@ def parse_args(argv=None):
         mex.add_argument(f"--{name}", dest=f"payload_{name}",
                          action="store_true", help=f"Use payload '{name}'")
 
-    # ----- Commands (subparsers) -----
-    subparsers = parser.add_subparsers(dest="command", metavar="command")
-
-    sp_clean = subparsers.add_parser("clean", help="Clean the build directory")
-    sp_setup = subparsers.add_parser("setup", help="Setup the build environment")
-
     args = parser.parse_args(argv)
 
     # ----- Validation: si pas de commande, exiger exactement 1 payload -----
@@ -84,7 +76,7 @@ def parse_args(argv=None):
 
 def main():
     args = parse_args()
-
+    print(args)
     if args.command == "clean":
         os.system("bash scripts/clean.sh")
         print("Build directory cleaned.")
@@ -94,6 +86,14 @@ def main():
         os.system("bash scripts/setup.sh")
         return
 
+
+    """
+    Steps:
+        - encrypt payload with selected method (xor/dict/etc)                                     -> encryptor.py
+        - sed files with config values, checks, evasions, payloads and so (LHOST, LPORT, etc)     -> templator.py
+        - build dll                                                                               -> scripts/compile_dll.sh
+        - build exe                                                                               -> scripts/compile_exe.sh
+    """
     # Ici on est en mode "build" avec exactement 1 payload sélectionné
     # Récupère le nom du payload choisi
     payload = None
@@ -101,15 +101,16 @@ def main():
         if getattr(args, f"payload_{name}", False):
             payload = name
             break
+    assert payload is not None  # devrait être garanti par parse_args()
 
-    # Exemple d’utilisation :
     if args.verbose:
         print(f"[i] building with payload='{payload}', output='{args.output}', small={args.small}")
 
-    make(args.verbose, args.small, payload)
     # TODO: appelle ton orchestrateur avec payload / options
     # run_build(payload=payload, output=args.output, small=args.small, verbose=args.verbose)
     print(f"Build completed: {args.output}")
+
+    
 
 if __name__ == "__main__":
     main()

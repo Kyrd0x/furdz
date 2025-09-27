@@ -1,6 +1,6 @@
 # Core module for the project
 # export all necessary functions and classes here, * for easier imports*
-from core.templating import *
+from core.templator import *
 from core.hasher import *
 from core.utils import *
 from core.dict import *

@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+green()  { printf '\033[0;32m%s\033[0m\n' "$*"; }
+yellow() { printf '\033[0;33m%s\033[0m\n' "$*"; }
+red()    { printf '\033[0;31m%s\033[0m\n' "$*"; }
+
 dependencies_install() {
     echo "Installing required dependencies..."
 
@@ -10,30 +14,30 @@ dependencies_install() {
         # macOS
         # check if brew installed, if so warn and exit
         if ! command -v brew &> /dev/null; then
-            echo "Homebrew not found. Please install Homebrew first."
+            red "Homebrew not found. Please install Homebrew first."
             exit 1
         fi
         echo "Installing dependencies with Homebrew..."
         brew install mingw-w64 dos2unix python3
         if [[ $? -ne 0 ]]; then
-            echo "Failed to install dependencies with Homebrew."
+            red "Failed to install dependencies with Homebrew."
             exit 1
         fi
     else
         # Linux, apt require sudo privileges
         if [[ $EUID -ne 0 ]]; then
-            echo "This script must be run as root"
+            red "This script must be run as root"
             exit 1
         fi
 
         echo "Installing dependencies with apt..."
         apt update && apt install -y build-essential mingw-w64 dos2unix python3-venv
         if [[ $? -ne 0 ]]; then
-            echo "Failed to install dependencies with apt."
+            red "Failed to install dependencies with apt."
             exit 1
         fi
     fi
-    echo "Dependencies installed successfully."
+    green "Dependencies installed successfully."
 }
 
 virtualenv_setup() {
@@ -47,7 +51,7 @@ virtualenv_setup() {
             echo "Installing Python dependencies..."
             pip install -r requirements.txt
         else
-            echo "No requirements.txt found. Skipping Python dependencies installation."
+            yellow "No requirements.txt found. Skipping Python dependencies installation."
         fi
     fi
 }
@@ -61,8 +65,6 @@ project_init() {
         cp .conf.template .conf
     fi
 
-    echo "Please edit the .conf file to configure the build options."
-
     echo "Fixing bash scripts and making them executable..."
     find . -name "*.sh" -type f -exec dos2unix {} \; -exec chmod +x {} \;
 }
@@ -75,8 +77,9 @@ fullinstall() {
     virtualenv_setup
     project_init
 
-    echo "Then run './build.sh -h' to see build options."
-    echo "Setup done. Please edit the .conf file to configure the build options."
+    green "Install done. Activate your virtual environment with 'source .env/bin/activate'."
+    green "Don't forget to edit the .conf file to configure the build options."
+    green "Then run './build.py -h' to see build options."
 }
 
 fullinstall
