@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
+from configparser import ConfigParser
 import argparse
 import os
-from core.orchestrator import *   # à remplacer par imports ciblés
-from core.utils import *          # idem: éviter import *
 
 PAYLOAD_DIR = "src/dll/payloads"
 
-class _Fmt(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
-    pass
+config = ConfigParser()
+config.read(".conf") 
 
-""" usage() { echo "Usage: $0 [options] --<payload> | clean" echo "" echo "Options:" echo " -o, --output <output_file> Specify the output file name (default: executable.exe)" echo " -s, --small Prioritize size over detection (no icon & no stdlib)" echo " -v, --verbose Enable verbose mode" echo " -h, --help Show this help message" echo "" echo "Payload:" echo " --<payload> Exactly one payload must be specified." echo " Maps to src/dll/<payload>.c (e.g., --foo -> src/dll/foo.c)" echo "" echo "Evasion:" echo " --etw Disable ETW" echo " --ntdll Overwrite ntdll from disk" echo "" echo "Available payloads:" if compgen -G "src/dll/payloads/*.c" >/dev/null; then for f in src/dll/payloads/*.c; do printf ' --%s\n' "$(basename "$f" .c)" done else echo " (none found in src/dll/payloads)" fi echo "" echo "Commands:" echo " clean Clean the build directory" echo " setup Setup the build environment" echo "" echo "Examples:" echo " $0 --small -o out.exe --foo" echo " $0 --help" echo " $0 clean" exit 1 } """
+# Custom formatter: show defaults normally, but DO NOT append "(default: ...)"
+# for arguments whose dest starts with "payload_" or which are evasions.
+class _Fmt(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
+    # Add here any dest names for which we don't want the "(default: ...)" suffix
+    _no_default_dests = {"etw", "ntdll"}
+
+    def _get_help_string(self, action):
+        dest = getattr(action, "dest", "")
+        # Hide defaults for dynamic payload flags (dest starts with payload_)
+        # and for explicit evasions listed in _no_default_dests.
+        if dest.startswith("payload_") or dest in self._no_default_dests:
+            return action.help
+        return argparse.ArgumentDefaultsHelpFormatter._get_help_string(self, action)
+
 
 EPILOG = """Examples:
-  build.py --small -o out.exe --foo
+  build.py -o evil.exe --ransom --etw -v
+  build.py --small -o demo.exe --debug
   build.py --help
 """
 
 DESCRIPTION = """Usage:
   build.py [options] --<payload>
-
-Exactly one payload must be specified unless you run a command.
 """
 
 def _discover_payloads(payload_dir: str):
@@ -27,18 +38,22 @@ def _discover_payloads(payload_dir: str):
     if os.path.isdir(payload_dir):
         for f in sorted(os.listdir(payload_dir)):
             if f.endswith(".c"):
-                names.append(f[:-2])  # nom sans .c
+                names.append(f[:-2])
     return names
 
 def parse_args(argv=None):
+    # We disable the automatic -h so we can add it inside our "Options" group.
     parser = argparse.ArgumentParser(
         description=DESCRIPTION,
         epilog=EPILOG,
         formatter_class=_Fmt,
+        add_help=False,
     )
 
-    # ----- Options (groupe) -----
+    # ----- Options (group) -----
     opt = parser.add_argument_group("Options")
+    # Manually add help so it appears under the "Options" header
+    opt.add_argument("-h", "--help", action="help", help="show this help message and exit")
     opt.add_argument("-o", "--output", type=str, default="executable.exe",
                      help="Output file name")
     opt.add_argument("-s", "--small", action="store_true",
@@ -46,54 +61,58 @@ def parse_args(argv=None):
     opt.add_argument("-v", "--verbose", action="store_true",
                      help="Enable verbose mode")
 
-    # ----- Payloads (groupe + mutually exclusive) -----
+    # ----- Payloads (group + mutually exclusive) -----
     payload_group = parser.add_argument_group(
         "Payload",
-        "Exactly one payload must be specified (unless you use a command). "
+        "Exactly one payload must be specified. "
         f"Payload flags map to {PAYLOAD_DIR}/<name>.c"
     )
     mex = payload_group.add_mutually_exclusive_group(required=False)
 
     payload_names = _discover_payloads(PAYLOAD_DIR)
     for name in payload_names:
+        # dest names start with "payload_" so our custom formatter can detect them
         mex.add_argument(f"--{name}", dest=f"payload_{name}",
                          action="store_true", help=f"Use payload '{name}'")
 
+
+    # ----- Evasions (separate group) -----
+    evasions = parser.add_argument_group("Evasions")
+    evasions.add_argument("--etw", action="store_true", help="Disable ETW")
+    evasions.add_argument("--ntdll", action="store_true", help="Overwrite ntdll from disk")
+
+
+    # You previously used a "command" idea; keep it if you need commands later.
+    # For now we keep no subcommands, so just parse.
     args = parser.parse_args(argv)
 
-    # ----- Validation: si pas de commande, exiger exactement 1 payload -----
-    if args.command is None:
-        selected = [k for k, v in vars(args).items() if k.startswith("payload_") and v]
-        if len(selected) != 1:
-            # Construit un message d’erreur clair avec les payloads dispo
-            if payload_names:
-                choices = ", ".join(f"--{n}" for n in payload_names)
-                parser.error(f"Exactly one payload must be specified. Available: {choices}")
-            else:
-                parser.error(f"No payloads found in {PAYLOAD_DIR}")
+    # ----- Validation: require exactly one payload -----
+    selected = [k for k, v in vars(args).items() if k.startswith("payload_") and v]
+    if len(selected) != 1:
+        if payload_names:
+            choices = ", ".join(f"--{n}" for n in payload_names)
+            parser.error(f"Exactly one payload must be specified. Available: {choices}")
+        else:
+            parser.error(f"No payloads found in {PAYLOAD_DIR}")
 
     return args
 
 def main():
     args = parse_args()
     print(args)
-    if args.command == "clean":
-        os.system("bash scripts/clean.sh")
-        print("Build directory cleaned.")
-        return
 
-    if args.command == "setup":
-        os.system("bash scripts/setup.sh")
-        return
-
+    # logger todo here
 
     """
     Steps:
-        - encrypt payload with selected method (xor/dict/etc)                                     -> encryptor.py
         - sed files with config values, checks, evasions, payloads and so (LHOST, LPORT, etc)     -> templator.py
+        - encrypt payload with selected method (xor/dict/etc)                                     -> encryptor.py
+        - Replace payload in main app
         - build dll                                                                               -> scripts/compile_dll.sh
         - build exe                                                                               -> scripts/compile_exe.sh
     """
+
+
     # Ici on est en mode "build" avec exactement 1 payload sélectionné
     # Récupère le nom du payload choisi
     payload = None
@@ -106,11 +125,6 @@ def main():
     if args.verbose:
         print(f"[i] building with payload='{payload}', output='{args.output}', small={args.small}")
 
-    # TODO: appelle ton orchestrateur avec payload / options
-    # run_build(payload=payload, output=args.output, small=args.small, verbose=args.verbose)
-    print(f"Build completed: {args.output}")
-
-    
 
 if __name__ == "__main__":
     main()
