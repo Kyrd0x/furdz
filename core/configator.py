@@ -5,9 +5,33 @@ import sys
 from .utils import generate_high_entropy_int
 
 
-config = ConfigParser()
-config.read(".conf") 
 
+def check_config(config):
+    required_sections = ["Payload", "Anti-Analysis", "Evasion"]
+    for section in required_sections:
+        if not config.has_section(section):
+            sys.exit(f"Error: Missing section [{section}] in configuration (.conf) file.")
+
+    # Check required options in Payload section
+    required_options = ["encryption_method", "lhost", "lport", "type"]
+    for option in required_options:
+        if not config.has_option("Payload", option):
+            sys.exit(f"Error: Missing option '{option}' in section [Payload] of configuration (.conf) file.")
+
+    # Check required options in Anti-Analysis section
+    required_options = ["disk_size", "ram_size", "cpu_cores", "target_hostname"]
+    for option in required_options:
+        if not config.has_option("Anti-Analysis", option):
+            sys.exit(f"Error: Missing option '{option}' in section [Anti-Analysis] of configuration (.conf) file.")
+
+    # Check required options in Evasion section
+    required_options = ["etw_patching"]
+    for option in required_options:
+        if not config.has_option("Evasion", option):
+            sys.exit(f"Error: Missing option '{option}' in section [Evasion] of configuration (.conf) file.")
+
+
+"""
 def is_set(value):
     return value != None and value != ""
 
@@ -71,3 +95,4 @@ WORKING_FOLDER = "build/"
 STUB_FILE = "main.c"
 PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"
+"""
