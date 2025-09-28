@@ -1,4 +1,5 @@
 name: Deploy setup.sh via FTP
+# Deploy scripts/oneliner.sh to FTP server over Tailscale
 
 on:
   push:

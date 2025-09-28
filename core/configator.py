@@ -1,9 +1,5 @@
-from configparser import ConfigParser
-import os
-import sys
-
 from .utils import generate_high_entropy_int
-
+import sys
 
 
 def check_config(config):
@@ -31,6 +27,12 @@ def check_config(config):
             sys.exit(f"Error: Missing option '{option}' in section [Evasion] of configuration (.conf) file.")
 
 
+def check_config_and_merge(config, args):
+    check_config(config)
+
+    # Merge command-line arguments with config values
+    
+    return args
 """
 def is_set(value):
     return value != None and value != ""

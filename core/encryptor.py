@@ -1,8 +1,6 @@
 import requests
 import random
 
-from core.dict import get_wordlist
-
 class Encryptor:
     def __init__(self, method, verbose=False):
         self.method = method
@@ -33,7 +31,6 @@ class Encryptor:
         return self.nb_words
 
     def set_wordlist(self, source_file, size=256):
-        self.wordlist = get_wordlist(source_file)
         if "http" in source_file:
             words = requests.get(source_file).text.splitlines()
         else:

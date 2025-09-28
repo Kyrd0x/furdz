@@ -4,18 +4,18 @@
 set -euo pipefail
 
 # default values
-OUTPUT_FILE="executable.exe" # -o | --output <output_file>
-PRIORIZE_SIZE="false" # -p | --prioritize-size <true|false>
+OUTPUT_FILE="executable.exe" # -o <output_file>
+PRIORIZE_SIZE="false" # --prioritize-size <true|false>
 
 # retrieve arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -o|--output)
+        -o)
             OUTPUT_FILE="$2"
             shift 2
             ;;
-        -p|--prioritize-size)
-            PRIORIZE_SIZE="true"
+        --prioritize-size)
+            PRIORIZE_SIZE="$3"
             shift
             ;;
         *)

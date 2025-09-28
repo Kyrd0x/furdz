@@ -1,7 +1,6 @@
 #!/bin/bash
 
 PAYLOAD=$1
-VERBOSE=false
 
 if [[ -z "$PAYLOAD" ]]; then
   echo "Error: No DLL payload provided."

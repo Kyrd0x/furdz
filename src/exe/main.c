@@ -40,7 +40,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
     // Seed the random number generator
     srand(time(NULL));
-    uint16_t key = %XOR_KEY%; // Placeholder for XOR key
+    uint16_t key = %__XOR_KEY__%; // Placeholder for XOR key
     char path[MAX_PATH]; 
     int min = 4000; // Minimum range for random money
     int max = 17000; // Maximum range for random money

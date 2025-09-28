@@ -16,66 +16,12 @@ def round_pow2(n):
 def ro_line(ro_value, direction):
     return f"ro{direction[0].lower()} ${ro_value}"
 
-def is_valid_tag(tag):
-    tag_content = tag[1:-1]  # Remove the '%' characters
-    # Check if the tag contains only alphanumeric characters and underscores
-    return bool(re.fullmatch(r'[A-Za-z0-9_.-]+', tag_content))
-
-# Replace occurrences of a string in a file
-def sed_file(filepath, old, new):
-    # Open the file in read/write mode
-    # print(f"Replacing '{old}' with '{new}' in {filepath}")  # Debugging line
-    with open(filepath, 'r+') as file:
-        content = file.read().replace(old, new)  # Replace old with new
-        file.seek(0)
-        file.write(content)
-        file.truncate()
-
-# Replace occurrences of a string in all files within a folder with specific extensions
-def sed_files(folderpath, old, new, extension=[".nasm", ".c", ".h"]):
-    for root, _dirs, files in os.walk(folderpath):
-        for filename in files:
-            if filename.endswith(tuple(extension)):
-                filepath = os.path.join(root, filename)
-                sed_file(filepath, old, new)
-
-def dll2instructions(filepath="build/bin/injected-dll.dll"):
-    with open(filepath, 'rb') as file:
-        content = file.read()
-        return content.hex()
-
 # Format instructions into a specific string format
 def format_instructions(instructions):
     if len(instructions) == 0:
         return ""
     else:
         return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
-
-# Extract tags from a file
-def extract_tags_from_file(filepath):
-    tags = []
-    with open(filepath, 'r') as file:
-        content = file.read()
-        # Use regex to find all tags in the format %tag%
-        matches = re.findall(r'%[^%]+%', content)
-        for match in matches:
-            if is_valid_tag(match):
-                tags.append(match)
-    return tags
-
-# Extract tags from all files within a folder recursively
-def extract_tags_from_folder(folderpath):
-    result = []
-    for root, _dirs, files in os.walk(folderpath):
-        for filename in files:
-            if filename.endswith((".nasm", ".c", ".h")):
-                filepath = os.path.join(root, filename)
-                relative_path = os.path.relpath(filepath, folderpath)
-                result.append({
-                    "filename": relative_path.replace("\\", "/"),  # Pour un format uniforme, même sous Windows
-                    "tags": extract_tags_from_file(filepath)
-                })
-    return result
 
 def xor1_encrypt_decrypt(data, key):
     # Convert the hexadecimal string to bytes
@@ -148,10 +94,3 @@ def get_LCID(country_code):
         raise ValueError(f"'{country_code}' is not valid.")
     
     return result
-
-# Run the dll/compile.sh script to compile the DLL to inject
-def compile_dll(name):
-    subprocess.run(["bash", "scripts/compile_dll.sh", name], check=True)
-
-def clean_repo():
-    subprocess.run(["rm", "-rf", "bin", "build", ".build"], check=True)
