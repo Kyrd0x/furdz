@@ -110,6 +110,8 @@ def parse_args(argv=None):
         else:
             parser.error(f"No payloads found in {PAYLOAD_DIR}")
 
+    args.payload_name = selected[0][8:]  # drop "payload_" prefix
+
     return args
 
 def main():
@@ -141,14 +143,21 @@ def main():
 
 
     # Step 1: Replace templates in payload file
-    templator = Templator(working_folder="src/dll/payloads", templates_folder="src/templates/", verbose=args.verbose)
+    dll_templator = Templator(working_folder="build/dll/", templates_folder="src/templates/", verbose=args.verbose)
     # replace all patterns execpt list of exceptions
-    templator.replace_all(exception=["%__PAYLOAD__%", "%__PAYLOAD_SIZE__%", "%__SHELLCODE__%", "%__SHELLCODE_DECODER__%"])
+    tags_by_file = dll_templator.extract_tags_from_folder("build/dll/")
+    tags_by_file += dll_templator.extract_tags_from_folder("build/common/")
+    print(tags_by_file) if args.verbose else None
+    dll_templator.replace_tags(tags_by_file)
 
+    if args.etw:
+        dll_templator.sed_files("%__ETW_PATCHING__%", "patch_etw();")
+    else: 
+        dll_templator.sed_files("%__ETW_PATCHING__%", "// ETW patching not enabled")
 
     build_dll(payload, verbose=args.verbose)  # bash scripts/compile_dll.sh payload
-
     exit(0)  # TODO remove me when done testing
+
 
     # Step 2: Encrypt payload
     if "dict" in config.get("Payload", "encryption_method"):
@@ -189,8 +198,7 @@ def main():
 
     # --------- EVASIONS ---------
 
-    if args.etw:
-        templator.sed_files("%__ETW_PATCHING__%", "patch_etw();")
+   
 
     if args.ntdll:
         print("[i] ntdll evasion not implemented yet")

@@ -15,7 +15,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
         } else {
             // DO NOT TOUCH
             // will be replaced by 'patch_etw();' if --etw flag set at compilation
-            /
+            %__ETW_PATCH__%
 
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)entrypoint, NULL, 0, NULL);
         }

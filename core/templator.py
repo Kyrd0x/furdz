@@ -19,9 +19,9 @@ class Templator:
     <content>
     //__END__<TAG>__//
     """
-    def __init__(self, working_folder="build/src/", template_folder="build/src/templates/", verbose=False):
+    def __init__(self, working_folder="build/src/", templates_folder="build/src/templates/", verbose=False):
         self.working_folder = working_folder if working_folder.endswith("/") else working_folder + "/"
-        self.templates_folder = template_folder if template_folder.endswith("/") else template_folder + "/"
+        self.templates_folder = templates_folder if templates_folder.endswith("/") else templates_folder + "/"
         self.verbose = verbose
         self.pattern = re.compile(r"%__(\w+)__%")
 
@@ -59,13 +59,21 @@ class Templator:
     # Extract tags from a file
     def extract_tags_from_file(self, filepath):
         tags = []
-        with open(filepath, 'r') as file:
+        with open(filepath, 'r', encoding="utf-8") as file:
             content = file.read()
-            # Use regex to find all tags in the format %tag%
-            matches = re.findall(r'%[^%]+%', content)
-            for match in matches:
-                if self.is_valid_tag(match):
-                    tags.append(match)
+            matches = self.pattern.findall(content)
+
+            for raw_tag in matches:
+                parts = raw_tag.split("__")
+                if len(parts) < 2:
+                    tag_type = "simple"
+                    tag_name = parts[0]
+                else:
+                    tag_type = parts[0] if parts[0] else "simple"
+                    tag_name = parts[1]
+                tags.append({"type": tag_type, "name": tag_name})
+
+        print(tags) if self.verbose else None
         return tags
 
     # Extract tags from all files within a folder recursively
