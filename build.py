@@ -118,7 +118,7 @@ def main():
             elif not tag['type']:
                 if tag['name'] == "LHOST":
                     if config.get("Payload", "lhost"):
-                        step1_templator.sed_file(filepath, tag['raw'], '"' + config.get("Payload", "lhost") + '"')
+                        step1_templator.sed_file(filepath, tag['raw'], config.get("Payload", "lhost"))
                     else:
                         raise ValueError("LHOST is not set in the configuration (.conf) file.")
                 elif tag['name'] == "LPORT":
