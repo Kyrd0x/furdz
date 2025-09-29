@@ -6,6 +6,11 @@ green()  { printf '\033[0;32m%s\033[0m\n' "$*"; }
 yellow() { printf '\033[0;33m%s\033[0m\n' "$*"; }
 red()    { printf '\033[0;31m%s\033[0m\n' "$*"; }
 
+cleanup_on_error() {
+  red "Installation failed (line ${BASH_LINENO[0]})."
+}
+trap cleanup_on_error ERR
+
 dependencies_install() {
     echo "Installing required dependencies..."
 
@@ -14,7 +19,7 @@ dependencies_install() {
         # macOS
         # check if brew installed, if so warn and exit
         if ! command -v brew &> /dev/null; then
-            red "Homebrew not found. Please install Homebrew first."
+            red "Homebrew not found. Please install Homebrew first: https://brew.sh/"
             exit 1
         fi
         echo "Installing dependencies with Homebrew..."
@@ -58,14 +63,13 @@ virtualenv_setup() {
 }
 
 argcomplete_setup() {
-    # Activate arg completion if available
-    if [[ -f .env/bin/activate && -x .env/bin/activate ]]; then
+    if [[ -f .env/bin/activate ]]; then
         source .env/bin/activate
     fi
-    
-    if command -v argcomplete &> /dev/null; then
+
+    if command -v register-python-argcomplete &>/dev/null; then
         eval "$(register-python-argcomplete build.py)"
-        green "Argcomplete setup completed."
+        green "Argcomplete setup completed (register-python-argcomplete)."
     else
         yellow "Argcomplete not found. Skipping argcomplete setup."
     fi
@@ -75,13 +79,20 @@ project_init() {
     # to change to config.ini later
     if [[ -f .conf ]]; then
         echo ".conf file already exists. Skipping creation."
-    else
+    elif [[ -f .conf.template ]]; then
         echo "Creating .conf file from template..."
         cp .conf.template .conf
+    else
+        yellow "No .conf.template found. Skipping .conf creation."
     fi
 
     echo "Fixing bash scripts and making them executable..."
-    find . -name "*.sh" -type f -exec dos2unix {} \; -exec chmod +x {} \;
+    if command -v dos2unix &>/dev/null; then
+        find . -name "*.sh" -type f -exec dos2unix {} \; -exec chmod +x {} \;
+    else
+        yellow "dos2unix not available; only chmod will be applied."
+        find . -name "*.sh" -type f -exec chmod +x {} \;
+    fi
 }
 
 fullinstall() {
