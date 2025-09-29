@@ -133,7 +133,7 @@ class Templator:
             filepath = file["filepath"]
             tags = file["tags"]
             for tag in tags:
-                print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']}") if args.verbose else None
+                print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']})") if args.verbose else None
                 if tag['replaced']:
                     continue
                 elif tag['type'] == "MODHASH":
