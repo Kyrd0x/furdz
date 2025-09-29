@@ -1,3 +1,4 @@
-pyyaml
 Pillow
 requests
+configparser
+argcomplete

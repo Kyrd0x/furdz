@@ -8,9 +8,9 @@ Also scoring minimal on VirusTotal.
 ## TODO
 
  - **Autoload the DLL**
- - Increase ```winapi.c``` obfuscation (jmp -1 as an example)
+ - Increase ```winapi.c``` obfuscation
+ - Ability to choose between multiple techniques
  - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
- - Clean the Python code (logging, use ```/*-%TAG%-*/``` project-wide)
 
 ## Options
 
@@ -52,8 +52,8 @@ If you prefer to install dependencies yourself, adjust permissions, and set up t
 ```bash
 git clone https://github.com/Kyrd0x/furdz.git
 cd furdz
-chmod +x setup.sh
-sudo ./setup.sh
+chmod +x scripts/setup.sh
+sudo ./scripts/setup.sh
 ```
 
 The ```setup.sh``` script will:
@@ -66,7 +66,7 @@ The ```setup.sh``` script will:
 
 After installation, you need to READ and edit the .conf file.
 
-Then running ```./build.sh -h``` is a nice idea.
+Then running ```./build.py -h``` is a nice idea.
 
 ## Disclaimer & Legal Warning
 

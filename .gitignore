@@ -3,7 +3,7 @@ __pycache__/
 other/
 env/
 .env/
-temp*
+
 
 build/
 .build/
@@ -18,4 +18,3 @@ config.ini
 background.c
 
 #temp
-build_v2.py

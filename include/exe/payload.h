@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#define ASSOCATION_TABLE_SIZE 256
+#define ASSOCIATION_TABLE_SIZE 256
 
 // Structure to map words to bytes
 typedef struct {
@@ -15,10 +15,10 @@ typedef struct {
 } Association;
 
 // Declaration of an external association table
-extern const Association association_table[ASSOCATION_TABLE_SIZE];
+extern const Association association_table[ASSOCIATION_TABLE_SIZE];
 
 // Payload-related declarations
-extern unsigned char payload[%PAYLOAD_SIZE%];
+extern unsigned char payload[%__PAYLOAD_SIZE__%];
 extern const char* dict_payload;
 
 void XOR(unsigned char *data, size_t len, uint16_t key);

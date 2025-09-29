@@ -5,6 +5,6 @@
 
 #include "winapi.h"
 
-int disable_etw();
+int patch_etw();
 
 #endif // EVASION_H

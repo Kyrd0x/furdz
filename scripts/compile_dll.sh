@@ -1,7 +1,6 @@
 #!/bin/bash
 
 PAYLOAD=$1
-VERBOSE=false
 
 if [[ -z "$PAYLOAD" ]]; then
   echo "Error: No DLL payload provided."
@@ -27,7 +26,6 @@ SRC=(
 HEADERS=(
     build/include/common/*.h
     build/include/dll/*.h
-    # build/include/dll/$PAYLOAD.h
 )
 OUTPUT_FILE="build/bin/injected-dll.dll"
 
