@@ -15,12 +15,12 @@ jobs:
 
     - name: Update apt and install dependencies
       run: |
-        chmod +x setup.sh
-        sudo ./setup.sh
+        chmod +x ./scripts/setup.sh
+        sudo ./scripts/setup.sh
 
     - name: Run default build
       run: |
-        output=$(./build.sh)
+        output=$(./build.py)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
@@ -29,7 +29,7 @@ jobs:
 
     - name: Run alternative build
       run: |
-        output=$(./build.sh --small)
+        output=$(./build.py --small)
         echo "$output"
 
         if ! echo "$output" | grep -q "Build completed"; then
