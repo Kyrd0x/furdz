@@ -23,33 +23,7 @@ def format_instructions(instructions):
     else:
         return "\\x" + "\\x".join(instructions[i:i+2] for i in range(0, len(instructions), 2))
 
-def xor1_encrypt_decrypt(data, key):
-    # Convert the hexadecimal string to bytes
-    data_bytes = bytes.fromhex(data)
 
-    # Apply XOR operation on each byte with the key
-    result = bytearray()
-    for byte in data_bytes:
-        result.append(byte ^ key)
-
-    # Return the result in hexadecimal
-    return result.hex()
-
-# XOR encryption/decryption with a WORD key
-def xor2_encrypt_decrypt(data, word_key):
-    # Convert the hexadecimal string to bytes
-    data_bytes = bytes.fromhex(data)
-
-    # Split the 16-bit key (WORD) into two bytes
-    key_bytes = [word_key & 0xFF, (word_key >> 8) & 0xFF]
-
-    # Apply XOR operation on each byte, alternating key bytes
-    result = bytearray()
-    for i in range(len(data_bytes)):
-        result.append(data_bytes[i] ^ key_bytes[i % 2])
-
-    # Return the result in hexadecimal
-    return result.hex()
         
 # Generate a hash object with random rotation values and direction
 def hash_obj(module, function, verbose):

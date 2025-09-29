@@ -11,6 +11,7 @@ class Encryptor:
         self.dict = None # correspondance table for dict encryption
         self.wordlist = None  # list of words for dictionary encryption
         self.size = 0  # size of the final encrypted payload
+        self.key = None # XOR key (WORD)
 
     def set_key(self, key):
         self.key = key
@@ -106,3 +107,21 @@ class Encryptor:
         print(f"[i] dictionary size: {self.nb_words} words") if self.verbose else None
 
         return c_message
+    
+    # ---------- XOR-BASED ENCRYPTION ----------
+
+    # XOR encryption/decryption with a WORD key
+    def xor_encrypt(self, data):
+        # Convert the hexadecimal string to bytes
+        data_bytes = bytes.fromhex(data)
+
+        # Split the 16-bit key (WORD) into two bytes
+        key_bytes = [self.key & 0xFF, (self.key >> 8) & 0xFF]
+
+        # Apply XOR operation on each byte, alternating key bytes
+        result = bytearray()
+        for i in range(len(data_bytes)):
+            result.append(data_bytes[i] ^ key_bytes[i % 2])
+
+        # Return the result in hexadecimal
+        return result.hex()
