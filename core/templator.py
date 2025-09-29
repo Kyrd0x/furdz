@@ -139,7 +139,7 @@ class Templator:
                 elif tag['type'] == "MODHASH":
                     self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "", args.verbose))
                 elif tag['type'] == "FCTHASH":
-                    self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "function", args.verbose))
+                    self.sed_file(filepath, tag['raw'], hash_obj("", tag['name'], args.verbose))
 
                 elif tag['type'] == "SANDBOX":
                     if tag['name'] == "CPU_CHECK":
