@@ -9,6 +9,7 @@ Also scoring minimal on VirusTotal.
 
  - **Autoload the DLL**
  - Increase ```winapi.c``` obfuscation
+ - Ability to choose between multiple techniques
  - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
 
 ## Options
