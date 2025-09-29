@@ -26,7 +26,6 @@ SRC=(
 HEADERS=(
     build/include/common/*.h
     build/include/dll/*.h
-    # build/include/dll/$PAYLOAD.h
 )
 OUTPUT_FILE="build/bin/injected-dll.dll"
 

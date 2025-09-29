@@ -81,6 +81,12 @@ project_init() {
 }
 
 fullinstall() {
+    # check if git is installed
+    if ! command -v git &> /dev/null; then
+        red "Git not found. Please install Git first."
+        exit 1
+    fi
+
     git clone https://github.com/Kyrd0x/furdz.git
     cd furdz
 
