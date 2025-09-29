@@ -31,7 +31,7 @@ class Templator:
     # Replace occurrences of a string in a file
     def sed_file(self, filepath, pattern, new):
         # Open the file in read/write mode
-        # print(f"Replacing '{old}' with '{new}' in {filepath}")  # Debugging line
+        print(f"Replacing '{pattern}' with '{new}' in {filepath}") if self.verbose else None
         with open(filepath, 'r+') as file:
             content = file.read().replace(pattern, new)  # Replace old with new
             file.seek(0)
@@ -66,7 +66,7 @@ class Templator:
         raise ValueError(f"Template '{template_name}' not found in templates folder.")
 
     # Extract tags from a file
-    def extract_tags_from_file(self, filepath):
+    def extract_tags_from_file(self, filepath, exceptions=[]):
         tags = []
         with open(filepath, 'r', encoding="utf-8") as file:
             content = file.read()
@@ -80,13 +80,15 @@ class Templator:
                 else:
                     tag_type = parts[0] or None
                     tag_name = parts[1]
+                if raw_tag in exceptions or tag_name in exceptions:
+                    continue
                 tags.append({"type": tag_type, "name": tag_name, "replaced": False, "raw": f"%__{raw_tag}__%"})
 
         print(tags) if self.verbose else None
         return tags
 
     # Extract tags from all files within a folder recursively
-    def extract_tags_from_folder(self, folderpath=None):
+    def extract_tags_from_folder(self, folderpath=None, exceptions=[]):
         if folderpath is None:
             folderpath = self.working_folder
         result = []
@@ -99,7 +101,7 @@ class Templator:
                     relative_path = os.path.relpath(filepath, folderpath)
                     result.append({
                         "filepath": relative_path.replace("\\", "/"),
-                        "tags": self.extract_tags_from_file(filepath)
+                        "tags": self.extract_tags_from_file(filepath, exceptions=exceptions)
                     })
         return result
                 
