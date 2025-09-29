@@ -93,7 +93,7 @@ class Encryptor:
         c_message = ' '.join(decoded_words)  # Join decoded words into a single string
 
         # Generate a C array for the association table
-        association_c_array = 'const Association association_table[ASSOCATION_TABLE_SIZE] = {\n'
+        association_c_array = 'const Association association_table[ASSOCIATION_TABLE_SIZE] = {\n'
         for i in range(256):
             word = associations.get(i, f"mot{i}")
             association_c_array += f'    {{"{word}", 0x{i:02X}}},\n'

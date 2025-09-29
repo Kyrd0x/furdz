@@ -21,32 +21,36 @@ class Templator:
     <content>
     //__END__<TAG>__//
     """
-    def __init__(self, working_folder="build/", verbose=False):
-        self.working_folder = working_folder if working_folder.endswith("/") else working_folder + "/"
+    def __init__(self, working_dir="build/", verbose=False):
+        self.working_dir = working_dir if working_dir.endswith("/") else working_dir + "/"
         self.templates_folder = TEMPLATE_DIR
         self.verbose = verbose
-        self.pattern = re.compile(r"%__(\w+)__%")
+        self.pattern = re.compile(r"%__(.+?)__%", re.DOTALL)
 
     def is_valid_tag(self, tag):
         return self.pattern.match(tag)
 
     # Replace occurrences of a string in a file
     def sed_file(self, filepath, pattern, new):
+        fullpath = os.path.join(self.working_dir, filepath)
+        if not os.path.isfile(fullpath):
+            raise FileNotFoundError(f"File '{fullpath}' not found.")
         # Open the file in read/write mode
-        print(f"Replacing '{pattern}' with '{new}' in {filepath}") if self.verbose else None
-        with open(filepath, 'r+') as file:
+        with open(fullpath, 'r+') as file:
             content = file.read().replace(pattern, new)  # Replace old with new
             file.seek(0)
             file.write(content)
             file.truncate()
 
     # Replace occurrences of a string in all files within a folder with specific extensions
-    def sed_files(self, pattern, new, extension=[".nasm", ".c", ".h"]):
-        for root, _dirs, files in os.walk(self.working_folder):
+    def sed_files(self, pattern, new, extension=(".nasm", ".c", ".h")):
+        for root, _dirs, files in os.walk(self.working_dir):
             for filename in files:
-                if filename.endswith(tuple(extension)):
-                    filepath = os.path.join(root, filename)
-                    self.sed_file(filepath, pattern, new)
+                if filename.endswith(extension):
+                    full = os.path.join(root, filename)
+                    rel  = os.path.relpath(full, self.working_dir)  # <- relative to working_dir
+                    self.sed_file(rel, pattern, new)
+
 
     # Get template content by tag from templates folder
     def get_template(self, template_name, *values_to_replace):
@@ -56,9 +60,7 @@ class Templator:
             with open(os.path.join(self.templates_folder, file), "r") as f:
                 content = f.read()
                 pattern = re.compile(rf"//__{template_name}__//(.*?)//__END__{template_name}__//", re.DOTALL)
-
                 match = pattern.search(content)
-                print(f"Match found: {match} in file {file}") if self.verbose else None
                 if match:
                     template_content = match.group(1).strip()
                     if ordered_values:
@@ -92,7 +94,7 @@ class Templator:
     # Extract tags from all files within a folder recursively
     def extract_tags_from_folder(self, folderpath=None, exceptions=[]):
         if folderpath is None:
-            folderpath = self.working_folder
+            folderpath = self.working_dir
         result = []
         for root, _dirs, files in os.walk(folderpath):
             if root.endswith("templates"):
@@ -100,7 +102,7 @@ class Templator:
             for filename in files:
                 if filename.endswith((".nasm", ".c", ".h")):
                     filepath = os.path.join(root, filename)
-                    path_from_root = os.path.relpath(filepath, self.working_folder)
+                    path_from_root = os.path.relpath(filepath, self.working_dir)
                     result.append({
                         "filepath": path_from_root,
                         "tags": self.extract_tags_from_file(filepath, exceptions=exceptions)
@@ -108,7 +110,7 @@ class Templator:
         return result
                 
     def get_all_tags_from_folder(self, exception=[]):
-        tags_by_file = self.extract_tags_from_folder(self.working_folder)
+        tags_by_file = self.extract_tags_from_folder(self.working_dir)
         if exception:
             for file in tags_by_file:
                 file["tags"] = [tag for tag in file["tags"] if tag not in exception]
@@ -121,3 +123,8 @@ class Templator:
                 template = self.get_template(tag)
                 if template:
                     self.sed_files(tag, template)
+
+
+    def step1(self, exceptions=[]):
+        tags_by_file = self.get_all_tags_from_folder(exception=exceptions)
+        self.replace_tags(tags_by_file)

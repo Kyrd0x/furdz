@@ -43,7 +43,7 @@ const ObjHash AVOIDED_HOSTNAME_PREFIX_HASHES[] = {
 };
 
 // const ObjHash AVOIDED_CPU_NAME_HASHES[] = {
-//     %__SANDBOX__AVOID_CPU_NAME__
+//     %__SANDBOX__AVOID_CPU_NAME__%
 // };
 
 // List of country codes to avoid
