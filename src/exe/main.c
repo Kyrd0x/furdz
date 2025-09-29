@@ -50,14 +50,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     
     printf("beginning\n");    
     HMODULE hKernel32dll = CustomGetModuleHandle(KERNEL32_HASH); // Load Kernel32 module
-    HMODULE hUser32dll = NULL; // Placeholder for Kernel32 module handle
-    hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
+    HMODULE hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     // Check if the program is being debugged
     if (is_being_debugged()) {
         printf("Error during file openning\n"); // Debugging detected
-        // return 1;
+        money_spent += money;
+        // exiting here is too obvious
     } else {
-        printf("No debugging detected\n"); // No debugging detected
+        printf("Success\n"); // No debugging detected
         // hUser32dll = CustomGetModuleHandle(USER32_HASH); // Load User32 module
     }
 
