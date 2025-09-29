@@ -18,8 +18,8 @@ jobs:
 
     - name: Update apt and install dependencies
       run: |
-        chmod +x setup.sh
-        sudo ./setup.sh
+        chmod +x ./scripts/setup.sh
+        sudo ./scripts/setup.sh
 
     - name: Set up Tailscale
       uses: tailscale/github-action@v3
@@ -90,8 +90,8 @@ jobs:
         chmod +x build.sh
 
         safe_name="${{ steps.get_commit_msg.outputs.commit_message }}"
-        ./build.sh -o "sample_${safe_name}.exe"
-        ./build.sh --small -o "sample_${safe_name}_small.exe"
+        ./build.py -o "sample_${safe_name}.exe" --debug
+        ./build.py --small -o "sample_${safe_name}_small.exe" --debug
 
     - name: Submit sample to CAPE
       env:
