@@ -1,0 +1,29 @@
+name: Test Oneliner Installation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Update apt and install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y curl git
+
+    - name: Test oneliner
+      run: |
+        chmod +x ./scripts/oneliner.sh
+        ./scripts/oneliner.sh
+        if [ $? -ne 0 ]; then
+          echo "Oneliner installation failed"
+          exit 1
+        fi
+        echo "Oneliner installation succeeded"
