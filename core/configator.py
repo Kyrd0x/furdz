@@ -98,7 +98,7 @@ ETW_PATCHING = argVal_etw_patching or confVal_etw_patching
 
 # ===============================
 
-WORKING_FOLDER = "build/"
+WORKING_DIR = "build/"
 STUB_FILE = "main.c"
 PAYLOAD_NAME = "injected-dll.dll"
 PAYLOAD_FILE = "payload.txt"

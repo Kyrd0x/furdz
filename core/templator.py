@@ -133,13 +133,13 @@ class Templator:
             filepath = file["filepath"]
             tags = file["tags"]
             for tag in tags:
-                print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']}") if args.verbose else None
+                print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']})") if args.verbose else None
                 if tag['replaced']:
                     continue
                 elif tag['type'] == "MODHASH":
                     self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "", args.verbose))
                 elif tag['type'] == "FCTHASH":
-                    self.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "function", args.verbose))
+                    self.sed_file(filepath, tag['raw'], hash_obj("", tag['name'], args.verbose))
 
                 elif tag['type'] == "SANDBOX":
                     if tag['name'] == "CPU_CHECK":
