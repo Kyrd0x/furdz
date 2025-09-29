@@ -1,6 +1,13 @@
 import argparse
 import os
 
+try:
+    import argcomplete
+    from argcomplete.completers import FilesCompleter
+except Exception:
+    argcomplete = None
+    FilesCompleter = None
+
 PAYLOAD_DIR = "src/dll/payloads"
 
 # Custom formatter: show defaults normally, but DO NOT append "(default: ...)"
@@ -52,6 +59,7 @@ def parse_args(argv=None):
         epilog=EPILOG,
         formatter_class=_Fmt,
         add_help=False,
+        allow_abbrev=False
     )
 
     # ----- Options (group) -----
@@ -85,9 +93,14 @@ def parse_args(argv=None):
     evasions.add_argument("--etw", action="store_true", help="Disable ETW")
     # evasions.add_argument("--ntdll", action="store_true", help="Overwrite ntdll from disk")
 
+    if argcomplete:
+        # (optionnel) compléter des chemins pour --output
+        for act in parser._actions:
+            if getattr(act, "dest", "") == "output" and FilesCompleter:
+                act.completer = FilesCompleter()
+        argcomplete.autocomplete(parser)
 
-    # You previously used a "command" idea; keep it if you need commands later.
-    # For now we keep no subcommands, so just parse.
+
     args = parser.parse_args(argv)
 
     # ----- Validation: require exactly one payload -----

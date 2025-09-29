@@ -53,6 +53,17 @@ virtualenv_setup() {
         else
             yellow "No requirements.txt found. Skipping Python dependencies installation."
         fi
+
+        # Activate arg completion if available
+        if [[ -f .env/bin/activate && -x .env/bin/activate ]]; then
+            source .env/bin/activate
+        fi
+        if command -v argcomplete &> /dev/null; then
+            eval "$(register-python-argcomplete build.py)"
+            green "Argcomplete setup completed."
+        else
+            yellow "Argcomplete not found. Skipping argcomplete setup."
+        fi
     fi
 }
 

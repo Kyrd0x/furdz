@@ -1,3 +1,4 @@
 Pillow
 requests
 configparser
+argcomplete

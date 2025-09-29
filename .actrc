@@ -1,3 +1,0 @@
-push
---workflows .github/workflows/check_score.yml
---secret-file .secrets

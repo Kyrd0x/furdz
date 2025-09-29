@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
+
 from configparser import ConfigParser
 import random
 import sys
@@ -13,6 +15,12 @@ from core.argparsor import parse_args, get_selected_payload
 
 PAYLOAD_DIR = "src/dll/payloads"
 WORKING_FOLDER = "build/"
+
+try:
+    import argcomplete
+except ImportError:
+    argcomplete = None
+
 
 def main():
     config = ConfigParser()
