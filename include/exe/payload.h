@@ -18,7 +18,7 @@ typedef struct {
 extern const Association association_table[ASSOCATION_TABLE_SIZE];
 
 // Payload-related declarations
-extern unsigned char payload[%PAYLOAD_SIZE%];
+extern unsigned char payload[%__PAYLOAD_SIZE__%];
 extern const char* dict_payload;
 
 void XOR(unsigned char *data, size_t len, uint16_t key);

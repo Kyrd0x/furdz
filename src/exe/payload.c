@@ -88,4 +88,4 @@ void DICT_decrypt(const char* dict_payload) {
 // }
 
 // Payload to be injected into the target process
-%SHELLCODE%
+%__SHELLCODE__%

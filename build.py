@@ -45,9 +45,9 @@ def main():
 
 
     # Step 1: Replace templates in payload file
-    step1_templator = Templator(working_folder="build/", templates_folder="src/templates/", verbose=args.verbose)
+    step1_templator = Templator(working_folder="build/", verbose=args.verbose)
     # replace all patterns execpt list of exceptions
-    tags_by_file = step1_templator.extract_tags_from_folder("build/src/", exceptions=["PAYLOAD", "SHELLCODE", "SHELLCODE_DECODER", "PAYLOAD_SIZE"])
+    tags_by_file = step1_templator.extract_tags_from_folder("build/", exceptions=["XOR_KEY", "PAYLOAD", "SHELLCODE", "SHELLCODE_DECODER", "PAYLOAD_SIZE"])
     print("[i] Tags found in files:") if args.verbose else None
     print(tags_by_file) if args.verbose else None
     # dll_templator.replace_tags(tags_by_file)

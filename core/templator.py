@@ -1,6 +1,8 @@
 import os
 import re
 
+TEMPLATE_DIR = "src/templates/"
+
 class Templator:
     """Class to handle templating operations.
     This can be:
@@ -19,9 +21,9 @@ class Templator:
     <content>
     //__END__<TAG>__//
     """
-    def __init__(self, working_folder="build/src/", templates_folder="build/src/templates/", verbose=False):
+    def __init__(self, working_folder="build/", verbose=False):
         self.working_folder = working_folder if working_folder.endswith("/") else working_folder + "/"
-        self.templates_folder = templates_folder if templates_folder.endswith("/") else templates_folder + "/"
+        self.templates_folder = TEMPLATE_DIR
         self.verbose = verbose
         self.pattern = re.compile(r"%__(\w+)__%")
 
@@ -98,9 +100,9 @@ class Templator:
             for filename in files:
                 if filename.endswith((".nasm", ".c", ".h")):
                     filepath = os.path.join(root, filename)
-                    relative_path = os.path.relpath(filepath, folderpath)
+                    path_from_root = os.path.relpath(filepath, self.working_folder)
                     result.append({
-                        "filepath": relative_path.replace("\\", "/"),
+                        "filepath": path_from_root,
                         "tags": self.extract_tags_from_file(filepath, exceptions=exceptions)
                     })
         return result
