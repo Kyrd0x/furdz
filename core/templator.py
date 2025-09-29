@@ -47,14 +47,23 @@ class Templator:
                     self.sed_file(filepath, pattern, new)
 
     # Get template content by tag from templates folder
-    def get_template(self, tag):
+    def get_template(self, template_name, *values_to_replace):
+        ordered_values = list(values_to_replace)
+        print(f"Looking for template '{template_name}' in recursive folder {self.templates_folder}") if self.verbose else None
         for file in os.listdir(self.templates_folder):
             with open(os.path.join(self.templates_folder, file), "r") as f:
                 content = f.read()
-                pattern = re.compile(rf"%__{tag}__%(.*?)%__END__{tag}__%", re.DOTALL)
+                pattern = re.compile(rf"//__{template_name}__//(.*?)//__END__{template_name}__//", re.DOTALL)
+
                 match = pattern.search(content)
+                print(f"Match found: {match} in file {file}") if self.verbose else None
                 if match:
-                    return match.group(1).strip()
+                    template_content = match.group(1).strip()
+                    if ordered_values:
+                        for i, value in enumerate(ordered_values):
+                            template_content = template_content.replace(f"%__VALUE{i+1}__%", str(value))
+                    return template_content
+        raise ValueError(f"Template '{template_name}' not found in templates folder.")
 
     # Extract tags from a file
     def extract_tags_from_file(self, filepath):
@@ -66,18 +75,20 @@ class Templator:
             for raw_tag in matches:
                 parts = raw_tag.split("__")
                 if len(parts) < 2:
-                    tag_type = "simple"
+                    tag_type = None
                     tag_name = parts[0]
                 else:
-                    tag_type = parts[0] if parts[0] else "simple"
+                    tag_type = parts[0] or None
                     tag_name = parts[1]
-                tags.append({"type": tag_type, "name": tag_name})
+                tags.append({"type": tag_type, "name": tag_name, "replaced": False, "raw": f"%__{raw_tag}__%"})
 
         print(tags) if self.verbose else None
         return tags
 
     # Extract tags from all files within a folder recursively
-    def extract_tags_from_folder(self, folderpath):
+    def extract_tags_from_folder(self, folderpath=None):
+        if folderpath is None:
+            folderpath = self.working_folder
         result = []
         for root, _dirs, files in os.walk(folderpath):
             if root.endswith("templates"):
@@ -87,7 +98,7 @@ class Templator:
                     filepath = os.path.join(root, filename)
                     relative_path = os.path.relpath(filepath, folderpath)
                     result.append({
-                        "filename": relative_path.replace("\\", "/"),
+                        "filepath": relative_path.replace("\\", "/"),
                         "tags": self.extract_tags_from_file(filepath)
                     })
         return result

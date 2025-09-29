@@ -8,9 +8,8 @@ Also scoring minimal on VirusTotal.
 ## TODO
 
  - **Autoload the DLL**
- - Increase ```winapi.c``` obfuscation (jmp -1 as an example)
+ - Increase ```winapi.c``` obfuscation
  - Add anti sandboxs checks, based on virtualization, cpu name, bios name, connected devices
- - Clean the Python code (logging, use ```/*-%TAG%-*/``` project-wide)
 
 ## Options
 

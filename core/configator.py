@@ -15,7 +15,7 @@ def check_config(config):
             sys.exit(f"Error: Missing option '{option}' in section [Payload] of configuration (.conf) file.")
 
     # Check required options in Anti-Analysis section
-    required_options = ["disk_size", "ram_size", "cpu_cores", "target_hostname"]
+    required_options = ["disk_size", "ram_size", "cpu_cores", "target_hostname", "avoid_hostname", "avoid_countries"]
     for option in required_options:
         if not config.has_option("Anti-Analysis", option):
             sys.exit(f"Error: Missing option '{option}' in section [Anti-Analysis] of configuration (.conf) file.")
@@ -29,8 +29,13 @@ def check_config(config):
 
 def check_config_and_merge(config, args):
     check_config(config)
+    # If command-line args are provided, they take precedence over config file values
+    
+    if not args.payload_name:
+        args.payload_name = config.get("Payload", "type")
 
-    # Merge command-line arguments with config values
+    # Evasion
+    args.etw = args.etw or config.getboolean("Evasion", "etw_patching", fallback=False)
     
     return args
 """
