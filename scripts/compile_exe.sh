@@ -4,13 +4,16 @@
 set -euo pipefail
 
 # usage : ./compile_exe.sh <output_file> <prioritize_size:true|false> <verbose:true|false>
-OUTPUT_FILE="$1" # --output-file <filename>
-PRIORIZE_SIZE="$2" # --prioritize-size <true|false>
-VERBOSE="$3" # --verbose <true|false>
+OUTPUT_FILE="$1"
+PRIORIZE_SIZE="$2"
+VERBOSE="$3"
 
-echo "⚙️  Compiling with options:"
-echo "   - Output file: ${OUTPUT_FILE:-furdz.exe}"
-echo "   - Prioritize size: ${PRIORIZE_SIZE:-false}"
+if [[ "$VERBOSE" == "true" ]]; then
+    echo "⚙️  Compiling with options:"
+    echo "   - Output file: ${OUTPUT_FILE:-furdz.exe}"
+    echo "   - Prioritize size: ${PRIORIZE_SIZE:-false}"
+    echo "   - Verbose: ${VERBOSE:-false}"
+fi
 
 # Define source and header files
 shopt -s nullglob
@@ -48,6 +51,16 @@ LIBS=(-lkernel32 -luser32 -ladvapi32 -lshell32 -lm -lgcc)
 OBFUSCATION=(-s -fvisibility=hidden -fno-inline -fno-builtin -fno-ident)
 LDFLAGS=(-Wl,--gc-sections,--entry=$ENTRYPOINT,--disable-auto-import,--no-insert-timestamp)
 
+# Log the compile command if verbose
+if [[ "$VERBOSE" == "true" ]]; then
+    echo "Using SRC: ${SRC[@]}"
+    echo "Using HEADERS: ${HEADERS[@]}"
+    echo "Using CFLAGS: ${CFLAGS[@]}"
+    echo "Using WARNINGS: ${WARNINGS[@]}"
+    echo "Using LIBS: ${LIBS[@]}"
+    echo "Using OBFUSCATION: ${OBFUSCATION[@]}"
+    echo "Using LDFLAGS: ${LDFLAGS[@]}"
+fi
 
 # Compile the main program
 $CC "${CFLAGS[@]}" "${WARNINGS[@]}" "${SRC[@]}" -static -static-libgcc -o "bin/$OUTPUT_FILE" "${LDFLAGS[@]}" "${LIBS[@]}" "${OBFUSCATION[@]}"
